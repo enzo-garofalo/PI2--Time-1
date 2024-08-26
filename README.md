@@ -1,5 +1,5 @@
 
-# TIME 1 -- PUC BET
+# TIME 1 - Projeto Integrador 2 - PUC BET
 
 Esta plataforma de apostas permite que os usuários criem e aceitem apostas em uma variedade de eventos futuros, como resultados de jogos esportivos, vencedores de eleições ou até eventos catastróficos como a erupção de vulcões. As apostas são feitas de forma simulada, sem envolvimento de transações financeiras reais.
 
