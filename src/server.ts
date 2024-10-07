@@ -1,5 +1,28 @@
-import http from 'http';
+import express from "express";
+import {Request, Response, Router} from "express";
 
+const port = 3000; 
+const server = express();
+const routes = Router();
+
+routes.get('/', (req: Request, res: Response)=>{
+  res.statusCode = 403;
+  res.send('Acesso não permitido. Rota default não disponível.');
+});
+
+
+
+//EXEMPLO DE ROTAS
+/*routes.put('/signUp', AccountsManager.signUpHandler);
+routes.post('/financial', FinancialManager.getWalletBalanceHandler);*/
+
+server.use(routes);
+
+server.listen(port, () =>{
+  console.log(`Eita mundo bom! Na porta ${port}.`);
+});
+
+/*
 const server = http.createServer((req, res) =>{
   if(req.url === '/signUp')
   {
@@ -57,8 +80,5 @@ const server = http.createServer((req, res) =>{
     res.end("Pagina de Busca de Eventos");
   }
   
-});
+});*/
 
-server.listen(3000, () =>{
-  console.log('Eita mundo bom! Na porta 3000.');
-});
