@@ -2,16 +2,26 @@ import express from "express";
 import {Request, Response, Router} from "express";
 
 //colocar as rotas adicionadas
-import { AccountsManager } from "./accounts/accounts";
+import {AccountsManager} from "./accounts/accounts";
+import {accessSystem} from "./accounts/login";
 
+/*
+/signUp
+/login
 
+/addNewEvent
+/getEvent
+/deleteEvent
+/evaluateNewEvent
 
+/addFounds
+/widrawFounds
 
+/betOnEvent
+/finishEvent
+/searchEvent
 
-
-
-
-
+*/
 
 //__________________________________________________
 const port = 3000; 
@@ -27,6 +37,7 @@ routes.get('/', (req: Request, res: Response)=>{
 
 //EXEMPLO DE ROTAS
 routes.put('/signUp', AccountsManager.signUpHandler);
+routes.post('/login', accessSystem.loginHandler);
 //routes.post('/financial', FinancialManager.getWalletBalanceHandler);
 
 server.use(routes);
@@ -34,4 +45,3 @@ server.use(routes);
 server.listen(port, () =>{
   console.log(`Eita mundo bom! Na porta ${port}.`);
 });
-

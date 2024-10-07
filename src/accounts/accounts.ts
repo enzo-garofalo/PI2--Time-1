@@ -9,7 +9,7 @@ export namespace AccountsManager {
         birthdate: string;
     };
 
-    let accountsDataBase: userAccount [] = []; //provávelmente será aqui implementado o Banco de dados.
+    export let accountsDataBase: userAccount [] = []; //provávelmente será aqui implementado o Banco de dados.
 
     function saveNewAccount(ua: userAccount) : number {
         accountsDataBase.push(ua);
