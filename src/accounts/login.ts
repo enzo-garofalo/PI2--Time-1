@@ -18,16 +18,13 @@ export namespace accessSystem {
         var access: boolean = false;
         
         if(pEmail && pPassword){
-            const account: userLogin = {
-                email: pEmail,
-                password: pPassword
-            }
+            
             for (const account of allAccounts) {
                 if (account.email === pEmail && account.password === pPassword) {
                     access = true;  // Retorna a conta se o login for válido
                     break;
                 }
-                
+            
             }
             if(access){
                 res.statusCode = 200;
