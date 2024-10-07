@@ -11,33 +11,36 @@ export namespace accessSystem {
     const allAccounts = AccountsManager.accountsDataBase;
     const qntAccounts = allAccounts.length;
 
-
-
     export const loginHandler: RequestHandler = (req: Request, res: Response) => {
-        // Passo 1 - Receber os parametros para criar a conta
-        
+
         const pEmail = req.get('email');
         const pPassword = req.get('password');
         var access: boolean = false;
-
+        
         if(pEmail && pPassword){
             const account: userLogin = {
                 email: pEmail,
                 password: pPassword
             }
-            function verifyAccount(email: string, password: string){
-                for (let i = 0; i < qntAccounts; i++) {
-                    if (account.email === allAccounts[i].email && account.password === allAccounts[i].password) {
-                        res.statusCode = 200;
-                        res.send("Acesso Liberado");
-                    }
+            for (const account of allAccounts) {
+                if (account.email === pEmail && account.password === pPassword) {
+                    access = true;  // Retorna a conta se o login for válido
+                    break;
                 }
-                return null;  // Retorna null se não encontrar correspondência
+                
+            }
+            if(access){
+                res.statusCode = 200;
+                res.send("Acesso Liberado.");
+            }else{
+                res.statusCode = 400;
+                res.send("Conta não encontrada.");
             }
             
         }else{
             res.statusCode = 400;
-            res.send("Parâmetros inválidos.");
+            res.send("Parametro invalidos");
         }
+
     }
 }
