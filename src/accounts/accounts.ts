@@ -9,6 +9,7 @@ export namespace AccountsManager {
         name: string;
         email:string;
         password: string;
+        birthdate: string;
         role: number;
     };
 
@@ -21,12 +22,13 @@ export namespace AccountsManager {
         // Precisei colocar o insert de maneira diferente, com chaves, daquele
         // outro jeito não rolava!!
         await connection.execute(
-            `INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, ROLE) 
-             VALUES (SEQ_ACCOUNTS.NEXTVAL, :name, :email, :password, :role)`,
+            `INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDATE, ROLE) 
+             VALUES (SEQ_ACCOUNTS.NEXTVAL, :name, :email, :password, :birthdate, :role)`,
             {
                 name: account.name,
                 email: account.email,
                 password: account.password,
+                birthdate: account.birthdate,
                 role: account.role
             }
         );
@@ -39,13 +41,15 @@ export namespace AccountsManager {
         const pName = req.get('name');
         const pEmail = req.get('email');
         const pPassword = req.get('password');
+        const pBirthdate = req.get('birthdate');
     
-        if(pName && pEmail && pPassword){
+        if(pName && pEmail && pPassword && pBirthdate){
             const newAccount: userAccount = {
                 id: undefined,
                 name: pName,
                 email: pEmail,
                 password: pPassword,
+                birthdate: pBirthdate,
                 role: 0
             }
             // Precisei colocar um await aqui
