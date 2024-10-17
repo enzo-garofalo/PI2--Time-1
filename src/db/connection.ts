@@ -1,4 +1,6 @@
 import OracleDB from "oracledb";
+import dotenv from "dotenv"; 
+dotenv.config();
 
 export namespace DataBaseManager{
     
@@ -7,9 +9,9 @@ export namespace DataBaseManager{
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT
 
         connection = await OracleDB.getConnection({
-            user: "ENZODEV",
-            password: '1234',
-            connectString: "localhost:1521/XEPDB1"
+            user: process.env.ORACLE_USER,
+            password: process.env.ORACLE_PASSWORD,
+            connectString: process.env.ORACLE_CONN_STR
         });
 
         return connection;
