@@ -21,11 +21,13 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.4",
+    "@types/oracledb": "^6.5.1",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.2"
   },
   "dependencies": {
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "oracledb": "^6.6.0"
   }
 }

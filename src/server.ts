@@ -2,7 +2,8 @@ import express from "express";
 import {Request, Response, Router} from "express";
 
 //colocar as rotas adicionadas
-import {AccountsManager} from "./accounts/accounts";
+import { AccountsManager } from "./accounts/accounts";
+import { EventsManager } from "./events/events";
 
 /*
 /signUp
@@ -11,15 +12,14 @@ import {AccountsManager} from "./accounts/accounts";
 /addNewEvent
 /getEvent
 /deleteEvent
+
 /evaluateNewEvent
-
-/addFounds
-/widrawFounds
-
-/betOnEvent
 /finishEvent
 /searchEvent
 
+/betOnEvent
+/addFounds
+/widrawFounds
 */
 
 //__________________________________________________
@@ -32,12 +32,13 @@ routes.get('/', (req: Request, res: Response)=>{
   res.send('Acesso não permitido. Rota default não disponível.');
 });
 
-
-
-//EXEMPLO DE ROTAS
+//Rotas de Accounts
 routes.put('/signUp', AccountsManager.signUpHandler);
 routes.post('/login', AccountsManager.loginHandler);
-// routes.post('/financial', FinancialManager.getWalletBalanceHandler);
+
+//Rotas de Eventos
+routes.post('/addNewEvent', EventsManager.NewEventHandler);
+routes.get('/getEvent', EventsManager.GetEventHandler);
 
 server.use(routes);
 
