@@ -3,7 +3,6 @@ import {Request, Response, Router} from "express";
 
 //colocar as rotas adicionadas
 import {AccountsManager} from "./accounts/accounts";
-import {accessSystem} from "./accounts/login";
 
 /*
 /signUp
@@ -37,8 +36,8 @@ routes.get('/', (req: Request, res: Response)=>{
 
 //EXEMPLO DE ROTAS
 routes.put('/signUp', AccountsManager.signUpHandler);
-routes.post('/login', accessSystem.loginHandler);
-//routes.post('/financial', FinancialManager.getWalletBalanceHandler);
+routes.post('/login', AccountsManager.loginHandler);
+// routes.post('/financial', FinancialManager.getWalletBalanceHandler);
 
 server.use(routes);
 

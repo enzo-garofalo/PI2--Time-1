@@ -38,4 +38,35 @@ export namespace AccountsManager {
         }
     }
 
+    export const loginHandler: RequestHandler = (req: Request, res: Response) => {
+
+        const pEmail = req.get('email');
+        const pPassword = req.get('password');
+        var access: boolean = false;
+        
+        if(pEmail && pPassword){
+            
+            for (const account of accountsDataBase) {
+                if (account.email === pEmail && account.password === pPassword) {
+                    access = true;  // Retorna a conta se o login for válido
+                    break;
+                }
+            
+            }
+            if(access){
+                res.statusCode = 200;
+                res.send("Acesso Liberado.");
+            }else{
+                res.statusCode = 400;
+                res.send("Conta não encontrada.");
+            }  
+        }else{
+            res.statusCode = 400;
+            res.send("Parametro invalidos");
+        }
+
+    }
+
+
+
 }
