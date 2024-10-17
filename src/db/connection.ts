@@ -7,9 +7,9 @@ export namespace DataBaseManager{
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT
 
         connection = await OracleDB.getConnection({
-            user: "ADMIN",
-            password: '',
-            connectString: "()"
+            user: "ENZODEV",
+            password: '1234',
+            connectString: "localhost:1521/XEPDB1"
         });
 
         return connection;

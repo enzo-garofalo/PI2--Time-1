@@ -9,7 +9,7 @@ export namespace AccountsManager {
         name: string;
         email:string;
         password: string;
-        birthdate: string;
+        role: number;
     };
 
     //conexão com  o BD
@@ -18,31 +18,38 @@ export namespace AccountsManager {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection:OracleDB.Connection = await DataBaseManager.get_connection();
-
+        // Precisei colocar o insert de maneira diferente, com chaves, daquele
+        // outro jeito não rolava!!
         await connection.execute(
-            `INSERT INTO ACCOUNTS (ID, NAME, EMAIL, PASSWORD, BIRTHDATE) 
-             VALUES (SEQ_ACCOUNTS.NEXTVAL, ${account.name}, ${account.email}, ${account.password}, ${account.password} );`
+            `INSERT INTO ACCOUNTS (ID, COMPLETE_NAME, EMAIL, PASSWORD, ROLE) 
+             VALUES (SEQ_ACCOUNTS.NEXTVAL, :name, :email, :password, :role)`,
+            {
+                name: account.name,
+                email: account.email,
+                password: account.password,
+                role: account.role
+            }
         );
 
         await connection.commit();
         await connection.close();
     }
 
-    export const signUpHandler: RequestHandler = (req: Request, res: Response) => {
+    export const signUpHandler: RequestHandler = async (req: Request, res: Response) => {
         const pName = req.get('name');
         const pEmail = req.get('email');
         const pPassword = req.get('password');
-        const pBirthdate = req.get('birthdate');
     
-        if(pName && pEmail && pPassword && pBirthdate){
+        if(pName && pEmail && pPassword){
             const newAccount: userAccount = {
                 id: undefined,
                 name: pName,
                 email: pEmail,
                 password: pPassword,
-                birthdate: pBirthdate
+                role: 0
             }
-            saveNewAccount(newAccount);
+            // Precisei colocar um await aqui
+            await saveNewAccount(newAccount);
             res.statusCode = 200;
             res.send("Nova conta adicionada.");
         }else{
@@ -56,28 +63,36 @@ export namespace AccountsManager {
 
         const connection:OracleDB.Connection = await DataBaseManager.get_connection();
 
-        await connection.execute(
+        const account = await connection.execute(
             'SELECT * FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
-            [email, password]
+            {email, password}
         );
 
         await connection.close();
-
+        // Fiz a função retornar as linhas que encontrou
+        return account.rows;
     }
 
     export const loginHandler: RequestHandler = async (req: Request, res: Response) => {
-
         const pEmail = req.get('email');
         const pPassword = req.get('password');
-        //var access: boolean = false;
         
-        if(pEmail && pPassword){
-            await login(pEmail, pPassword);
-            res.statusCode = 200;
-            res.send("Acesso Liberado.");
-        }else{
+        if(!pEmail || !pPassword){
             res.statusCode = 400;
             res.send("Formato de requisição inválido.");
-        }  
+            return;
+        }
+        
+        const account = await login(pEmail, pPassword);
+        // Verifica se a função retornou algo mesmo!
+        if(account && account.length > 0){
+            res.statusCode = 200;
+            res.send(`Acesso Liberado.\nBem Vindo`);
+        }else{
+            // Esse 401 é de não autorizado
+            res.statusCode = 401;
+            res.send(`Nome ou Senha Incorretos!`);
+        }
+      
     }
 }
