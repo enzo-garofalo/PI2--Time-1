@@ -19,6 +19,7 @@
   "author": "Time-1",
   "license": "ISC",
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.4",
     "@types/oracledb": "^6.5.1",
@@ -27,6 +28,7 @@
     "typescript": "^5.6.2"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "oracledb": "^6.6.0"
   }
