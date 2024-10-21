@@ -14,4 +14,12 @@ export namespace DataBaseManager{
 
         return connection;
     }
+
+    export function get_token(connection:OracleDB.Connection){
+        const token = connection.execute(
+            `DBMS_RANDOM.STRING('X',32);`
+        );
+
+        return token;
+    }
 }
