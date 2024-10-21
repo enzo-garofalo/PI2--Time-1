@@ -59,8 +59,8 @@ export namespace AccountsManager {
     async (req: Request, res: Response) => 
     {
         const pName = req.get('name');
-        const pEmail = req.get('assemail');
-        const pPassword = req.get('pword');
+        const pEmail = req.get('email');
+        const pPassword = req.get('password');
     
         if(pName && pEmail && pPassword){
             const newAccount: userAccount = 
