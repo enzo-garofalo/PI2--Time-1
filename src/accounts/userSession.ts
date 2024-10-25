@@ -1,6 +1,6 @@
 export class userSession{
     private static instance: userSession;
-    private email: string |null = null;
+    public email: string |null = null;
     public ID_User: number | null = null;
 
     private constructor(){}
