@@ -9,6 +9,7 @@ export namespace AccountsManager {
         name: string;
         email:string;
         password: string;
+        birthdate: string;
         role: number;
         token: number | undefined;
     };
@@ -29,16 +30,17 @@ export namespace AccountsManager {
             {
                 await connection.execute(
                     `INSERT INTO ACCOUNTS 
-                    (ID, COMPLETE_NAME, EMAIL, PASSWORD, ROLE, TOKEN) 
+                    (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDATE, ROLE, TOKEN) 
                     VALUES
                     (
                         SEQ_ACCOUNTS.NEXTVAL, 
-                        :name, :email, :password, :role, 
+                        :name, :email, :password, :birthdate, :role, 
                         DBMS_RANDOM.STRING('X', 32)
                     )`,
                     {   name: account.name,
                         email: account.email,
                         password: account.password,
+                        birthdate: account.birthdate,
                         role: account.role }
                 );
                 console.log('Nova conta adicionada');
@@ -59,16 +61,18 @@ export namespace AccountsManager {
     async (req: Request, res: Response) => 
     {
         const pName = req.get('name');
-        const pEmail = req.get('assemail');
-        const pPassword = req.get('pword');
+        const pEmail = req.get('email');
+        const pPassword = req.get('password');
+        const pBirthdate = req.get('birthdate');
     
-        if(pName && pEmail && pPassword){
+        if(pName && pEmail && pPassword && pBirthdate){
             const newAccount: userAccount = 
             {
                 id: undefined,
                 name: pName,
                 email: pEmail,
                 password: pPassword,
+                birthdate: pBirthdate,
                 role: 0,
                 token: undefined
             }

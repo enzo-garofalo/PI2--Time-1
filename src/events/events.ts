@@ -1,21 +1,96 @@
-import { Request, Response, RequestHandler } from "express";
+import {Request, RequestHandler, Response} from "express";
+import { DataBaseManager } from "../db/connection";
+import OracleDB from "oracledb";
+import { title } from "process";
+import { subscribe } from "diagnostics_channel";
 
 export namespace EventsManager{
 
     export type Event = {
-        id:number,
-        title:string,
-        description:string,
-        eventDate:string
+        idEvent: number|undefined,
+        title: string,
+        description: string,
+        //eventDate:string
+        categories: string
     }
 
-    export let EventsDatabase:Event [] = [];
+        //função que coloca o evento no BD (medina)
+    async function addNewEvent(event:Event){
 
-    function addNewEvent(event:Event){
-        EventsDatabase.push(event);
-        return EventsDatabase.length;
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+        
+        let attempts = 3;
+        let sucessfull = false;
+
+        while(attempts > 0){
+            try {
+                await connection.execute(
+                    `INSERT INTO EVENTS
+                    (ID_EVENT, TITLE, DESCRIPTION, CATEGORIES)
+                    VALUES
+                    (
+                    SEQ_EVENTS.NEXTVAL,
+                    :TITLE, :DESCRIPTION, :CATEGORIES
+                    )`,
+                    {
+                        title: event.title,
+                        description: event.description,
+                        categories: event.categories}
+                );
+            console.log('Novo Evento criado. Pendente aprovação.')
+            sucessfull = true;
+            break;
+            }catch(error){
+                console.error(error);
+                attempts--;
+            }
+        }
+        await connection.commit();
+        await connection.close();
+
+        return sucessfull;
     }
 
+    export const addNewEventHandler: RequestHandler = 
+    async (req: Request, res: Response) =>
+    {
+        const pTitle = req.get('Title');
+        const pDescription = req.get('Description');
+        const pCategories = req.get('Categories');
+
+        if(pTitle && pDescription && pCategories){
+            const newEvent: Event = {
+                idEvent: undefined,
+                title: pTitle,
+                description: pDescription,
+                categories: pCategories
+            }
+            if (await addNewEvent(newEvent)){
+                req.statusCode = 200;
+                res.send("Novo Evento adicionado.");
+            }else{
+                res.statusCode = 409;
+                res.send("Erro inesperado ao criar o evento")
+            }
+        }else{
+            res.statusCode = 400;
+            res.send("Parâmetros inválidos ou faltantes");
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+    /*
     function printEvent(event:Event){
         return(`
             ==================================
@@ -57,3 +132,4 @@ export namespace EventsManager{
         }
     }
 }
+*/    
