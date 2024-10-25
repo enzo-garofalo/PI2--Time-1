@@ -1,8 +1,10 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
-import { title } from "process";
-import { subscribe } from "diagnostics_channel";
+import { userSession } from "../accounts/userSession";
+
+/*import { title } from "process";
+import { subscribe } from "diagnostics_channel";*/
 
 export namespace EventsManager{
 
@@ -80,56 +82,59 @@ export namespace EventsManager{
             res.send("Parâmetros inválidos ou faltantes");
         }
     }
-}
 
+    export type newBet = {
+        userBet: number;
+        valuesBet: number;
+        fk_ID_User: number;
+        fk_ID_Event: number;
 
-
-
-
-
-
-
-
-    /*
-    function printEvent(event:Event){
-        return(`
-            ==================================
-            Id do evento: ${event.id}.
-            Titulo: ${event.title}
-            Descrição: ${event.description}
-            Data do evento: ${event.eventDate}
-            ==================================
-        `);
     }
-    // Talvez será necessário fazer duas tabelas
-    export const NewEventHandler:RequestHandler = (req:Request, res:Response) => {
-        const pTitle = req.get('title');
-        const pDescription = req.get('description');
-        // Adicionar verificação de data!
-        const pEventDate = req.get('eventDate');
+    async function betting(bet:newBet) {
         
-        if(pTitle && pDescription && pEventDate){
-            const newEvent: Event = {
-                id: (EventsDatabase.length+1),
-                title: pTitle,
-                description: pDescription,
-                eventDate:pEventDate
-            };
-            const id = addNewEvent(newEvent);
-            res.status(200);
-            res.send(printEvent(newEvent));
-        }else{
-            res.statusCode = 400;
-            res.send(`Não foi Possível criar novo Evento\nParâmetros Faltantes!`)
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection: OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+
+        let attempts = 3;
+        let sucessfull = false;
+
+        while (attempts>0){
+            try{
+                
+                await connection.execute(
+                    `INSERT INTO BETS
+                    (ID_BET, BET, VALUE_BET, ID_USER, ID_EVENT) VALUES(
+                    SEQ_BETS.NEXTVAL,
+                    :userBet, :valuesBet, :fk_ID_User, :fk_ID_Event)`,
+                    {   userBet: bet.userBet,
+                        valuesBet: bet.valuesBet,
+                        fk_ID_User: bet.fk_ID_User,
+                        fk_ID_Events: bet.fk_ID_Event
+                    }
+                )
+            }catch(error){
+                console.error(error);
+                sucessfull = true;
+                break;
+            }
         }
+        await connection.commit();
+        await connection.close();
     }
-    
-    export const GetEventHandler:RequestHandler = (req:Request, res:Response) => {
-        if(EventsDatabase.length == 0){ 
-            res.status(400).send('Não há eventos cadastrados');
-        }else{
-            res.status(200).send(EventsDatabase);
-        }
+
+
+
+function someFunction() {
+    const user = userSession.getInstance();
+    const email = user.getEmail();
+
+    if (email) {
+        console.log("Usuário logado com e-mail:", email);
+    } else {
+        console.log("Usuário não logado.");
     }
 }
-*/    
+
+}

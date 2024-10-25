@@ -1,6 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
+import { userSession } from "./userSession";
 
 export namespace AccountsManager {
 
@@ -96,8 +97,8 @@ export namespace AccountsManager {
 
         const connection:OracleDB.Connection = await DataBaseManager.get_connection();
 
-        const account = await connection.execute(
-            'SELECT TOKEN FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
+        const account: OracleDB.Result<userAccount> = await connection.execute(
+            'SELECT TOKEN, ID FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
             {email, password}
         );
 
@@ -122,6 +123,11 @@ export namespace AccountsManager {
         // Verifica se a função retornou algo mesmo!
         if(account && account.length > 0)
         {
+            const id = account[0].id;
+            const user = userSession.getInstance();
+            user.setEmail(pEmail);
+            user.setID(id);
+            
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
         }else{
