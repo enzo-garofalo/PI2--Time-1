@@ -1,6 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
+import { userSession } from "./userSession";
 
 export namespace AccountsManager {
 
@@ -9,6 +10,7 @@ export namespace AccountsManager {
         name: string;
         email:string;
         password: string;
+        birthdate: string;
         role: number;
         token: number | undefined;
     };
@@ -29,16 +31,17 @@ export namespace AccountsManager {
             {
                 await connection.execute(
                     `INSERT INTO ACCOUNTS 
-                    (ID, COMPLETE_NAME, EMAIL, PASSWORD, ROLE, TOKEN) 
+                    (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDATE, ROLE, TOKEN) 
                     VALUES
                     (
                         SEQ_ACCOUNTS.NEXTVAL, 
-                        :name, :email, :password, :role, 
+                        :name, :email, :password, :birthdate, :role, 
                         DBMS_RANDOM.STRING('X', 32)
                     )`,
                     {   name: account.name,
                         email: account.email,
                         password: account.password,
+                        birthdate: account.birthdate,
                         role: account.role }
                 );
                 console.log('Nova conta adicionada');
@@ -61,14 +64,16 @@ export namespace AccountsManager {
         const pName = req.get('name');
         const pEmail = req.get('email');
         const pPassword = req.get('password');
+        const pBirthdate = req.get('birthdate');
     
-        if(pName && pEmail && pPassword){
+        if(pName && pEmail && pPassword && pBirthdate){
             const newAccount: userAccount = 
             {
                 id: undefined,
                 name: pName,
                 email: pEmail,
                 password: pPassword,
+                birthdate: pBirthdate,
                 role: 0,
                 token: undefined
             }
@@ -92,7 +97,7 @@ export namespace AccountsManager {
 
         const connection:OracleDB.Connection = await DataBaseManager.get_connection();
 
-        const account = await connection.execute(
+        const account: OracleDB.Result<string> = await connection.execute(
             'SELECT TOKEN FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
             {email, password}
         );
@@ -118,8 +123,15 @@ export namespace AccountsManager {
         // Verifica se a função retornou algo mesmo!
         if(account && account.length > 0)
         {
+            const token:string = account[0];
+            const user = userSession.getInstance();
+            user.setEmail(pEmail);
+            user.setToken(token);
+            
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
+
+            console.log(token);
         }else{
             // Esse 401 é de não autorizado
             res.statusCode = 401;

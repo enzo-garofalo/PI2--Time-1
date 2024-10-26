@@ -17,11 +17,13 @@ export namespace DataBaseManager{
         return connection;
     }
 
-    export function get_token(connection:OracleDB.Connection){
-        const token = connection.execute(
-            `DBMS_RANDOM.STRING('X',32);`
+    export async function getUserID(connection:OracleDB.Connection, token:string){
+        const userID : OracleDB.Result<number>  = 
+            await connection.execute(
+                `SELECT ID FROM ACCOUNTS
+                WHERE TOKEN = :token`,
+                {token}
         );
-
-        return token;
+        return userID;
     }
 }
