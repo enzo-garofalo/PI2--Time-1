@@ -38,6 +38,7 @@ routes.post('/login', AccountsManager.loginHandler);
 
 //Rotas de Eventos
 routes.put('/addNewEvent', EventsManager.addNewEventHandler);
+routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
 //routes.get('/getEvent', EventsManager.GetEventHandler);
 
 server.use(routes);

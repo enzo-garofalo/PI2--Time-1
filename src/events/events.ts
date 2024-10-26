@@ -16,7 +16,7 @@ export namespace EventsManager{
         categories: string
     }
 
-        //função que coloca o evento no BD (medina)
+    //função que coloca o evento no BD (medina)
     async function addNewEvent(event:Event){
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
@@ -90,5 +90,56 @@ export namespace EventsManager{
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
+    }
+
+    async function getNewEvents()
+    {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+
+        const newEventsList: OracleDB.Result<Event> = 
+            await connection.execute(
+                `
+                SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES 
+                FROM EVENTS
+                WHERE ISVALID = 0
+                `
+        );
+        await connection.close();
+        console.log("Eventos retornados:", newEventsList.rows);
+        return newEventsList.rows;
+    }
+
+    export const evaluateNewEventHandler: RequestHandler =
+        async (req : Request, res : Response) => {
+            const newEventsList = await getNewEvents();
+
+            if(newEventsList)
+            {
+                res.statusCode = 200;
+                res.send(newEventsList);
+            }else{
+                res.statusCode = 404;
+                res.send('Nenhum evento encontrado!');
+            }
+
+            const pEventID = req.get('eventID');
+            const pValidate = req.get('validate');
+
+            if(pEventID && pValidate)
+            {
+                const connection:OracleDB.Connection = 
+                    await DataBaseManager.get_connection();
+
+                connection.execute(
+                    `UPDATE ISVALID = 1
+                    FROM EVENTS
+                    WHERE ID_EVENT = :id_event`,
+                    {pEventID}
+                )
+            }
+
     }
 }
