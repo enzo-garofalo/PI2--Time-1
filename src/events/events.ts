@@ -113,33 +113,41 @@ export namespace EventsManager{
     }
 
     export const evaluateNewEventHandler: RequestHandler =
-        async (req : Request, res : Response) => {
-            const newEventsList = await getNewEvents();
+    async (req : Request, res : Response) => {
+        const pEventID = req.get('eventID');
+        const pValidate = req.get('validate');
 
-            if(newEventsList)
-            {
-                res.statusCode = 200;
-                res.send(newEventsList);
-            }else{
-                res.statusCode = 404;
-                res.send('Nenhum evento encontrado!');
-            }
+        if(pEventID && pValidate)
+        {
+            const connection:OracleDB.Connection = 
+                await DataBaseManager.get_connection();
+            
+            await connection.execute(
+                `
+                UPDATE EVENTS
+                SET ISVALID = 1
+                WHERE ID_EVENT = :id_event
+                `,
+                { id_event: pEventID } 
+            );
 
-            const pEventID = req.get('eventID');
-            const pValidate = req.get('validate');
+            await connection.commit();
+            await connection.close();
 
-            if(pEventID && pValidate)
-            {
-                const connection:OracleDB.Connection = 
-                    await DataBaseManager.get_connection();
+            const updatedEventsList = await getNewEvents();
+            res.statusCode = 200;
+            res.send(updatedEventsList);
+        }
+        const newEventsList = await getNewEvents();
 
-                connection.execute(
-                    `UPDATE ISVALID = 1
-                    FROM EVENTS
-                    WHERE ID_EVENT = :id_event`,
-                    {pEventID}
-                )
-            }
-
+        if(newEventsList)
+        {
+            res.statusCode = 200;
+            res.send(newEventsList);
+        }else{
+            res.statusCode = 404;
+            res.send('Nenhum evento encontrado!');
+            return;
+        }
     }
 }
