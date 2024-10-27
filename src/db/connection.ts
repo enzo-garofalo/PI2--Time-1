@@ -1,6 +1,8 @@
 import OracleDB from "oracledb";
-import dotenv from "dotenv"; 
-dotenv.config();
+import dotenv from "dotenv";
+dotenv.config(); 
+
+import { AccountsManager } from "../accounts/accounts";
 
 export namespace DataBaseManager{
     
@@ -17,7 +19,8 @@ export namespace DataBaseManager{
         return connection;
     }
 
-    export async function getUserID(connection:OracleDB.Connection, token:string){
+    export async function getUserID(connection:OracleDB.Connection, token:string)
+    {
         const userID : OracleDB.Result<number>  = 
             await connection.execute(
                 `SELECT ID FROM ACCOUNTS
@@ -25,5 +28,22 @@ export namespace DataBaseManager{
                 {token}
         );
         return userID;
+    }
+
+    export async function getUserByToken(token: string)
+    {
+        const connection = await get_connection()
+
+        const account: OracleDB.Result<AccountsManager.userAccount> =
+        await connection.execute(
+            `
+            SELECT * FROM ACCOUNTS
+            WHERE TOKEN = :token
+            `, 
+            { token } 
+        );
+
+        await connection.close();
+        return account.rows;
     }
 }

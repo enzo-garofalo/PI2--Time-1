@@ -1,7 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
-import { userSession } from "../accounts/userSession";
+// import { userSession } from "../accounts/userSession";
 
 
 export namespace betsManager
@@ -14,18 +14,18 @@ export namespace betsManager
         fk_ID_Event: number;
     }
 
-    function someFunction() 
-    {
-        const user = userSession.getInstance();
-        const email = user.getEmail();
+    // function someFunction() 
+    // {
+    //     const user = userSession.getInstance();
+    //     const email = user.getEmail();
     
-        if(email) 
-        {
-            console.log("Usuário logado com e-mail:", email);
-        }else{
-            console.log("Usuário não logado.");
-        }
-    }
+    //     if(email) 
+    //     {
+    //         console.log("Usuário logado com e-mail:", email);
+    //     }else{
+    //         console.log("Usuário não logado.");
+    //     }
+    // }
 
     async function betting(bet:newBet) 
     {    

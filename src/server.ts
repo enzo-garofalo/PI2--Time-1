@@ -1,5 +1,7 @@
 import express from "express";
+import session from 'express-session';
 import {Request, Response, Router} from "express";
+
 
 //colocar as rotas adicionadas
 import { AccountsManager } from "./accounts/accounts";
@@ -24,7 +26,20 @@ import { EventsManager } from "./events/events";
 
 //__________________________________________________
 const port = 3000; 
-const server = express();
+export const server = express();
+
+declare module 'express-session' {
+  interface SessionData {
+      token: string;
+      role: number;
+  }
+}
+server.use(session({
+  secret: 'key', 
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+}));
 const routes = Router();
 
 routes.get('/', (req: Request, res: Response)=>{
@@ -44,5 +59,5 @@ routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
 server.use(routes);
 
 server.listen(port, () =>{
-  console.log(`Eita mundo bom! Na porta ${port}.`);
+  console.log(`Eita mundo bom!\nNa porta ${port}.`);
 });

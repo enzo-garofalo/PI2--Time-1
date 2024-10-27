@@ -1,7 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
-import { userSession } from "../accounts/userSession";
+// import { userSession } from "../accounts/userSession";
 
 /*import { title } from "process";
 import { subscribe } from "diagnostics_channel";*/
@@ -114,6 +114,14 @@ export namespace EventsManager{
 
     export const evaluateNewEventHandler: RequestHandler =
     async (req : Request, res : Response) => {
+
+        if(req.session.role === 0 || !req.session.role){
+            res.statusCode = 401;
+            res.send('Rota autorizada apenas para moderadores');
+            return;
+        }
+
+        console.log(req.session.role);
         const pEventID = req.get('eventID');
         const pValidate = req.get('validate');
 

@@ -1,18 +1,18 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
-import { userSession } from "./userSession";
+
 
 export namespace AccountsManager {
 
     export type userAccount = {
-        id:number | undefined;
-        name: string;
-        email:string;
-        password: string;
-        birthdate: string;
-        role: number;
-        token: number | undefined;
+        ID:number | undefined;
+        NAME: string;
+        EMAIL:string;
+        PASSWORD: string;
+        BIRTHDATE: string;
+        ROLE: number;
+        TOKEN: string | undefined;
     };
     //conexão com  o BD
     async function saveNewAccount(account:userAccount) {
@@ -38,11 +38,11 @@ export namespace AccountsManager {
                         :name, :email, :password, :birthdate, :role, 
                         DBMS_RANDOM.STRING('X', 32)
                     )`,
-                    {   name: account.name,
-                        email: account.email,
-                        password: account.password,
-                        birthdate: account.birthdate,
-                        role: account.role }
+                    {   name: account.NAME,
+                        email: account.EMAIL,
+                        password: account.PASSWORD,
+                        birthdate: account.BIRTHDATE,
+                        role: account.ROLE }
                 );
                 console.log('Nova conta adicionada');
                 sucessfull = true;
@@ -69,13 +69,13 @@ export namespace AccountsManager {
         if(pName && pEmail && pPassword && pBirthdate){
             const newAccount: userAccount = 
             {
-                id: undefined,
-                name: pName,
-                email: pEmail,
-                password: pPassword,
-                birthdate: pBirthdate,
-                role: 0,
-                token: undefined
+                ID: undefined,
+                NAME: pName,
+                EMAIL: pEmail,
+                PASSWORD: pPassword,
+                BIRTHDATE: pBirthdate,
+                ROLE: 0,
+                TOKEN: undefined
             }
             // Precisei colocar um await aqui
             if(await saveNewAccount(newAccount))
@@ -97,14 +97,14 @@ export namespace AccountsManager {
 
         const connection:OracleDB.Connection = await DataBaseManager.get_connection();
 
-        const account: OracleDB.Result<string> = await connection.execute(
+        const result: OracleDB.Result<{ TOKEN: string }> = await connection.execute(
             'SELECT TOKEN FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
             {email, password}
         );
 
         await connection.close();
         // Fiz a função retornar as linhas que encontrou
-        return account.rows;
+        return result.rows;
     }
 
     export const loginHandler: RequestHandler = 
@@ -119,19 +119,20 @@ export namespace AccountsManager {
             res.send("Formato de requisição inválido.");
             return;
         }
-        const account = await login(pEmail, pPassword);
+        const result = await login(pEmail, pPassword);
         // Verifica se a função retornou algo mesmo!
-        if(account && account.length > 0)
+        if(result && result.length > 0)
         {
-            const token:string = account[0];
-            const user = userSession.getInstance();
-            user.setEmail(pEmail);
-            user.setToken(token);
+            // iniciando session
+            const account = await DataBaseManager.getUserByToken(result[0].TOKEN);
             
+            if(account){
+                req.session.token = account[0].TOKEN;
+                req.session.role = account[0].ROLE;
+            } 
+
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
-
-            console.log(token);
         }else{
             // Esse 401 é de não autorizado
             res.statusCode = 401;
