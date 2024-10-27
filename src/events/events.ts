@@ -114,7 +114,7 @@ export namespace EventsManager{
 
     export const evaluateNewEventHandler: RequestHandler =
     async (req : Request, res : Response) => {
-
+    
         if(req.session.role === 0 || !req.session.role){
             res.statusCode = 401;
             res.send('Rota autorizada apenas para moderadores');

@@ -1,3 +1,4 @@
+// não utilizado (enzolas)
 export class userSession{
     private static instance: userSession;
     public email: string | null = null;

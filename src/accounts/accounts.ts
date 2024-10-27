@@ -16,15 +16,12 @@ export namespace AccountsManager {
     };
     //conexão com  o BD
     async function saveNewAccount(account:userAccount) {
-        
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-
         const connection:OracleDB.Connection = 
               await DataBaseManager.get_connection();
 
         let attempts = 3;
         let sucessfull = false;
-
         while(attempts > 0)
         {
             try
@@ -54,7 +51,6 @@ export namespace AccountsManager {
         }
         await connection.commit();
         await connection.close();
-    
         return sucessfull;
     }
 
@@ -125,12 +121,11 @@ export namespace AccountsManager {
         {
             // iniciando session
             const account = await DataBaseManager.getUserByToken(result[0].TOKEN);
-            
+            // atribui token e cargo para a session
             if(account){
                 req.session.token = account[0].TOKEN;
                 req.session.role = account[0].ROLE;
             } 
-
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
         }else{
