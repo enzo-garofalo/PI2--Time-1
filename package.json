@@ -23,11 +23,11 @@
     "@types/express": "^5.0.0",
     "@types/express-session": "^1.18.0",
     "@types/ioredis": "^4.28.10",
-    "@types/node": "^22.7.4",
+    "@types/node": "^22.8.1",
     "@types/oracledb": "^6.5.1",
     "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "connect-redis": "^7.1.1",

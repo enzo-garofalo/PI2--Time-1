@@ -6,22 +6,21 @@ import {Request, Response, Router} from "express";
 //colocar as rotas adicionadas
 import { AccountsManager } from "./accounts/accounts";
 import { EventsManager } from "./events/events";
+import {FundsManager} from "./funds/funds";
 
 /*
-/signUp
-/login
+/signUp falta criar uma wallet pro novo user
+/login falta tirar duvida sobre criar session salvando id
 
-/addNewEvent
 /getEvent
 /deleteEvent
 
-/evaluateNewEvent
 /finishEvent
 /searchEvent
 
 /betOnEvent
-/addFounds
-/widrawFounds
+/addFounds falta testar
+/widrawFounds falta testa
 */
 
 //__________________________________________________
@@ -55,6 +54,13 @@ routes.post('/login', AccountsManager.loginHandler);
 routes.put('/addNewEvent', EventsManager.addNewEventHandler);
 routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
 //routes.get('/getEvent', EventsManager.GetEventHandler);
+
+//Rotas de Wallet
+routes.put('/addFunds', FundsManager.addNewFundsHandler);
+routes.get('/withdrawFunds', FundsManager.withdrawFundsHandler);
+
+//Rotas de bets
+routes.put('/betOnEvent')
 
 server.use(routes);
 

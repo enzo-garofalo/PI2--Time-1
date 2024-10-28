@@ -2,7 +2,6 @@ import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
 
-
 export namespace AccountsManager {
 
     export type userAccount = {
@@ -14,45 +13,6 @@ export namespace AccountsManager {
         ROLE: number;
         TOKEN: string | undefined;
     };
-    //conexão com  o BD
-    async function saveNewAccount(account:userAccount) {
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-        const connection:OracleDB.Connection = 
-              await DataBaseManager.get_connection();
-
-        let attempts = 3;
-        let sucessfull = false;
-        while(attempts > 0)
-        {
-            try
-            {
-                await connection.execute(
-                    `INSERT INTO ACCOUNTS 
-                    (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDATE, ROLE, TOKEN) 
-                    VALUES
-                    (
-                        SEQ_ACCOUNTS.NEXTVAL, 
-                        :name, :email, :password, :birthdate, :role, 
-                        DBMS_RANDOM.STRING('X', 32)
-                    )`,
-                    {   name: account.NAME,
-                        email: account.EMAIL,
-                        password: account.PASSWORD,
-                        birthdate: account.BIRTHDATE,
-                        role: account.ROLE }
-                );
-                console.log('Nova conta adicionada');
-                sucessfull = true;
-                break;
-            }catch(error){
-                console.error(error);
-                attempts--;
-            }
-        }
-        await connection.commit();
-        await connection.close();
-        return sucessfull;
-    }
 
     export const signUpHandler: RequestHandler = 
     async (req: Request, res: Response) => 
@@ -73,8 +33,7 @@ export namespace AccountsManager {
                 ROLE: 0,
                 TOKEN: undefined
             }
-            // Precisei colocar um await aqui
-            if(await saveNewAccount(newAccount))
+            if( await DataBaseManager.saveNewAccount(newAccount))
             {
                 res.statusCode = 200;
                 res.send("Nova conta adicionada.");
@@ -99,7 +58,6 @@ export namespace AccountsManager {
         );
 
         await connection.close();
-        // Fiz a função retornar as linhas que encontrou
         return result.rows;
     }
 
@@ -122,7 +80,8 @@ export namespace AccountsManager {
             // iniciando session
             const account = await DataBaseManager.getUserByToken(result[0].TOKEN);
             // atribui token e cargo para a session
-            if(account){
+            if(account)
+            {
                 req.session.token = account[0].TOKEN;
                 req.session.role = account[0].ROLE;
             } 

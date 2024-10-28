@@ -1,10 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
-// import { userSession } from "../accounts/userSession";
 
-/*import { title } from "process";
-import { subscribe } from "diagnostics_channel";*/
 
 export namespace EventsManager{
 
@@ -158,4 +155,7 @@ export namespace EventsManager{
             return;
         }
     }
+
+
+    
 }
