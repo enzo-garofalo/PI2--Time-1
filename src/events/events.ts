@@ -13,7 +13,7 @@ export namespace EventsManager
         status_event: number,
         categories: string
     }
-
+ 
     //função que coloca o evento no BD (medina)
     async function addNewEvent(event:Event){
 
@@ -106,14 +106,14 @@ export namespace EventsManager
             return;
         }
 
-        console.log(req.session.role);
+    
         const pEventID = req.get('eventID');
         const pValidate = req.get('validate');
 
         if(pEventID && pValidate)
         {
             const connection:OracleDB.Connection = 
-                await DataBaseManager.get_connection();
+            await DataBaseManager.get_connection();
             
             await connection.execute(
                 `
@@ -148,6 +148,4 @@ export namespace EventsManager
         }
     }
 
-
-    
 }
