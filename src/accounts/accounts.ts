@@ -59,9 +59,13 @@ export namespace AccountsManager {
 
         const connection:OracleDB.Connection = await DataBaseManager.get_connection();
 
-        const result: OracleDB.Result<{ TOKEN: string }> = await connection.execute(
-            'SELECT TOKEN FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
-            {email, password}
+        const result: OracleDB.Result<{ TOKEN: string }> = 
+        await connection.execute(
+            `
+            SELECT TOKEN 
+            FROM ACCOUNTS 
+            WHERE EMAIL = :email AND PASSWORD = :password
+            `, {email, password}
         );
 
         await connection.close();
@@ -73,7 +77,7 @@ export namespace AccountsManager {
     {
         const pEmail = req.get('email');
         const pPassword = req.get('password');
-        
+
         if(!pEmail || !pPassword)
         {
             res.statusCode = 400;
@@ -81,12 +85,11 @@ export namespace AccountsManager {
             return;
         }
         const result = await login(pEmail, pPassword);
-        // Verifica se a função retornou algo mesmo!
         if(result && result.length > 0)
         {
-            // iniciando session
-            const account = await DataBaseManager.getUserByToken(result[0].TOKEN);
-            // atribui token e cargo para a session
+            const account = 
+            await DataBaseManager.getUserByToken(result[0].TOKEN);
+
             if(account)
             {
                 req.session.token = account[0].TOKEN;
@@ -95,7 +98,6 @@ export namespace AccountsManager {
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
         }else{
-            // Esse 401 é de não autorizado
             res.statusCode = 401;
             res.send(`Nome ou Senha Incorretos!`);
         }

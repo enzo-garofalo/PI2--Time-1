@@ -2,7 +2,6 @@ import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
 
-
 export namespace EventsManager
 {
 
@@ -12,50 +11,6 @@ export namespace EventsManager
         description: string,
         status_event: number,
         categories: string
-    }
- 
-    //função que coloca o evento no BD (medina)
-    async function addNewEvent(event:Event){
-
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-
-        const connection:OracleDB.Connection = 
-            await DataBaseManager.get_connection();
-        
-        let attempts = 3;
-        let sucessfull = false;
-
-        while(attempts > 0){
-            try {
-                await connection.execute(
-                    `INSERT INTO EVENTS
-                    (ID_EVENT, TITLE, DESCRIPTION, CATEGORIES, status_event)
-                    VALUES
-                    (
-                    SEQ_EVENTS.NEXTVAL,
-                    :title, :description, :categories, :status_event
-                    )`,
-                    {
-                        title: event.title,
-                        description: event.description,
-                        categories: event.categories,
-                        status_event: event.status_event
-                    }
-                );
-                
-                
-            console.log('Novo Evento criado. Pendente aprovação.')
-            sucessfull = true;
-            break;
-            }catch(error){
-                console.error(error);
-                attempts--;
-            }
-        }
-        await connection.commit();
-        await connection.close();
-
-        return sucessfull;
     }
 
     export const addNewEventHandler: RequestHandler = 
@@ -81,21 +36,14 @@ export namespace EventsManager
                 status_event: 0,
                 categories: pCategories
             }
-
-            if (await addNewEvent(newEvent))
-            {
+                await DataBaseManager.addNewEvent(newEvent);
                 req.statusCode = 200;
                 res.send("Novo Evento adicionado.");
-            }else{
-                res.statusCode = 409;
-                res.send("Erro inesperado ao criar o evento");
-            }
         }else{
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
     }
-
 
     export const evaluateNewEventHandler: RequestHandler =
     async (req : Request, res : Response) => {
@@ -147,5 +95,64 @@ export namespace EventsManager
             return;
         }
     }
+
+    export const finishEventHandler: RequestHandler =
+    async (req: Request, res: Response) => {
+        // Serviço usado para encerrar o evento, 
+        // informando um veredito se ocorreu ou não, 
+        // e distribuir os fundos dos apostadores proporcionalmente aos vencedores). 
+        if(!req.session.token)
+        {
+            res.statusCode = 401;
+            res.send("Usuário não está logado");
+        }else if(req.session.role === 0){
+            res.statusCode = 401;
+            res.send("Rota permitida apenas para moderadores");
+        }
+
+        const pIdEvent = req.get('eventId');
+        const pVerdictCode = req.get('verdictCode');
+        // 1 para aconteceu 2 para não aconteceu
+
+        if(pIdEvent && pVerdictCode){
+            
+        }else{
+            
+        }
+
+        
+    }
+;    export async function getEvent(event: EventsManager.Event, stringBusca: string){
+        
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
+
+        const returnEvent: OracleDB.Result<{Event: string}> =
+         await connection.execute(
+            `
+            SELECT TITLE
+            FROM EVENTS
+            WHERE TITLE = :stringBusca
+            `,
+            {stringBusca}
+        );
+            await connection.commit();
+            await connection.close();
+    }
+
+    export const getEventHandler: RequestHandler =
+    async (req: Request, res: Response) => {
+
+        if(req.session.role){
+            res.statusCode = 401;
+            res.send('Usuário não está logado!');
+            return;
+        }
+        
+
+        
+    }
+
+
 
 }

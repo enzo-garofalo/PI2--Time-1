@@ -4,6 +4,7 @@ dotenv.config();
 
 import { FundsManager } from "../funds/funds";
 import { AccountsManager } from "../accounts/accounts";
+import { EventsManager } from "../events/events";
 
 export namespace DataBaseManager
 {
@@ -235,5 +236,40 @@ export namespace DataBaseManager
         await connection.close();
         console.log("Eventos retornados:", newEventsList.rows);
         return newEventsList.rows;
+    }
+    
+    async function addNewEvent(event:EventsManager.Event){
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+
+        await connection.execute(
+            `
+            INSERT INTO EVENTS
+            (ID_EVENT, TITLE, DESCRIPTION, CATEGORIES, status_event)
+            VALUES
+            ( SEQ_EVENTS.NEXTVAL, :title, :description, :categories, :status_event )
+            `,
+            {
+                title: event.title,
+                description: event.description,
+                categories: event.categories,
+                status_event: event.status_event
+            }
+        );
+                    
+        await connection.commit();
+        await connection.close();
+
+    }
+
+    export async function addNewFunds(id_wallt:number, credit: number) {
+
+
+        
+        return true;
+        
     }
 }

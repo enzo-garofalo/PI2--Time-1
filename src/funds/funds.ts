@@ -9,6 +9,8 @@ export namespace FundsManager{
         balance: number        
     }
 
+
+
     export const addNewFundsHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
@@ -26,7 +28,7 @@ export namespace FundsManager{
             
         if(id_user)
             {
-            /*const resultSearch_IdWallet = 
+            const resultSearch_IdWallet = 
                 await DataBaseManager.getIdWallet(id_user[0]);
     
             if(resultSearch_IdWallet)
@@ -46,21 +48,10 @@ export namespace FundsManager{
                         res.statusCode = 400;
                         res.send("Parâmetros inválidos ou faltantes.");
                     }
-                }*/
-                if(await DataBaseManager.addNewFunds(41, pCredit))
-                    {
-                        req.statusCode = 200;
-                        res.send("Novo Valor adicionado.");
-                    }else{
-                        res.statusCode = 409;
-                        res.send("Erro inesperado ao colocar o valor.");
-                    }
-                }else{
-                    res.statusCode = 400;
-                    res.send("Parâmetros inválidos ou faltantes.");
                 }
+                
         }
-    
+    }
 
 
     export async function withdrawFunds(idWallet:number, qtdSacar:number){
@@ -109,7 +100,8 @@ export namespace FundsManager{
                 
                 const qtdSacar = Number(req.get('valorSacar'));
                 
-                if(await withdrawFunds(idWallet, qtdSacar)){
+                if(await withdrawFunds(idWallet, qtdSacar))
+                {
                    res.statusCode = 200
                    res.send("Saque realizado com sucesso.");
                 }else{
@@ -117,8 +109,7 @@ export namespace FundsManager{
                     res.send("Erro inesperado ao realizar saque. ")
                 }
             }
-        }
-                
-    }
+            }
+        }         
 }
     
