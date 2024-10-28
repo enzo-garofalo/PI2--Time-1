@@ -18,9 +18,9 @@ import {FundsManager} from "./funds/funds";
 /finishEvent
 /searchEvent
 
-/betOnEvent
-/addFounds falta testar
-/widrawFounds falta testa
+/betOnEvent falta testar
+/addFunds falta testar
+/widrawFunds falta testa
 */
 
 //__________________________________________________
@@ -39,6 +39,7 @@ server.use(session({
   saveUninitialized: true,
   cookie: { secure: false },
 }));
+
 const routes = Router();
 
 routes.get('/', (req: Request, res: Response)=>{

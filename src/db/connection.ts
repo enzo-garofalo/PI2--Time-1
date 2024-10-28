@@ -5,7 +5,8 @@ dotenv.config();
 import { FundsManager } from "../funds/funds";
 import { AccountsManager } from "../accounts/accounts";
 
-export namespace DataBaseManager{
+export namespace DataBaseManager
+{
     
     export async function get_connection()
     {
@@ -186,9 +187,27 @@ export namespace DataBaseManager{
                 }
             );
         }
-        
+        await connection.commit();
+        await connection.close();
+    }
 
-        await connection.commit
-        
+    export async function getNewEvents()
+    {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+
+        const newEventsList: OracleDB.Result<Event> = 
+            await connection.execute(
+                `
+                SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES 
+                FROM EVENTS
+                WHERE status_event = 0
+                `
+        );
+        await connection.close();
+        console.log("Eventos retornados:", newEventsList.rows);
+        return newEventsList.rows;
     }
 }
