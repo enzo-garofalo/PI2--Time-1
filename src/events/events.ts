@@ -1,5 +1,6 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
+import { dbEventsManager } from "../db/databaseEvent";
 import OracleDB from "oracledb";
 
 export namespace EventsManager
@@ -16,7 +17,7 @@ export namespace EventsManager
     export const addNewEventHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
-        if(req.session.role){
+        if(!req.session.role){
             res.statusCode = 401;
             res.send('Usuário não está logado!');
             return;
@@ -98,8 +99,6 @@ export namespace EventsManager
 
     export const finishEventHandler: RequestHandler =
     async (req: Request, res: Response) => {
-        // Serviço usado para encerrar o evento, 
-        // informando um veredito se ocorreu ou não, 
         // e distribuir os fundos dos apostadores proporcionalmente aos vencedores). 
         if(!req.session.token)
         {
@@ -110,49 +109,51 @@ export namespace EventsManager
             res.send("Rota permitida apenas para moderadores");
         }
 
-        const pIdEvent = req.get('eventId');
-        const pVerdictCode = req.get('verdictCode');
+        const pIdEvent = Number(req.get('eventId'));
+        const pVerdictCode = Number(req.get('verdictCode'));
         // 1 para aconteceu 2 para não aconteceu
 
         if(pIdEvent && pVerdictCode){
-            
+            await dbEventsManager.finishEvent(pIdEvent, pVerdictCode)
+            await dbEventsManager.shareEventFunds(pIdEvent, pVerdictCode)
         }else{
             
-        }
+        }        
+    };    
 
-        
-    }
-;    export async function getEvent(event: EventsManager.Event, stringBusca: string){
-        
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
-
-        const returnEvent: OracleDB.Result<{Event: string}> =
-         await connection.execute(
-            `
-            SELECT TITLE
-            FROM EVENTS
-            WHERE TITLE = :stringBusca
-            `,
-            {stringBusca}
-        );
-            await connection.commit();
-            await connection.close();
-    }
 
     export const getEventHandler: RequestHandler =
     async (req: Request, res: Response) => {
 
-        if(req.session.role){
+        if(!req.session.role){
             res.statusCode = 401;
             res.send('Usuário não está logado!');
             return;
         }
         
+        const pStringBusca = req.get('title_request')
 
+        if(pStringBusca){
+            try{
+                
+                const events = await dbEventsManager.getEvent(pStringBusca);
+
+                if(events){
+                    res.statusCode = 404;
+                    res.send('Evento não encontrado.');
+                }else{
+                    res.statusCode = 200;
+                    res.send(events);
+                }
+                
+            } catch (error){
+                console.error('Erro no servidor ao encontrar eventos.', error);
+            }
+        }else{
+            res.statusCode = 400;
+            res.send('Erro inesperado ao realizar busca de eventos');
+        }
         
+            
     }
-
-
-
 }

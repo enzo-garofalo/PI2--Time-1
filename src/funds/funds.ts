@@ -4,12 +4,11 @@ import OracleDB from "oracledb";
 
 export namespace FundsManager{
 
-    export type Wallet = {
+    export type Funds = {
         idWallet: number | undefined,
-        balance: number        
+        typeTransaction: string,
+        value: number        
     }
-
-
 
     export const addNewFundsHandler: RequestHandler = 
     async (req: Request, res: Response) => {
@@ -22,21 +21,25 @@ export namespace FundsManager{
             }
 
         const pCredit = Number(req.get('Credit'));
+        if(pCredit){
 
-        const id_user = 
-            await DataBaseManager.getUserID(req.session.token);
-            
-        if(id_user)
+            const id_user = 
+                await DataBaseManager.getUserID(req.session.token);
+                
+            if(id_user)
             {
-            const resultSearch_IdWallet = 
-                await DataBaseManager.getIdWallet(id_user[0]);
-    
-            if(resultSearch_IdWallet)
+                const resultSearch_IdWallet = 
+                    await DataBaseManager.getIdWallet(id_user[0]);
+        
+                if(resultSearch_IdWallet)
                 {
                     const idWallet = resultSearch_IdWallet[0].ID_WALLET;
-                    if(pCredit)
-                    {
-                        if(await DataBaseManager.addNewFunds(idWallet, pCredit))
+                    const newCredit: Funds = {
+                        idWallet: idWallet,
+                        typeTransaction: 'Credito',
+                        value: pCredit
+                    };
+                        if(await DataBaseManager.addNewFunds(newCredit))
                         {
                             req.statusCode = 200;
                             res.send("Novo Valor adicionado.");
@@ -48,10 +51,9 @@ export namespace FundsManager{
                         res.statusCode = 400;
                         res.send("Parâmetros inválidos ou faltantes.");
                     }
-                }
-                
-        }
+            }
     }
+}
 
 
     export async function withdrawFunds(idWallet:number, qtdSacar:number){

@@ -238,7 +238,7 @@ export namespace DataBaseManager
         return newEventsList.rows;
     }
     
-    async function addNewEvent(event:EventsManager.Event){
+    export async function addNewEvent(event:EventsManager.Event){
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -265,11 +265,40 @@ export namespace DataBaseManager
 
     }
 
-    export async function addNewFunds(id_wallt:number, credit: number) {
+    export async function addNewFunds(newFund: FundsManager.Funds) {
 
-
-        
-        return true;
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        const connection: OracleDB.Connection = await get_connection();
+    
+        let attempts = 3;
+        let successful = false;
+    
+        while (attempts > 0) {
+            try {
+                await connection.execute(
+                    `INSERT INTO HISTORIC 
+                    (TRANSACION_ID, TRANSACTION_TYPE, TRANSACTION_VALUE, FK_ID_WALLET) 
+                    VALUES
+                    (
+                        SEQ_TRANSACTION.NEXTVAL, 
+                        :typeTransaction, :credit, :id_wallet
+                    )`,
+                    {
+                        typeTransaction: newFund.typeTransaction,
+                        credit: newFund.value,
+                        id_wallet: newFund.idWallet
+                    }
+                    );
+                successful = true;
+                await connection.commit();
+            } catch (error) {
+                console.error('Erro ao salvar nova conta:', error);
+                attempts--;
+            } finally { //tratamento (executa sempre, dando erro ou não)
+                await connection.close();
+            }
+        }
+        return successful;
         
     }
 }
