@@ -131,11 +131,18 @@ export namespace DataBaseManager{
         await DataBaseManager.get_connection();
 
         await connection.execute(
-            `
-            UPDATE WALLET 
-            SET BALANCE = BALANCE - qtdSacar 
-            WHERE ID = idWallet
-            `,
+        `
+            INSERT INTO HISTORIC(
+            TRANSACTION_ID,
+            TRANSACTION_TYPE,
+            TRANSACTION_VALUE,
+            FK_ID_WALLET
+            )values(
+            SEQ_TRANSACTION.NEXTVAL,
+            'SACAR',
+            :qtdSacar,
+            :idWallet
+            )`,
             {qtdSacar, idWallet}
         );
 
