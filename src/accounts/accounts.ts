@@ -1,6 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
+import { FundsManager } from "../funds/funds";
 
 export namespace AccountsManager {
 
@@ -33,7 +34,13 @@ export namespace AccountsManager {
                 ROLE: 0,
                 TOKEN: undefined
             }
-            if( await DataBaseManager.saveNewAccount(newAccount))
+            const newAccountWallet: FundsManager.Wallet =
+            {
+                idWallet: undefined,
+                balance: 0
+            }
+
+            if( await DataBaseManager.saveNewAccount(newAccount, newAccountWallet))
             {
                 res.statusCode = 200;
                 res.send("Nova conta adicionada.");

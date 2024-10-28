@@ -12,15 +12,15 @@ import {FundsManager} from "./funds/funds";
 /signUp falta criar uma wallet pro novo user
 /login falta tirar duvida sobre criar session salvando id
 
-/getEvent
-/deleteEvent
+/getEvent (falta)
+/deleteEvent(falta)
 
-/finishEvent
-/searchEvent
+/finishEvent (falta)
+/searchEvent (falta)
 
-/betOnEvent falta testar
-/addFunds falta testar
-/widrawFunds falta testa
+/betOnEvent (falta testar)
+/addFounds (falta testar)
+/widrawFounds falta testa
 */
 
 //__________________________________________________
