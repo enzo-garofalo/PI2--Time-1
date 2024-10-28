@@ -52,19 +52,16 @@ export namespace DataBaseManager{
         await connection.close();
         return account.rows;
     }
-
-    export async function saveNewAccount(account:AccountsManager.userAccount) 
-    {
+    
+    export async function saveNewAccount(account: AccountsManager.userAccount, newAccountWallet: FundsManager.Wallet) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-        const connection:OracleDB.Connection = 
-              await get_connection();
-
+        const connection: OracleDB.Connection = await get_connection();
+    
         let attempts = 3;
-        let sucessfull = false;
-        while(attempts > 0)
-        {
-            try
-            {
+        let successful = false;
+    
+        while (attempts > 0) {
+            try {
                 await connection.execute(
                     `INSERT INTO ACCOUNTS 
                     (ID, COMPLETE_NAME, EMAIL, PASSWORD, BIRTHDATE, ROLE, TOKEN) 
@@ -74,23 +71,51 @@ export namespace DataBaseManager{
                         :name, :email, :password, :birthdate, :role, 
                         DBMS_RANDOM.STRING('X', 32)
                     )`,
-                    {   name: account.NAME,
+                    {
+                        name: account.NAME,
                         email: account.EMAIL,
                         password: account.PASSWORD,
                         birthdate: account.BIRTHDATE,
-                        role: account.ROLE }
+                        role: account.ROLE
+                    }
                 );
-                console.log('Nova conta adicionada');
-                sucessfull = true;
-                break;
-            }catch(error){
-                console.error(error);
+    
+                await connection.commit();
+    
+                const resultadoID: OracleDB.Result<{ ID: Number }> = await connection.execute(
+                    'SELECT ID FROM ACCOUNTS WHERE EMAIL = :email AND PASSWORD = :password',
+                    { email: account.EMAIL, password: account.PASSWORD }
+                );
+    
+                if (resultadoID.rows && resultadoID.rows.length > 0) {
+                    const idUsuario = resultadoID.rows[0].ID;
+    
+                    await connection.execute(
+                        `INSERT INTO WALLETS
+                        (ID_WALLET, BALANCE, FK_ID_USER)
+                        VALUES
+                        (
+                            SEQ_WALLETS.NEXTVAL,
+                            :BALANCE, :FK_ID_USER
+                        )`,
+                        {
+                            BALANCE: Number(newAccountWallet.balance),
+                            FK_ID_USER: Number(idUsuario)
+                        }
+                    );
+    
+                    console.log('Nova conta adicionada');
+                    successful = true;
+                    break;
+                }
+            } catch (error) {
+                console.error('Erro ao salvar nova conta:', error);
                 attempts--;
+            } finally { //tratamento (executa sempre, dando erro ou não)
+                await connection.close();
             }
         }
-        await connection.commit();
-        await connection.close();
-        return sucessfull;
+        return successful;
     }
     
     export async function getIdWallet(id_user:number) 
