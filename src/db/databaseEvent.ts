@@ -4,6 +4,7 @@ dotenv.config();
 
 import { DataBaseManager } from "./connection";
 import { EventsManager } from "../events/events";
+import { FundsManager } from "../funds/funds";
 
 export namespace dbEventsManager
 {
@@ -32,7 +33,7 @@ export namespace dbEventsManager
         const countWinners: OracleDB.Result<{TOTAL_BETTORS : number}> = 
         await connection.execute(
             `
-            SELECT COUNT(ID_USER)
+            SELECT COUNT(ID_USER) AS TOTAL_BETTORS
             FROM BETS
             WHERE ID_EVENT = :idEvent AND BET = :verdictBet
             `, { idEvent, verdictCode }
@@ -47,20 +48,30 @@ export namespace dbEventsManager
             // lista do id de ganhadores para fazer transações
             const idWinnersList: OracleDB.Result<{ID_USER: number}> =
             await connection.execute(
-                `SELECT ID_USER
+               `SELECT ID_USER
                 FROM BETS
                 WHERE ID_EVENT = :idEvent AND BET = :verdictBet
                 `, { idEvent, verdictCode }
             );
 
             if(idWinnersList.rows){
-                for(const winner of idWinnersList.rows){
+                for(const winner of idWinnersList.rows)
+                {
                     const idUser = winner.ID_USER;
-
+                    const idWallet = await DataBaseManager.getIdWallet(idUser);
+                    
+                    if(idWallet){
+                        // TEM QUE MELHORAR TYPE FUNDS!!
+                        const newTransaction: FundsManager.Funds = {
+                            idWallet: Number(idWallet[0].ID_WALLET),
+                            typeTransaction: 'Ganho',
+                            value: winnersValue
+                        }
+                        await DataBaseManager.addNewFunds(newTransaction);
+                    }
                 }
             }
         }
-        
     }
 
     export async function finishEvent(idEvent: number, verdictCode: number)

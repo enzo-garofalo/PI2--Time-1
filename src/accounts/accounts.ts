@@ -34,13 +34,14 @@ export namespace AccountsManager {
                 ROLE: 0,
                 TOKEN: undefined
             }
-            const newAccountWallet: FundsManager.Wallet =
+            const newAccountFunds: FundsManager.Funds =
             {
                 idWallet: undefined,
-                balance: 0
+                typeTransaction: 'Credito',
+                value: 0
             }
 
-            if( await DataBaseManager.saveNewAccount(newAccount, newAccountWallet))
+            if( await DataBaseManager.saveNewAccount(newAccount, newAccountFunds))
             {
                 res.statusCode = 200;
                 res.send("Nova conta adicionada.");

@@ -55,7 +55,7 @@ export namespace DataBaseManager
         return account.rows;
     }
     
-    export async function saveNewAccount(account: AccountsManager.userAccount, newAccountWallet: FundsManager.Wallet) {
+    export async function saveNewAccount(account: AccountsManager.userAccount, newAccountWallet: FundsManager.Funds) {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
         const connection: OracleDB.Connection = await get_connection();
     
@@ -101,7 +101,7 @@ export namespace DataBaseManager
                             :BALANCE, :FK_ID_USER
                         )`,
                         {
-                            BALANCE: Number(newAccountWallet.balance),
+                            BALANCE: Number(newAccountWallet.value),
                             FK_ID_USER: Number(idUsuario)
                         }
                     );

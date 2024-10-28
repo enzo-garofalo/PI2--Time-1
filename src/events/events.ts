@@ -114,10 +114,14 @@ export namespace EventsManager
         // 1 para aconteceu 2 para não aconteceu
 
         if(pIdEvent && pVerdictCode){
-            await dbEventsManager.finishEvent(pIdEvent, pVerdictCode)
-            await dbEventsManager.shareEventFunds(pIdEvent, pVerdictCode)
+            await dbEventsManager.finishEvent(pIdEvent, pVerdictCode);
+            await dbEventsManager.shareEventFunds(pIdEvent, pVerdictCode);
+
+            res.statusCode = 200;
+            res.send('Evento finalizado e ganhos distribuídos!');
         }else{
-            
+            res.statusCode = 400;
+            res.send("Formato de requisição inválido.");
         }        
     };    
 

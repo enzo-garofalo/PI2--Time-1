@@ -55,11 +55,12 @@ routes.post('/login', AccountsManager.loginHandler);
 //Rotas de Eventos
 routes.put('/addNewEvent', EventsManager.addNewEventHandler);
 routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
-//routes.get('/getEvent', EventsManager.GetEventHandler);
+routes.post('/finishEvent', EventsManager.finishEventHandler)
+routes.get('/getEvent', EventsManager.getEventHandler);
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
-routes.get('/withdrawFunds', FundsManager.withdrawFundsHandler);
+routes.post('/withdrawFunds', FundsManager.withdrawFundsHandler);
 
 //Rotas de bets
 routes.put('/betOnEvent', betsManager.betOnEventHandler)

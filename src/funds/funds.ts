@@ -14,22 +14,22 @@ export namespace FundsManager{
     async (req: Request, res: Response) => {
 
         if(!req.session.token)
-            {
-                res.statusCode = 401;
-                res.send('Usuário não está logado!');
-                return;
-            }
+        {
+            res.statusCode = 401;
+            res.send('Usuário não está logado!');
+            return;
+        }
 
         const pCredit = Number(req.get('Credit'));
-        if(pCredit){
-
+        if(pCredit)
+        {
             const id_user = 
-                await DataBaseManager.getUserID(req.session.token);
+            await DataBaseManager.getUserID(req.session.token);
                 
             if(id_user)
             {
                 const resultSearch_IdWallet = 
-                    await DataBaseManager.getIdWallet(id_user[0]);
+                await DataBaseManager.getIdWallet(id_user[0]);
         
                 if(resultSearch_IdWallet)
                 {
@@ -39,23 +39,21 @@ export namespace FundsManager{
                         typeTransaction: 'Credito',
                         value: pCredit
                     };
-                        if(await DataBaseManager.addNewFunds(newCredit))
-                        {
-                            req.statusCode = 200;
-                            res.send("Novo Valor adicionado.");
-                        }else{
-                            res.statusCode = 409;
-                            res.send("Erro inesperado ao colocar o valor.");
-                        }
+                    if(await DataBaseManager.addNewFunds(newCredit))
+                    {
+                        req.statusCode = 200;
+                        res.send("Novo Valor adicionado.");
                     }else{
-                        res.statusCode = 400;
-                        res.send("Parâmetros inválidos ou faltantes.");
+                        res.statusCode = 409;
+                        res.send("Erro inesperado ao colocar o valor.");
                     }
+                }else{
+                    res.statusCode = 400;
+                    res.send("Parâmetros inválidos ou faltantes.");
+                }
             }
-    }
-}
-
-
+        }
+    }   
     export async function withdrawFunds(idWallet:number, qtdSacar:number){
 
         const result = await DataBaseManager.getSaldoAtual(idWallet);
@@ -111,7 +109,7 @@ export namespace FundsManager{
                     res.send("Erro inesperado ao realizar saque. ")
                 }
             }
-            }
-        }         
+        }
+    }         
 }
     
