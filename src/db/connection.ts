@@ -129,6 +129,7 @@ export namespace DataBaseManager{
         
         const connection:OracleDB.Connection = 
         await DataBaseManager.get_connection();
+        
 
         await connection.execute(
         `
@@ -140,7 +141,7 @@ export namespace DataBaseManager{
             )values(
             SEQ_TRANSACTION.NEXTVAL,
             'SACAR',
-            :qtdSacar,
+            :-qtdSacar,
             :idWallet
             )`,
             {qtdSacar, idWallet}
@@ -186,9 +187,33 @@ export namespace DataBaseManager{
                 }
             );
         }
-        
-
         await connection.commit
-        
+    }
+
+
+    export async function addNewFunds(id_wallet: number, credit: number){
+
+            OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+            const connection:OracleDB.Connection = await get_connection();
+
+            await connection.execute(
+                `INSERT INTO HISTORIC 
+                (TRANSACTION_ID, TRANSACTION_TYPE, TRANSACTION_VALUE, FK_ID_WALLET)
+                VALUES
+                (
+                SEQ_TRANSACTION.NEXTVAL, 
+                'Credito',
+                :credit,
+                :id_wallet
+                )`,
+                {   
+                    credit: credit,
+                    id_wallet: id_wallet
+                }
+            );
+
+            await connection.commit();
+            await connection.close();
+            return true;
     }
 }

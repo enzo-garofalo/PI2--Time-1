@@ -7,6 +7,7 @@ import {Request, Response, Router} from "express";
 import { AccountsManager } from "./accounts/accounts";
 import { EventsManager } from "./events/events";
 import {FundsManager} from "./funds/funds";
+import {betsManager} from "./bets/bets";
 
 /*
 /signUp falta criar uma wallet pro novo user
@@ -60,7 +61,7 @@ routes.put('/addFunds', FundsManager.addNewFundsHandler);
 routes.get('/withdrawFunds', FundsManager.withdrawFundsHandler);
 
 //Rotas de bets
-routes.put('/betOnEvent')
+routes.put('/betOnEvent', betsManager.betOnEventHandler)
 
 server.use(routes);
 
