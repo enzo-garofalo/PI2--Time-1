@@ -1,57 +1,115 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
-import { dbEventsManager } from "../db/databaseEvent";
 import OracleDB from "oracledb";
+
 
 export namespace EventsManager
 {
-
+    
     export type Event = {
         idEvent: number|undefined,
         title: string,
         description: string,
-        status_event: number,
-        categories: string,
-        register_date: string | undefined,
-        bets_funds: number,
-        finish_date: string
+        isValid: number,
+        categories: string
+    }
+
+
+
+    //função que coloca o evento no BD (medina)
+    async function addNewEvent(event:Event){
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+        
+        let attempts = 3;
+        let sucessfull = false;
+
+        while(attempts > 0){
+            try {
+                await connection.execute(
+                    `INSERT INTO EVENTS
+                    (ID_EVENT, TITLE, DESCRIPTION, CATEGORIES, ISVALID)
+                    VALUES
+                    (
+                    SEQ_EVENTS.NEXTVAL,
+                    :title, :description, :categories, :isValid
+                    )`,
+                    {
+                        title: event.title,
+                        description: event.description,
+                        categories: event.categories,
+                        isValid: event.isValid
+                    }
+                );
+                
+                
+            console.log('Novo Evento criado. Pendente aprovação.')
+            sucessfull = true;
+            break;
+            }catch(error){
+                console.error(error);
+                attempts--;
+            }
+        }
+        await connection.commit();
+        await connection.close();
+
+        return sucessfull;
     }
 
     export const addNewEventHandler: RequestHandler = 
-    async (req: Request, res: Response) => {
+        async (req: Request, res: Response) => {
 
-        if(req.session.role === undefined){
-            console.log(req.session.token);
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
-        
         const pTitle = req.get('Title');
         const pDescription = req.get('Description');
         const pCategories = req.get('Categories');
-        const pFinishDate = req.get('finishDate');
 
-        if(pTitle && pDescription && pCategories && pFinishDate)
+        if(pTitle && pDescription && pCategories)
         {
             const newEvent: Event = 
             {
                 idEvent: undefined,
                 title: pTitle,
                 description: pDescription,
-                status_event: 0,
-                categories: pCategories,
-                register_date: undefined,
-                bets_funds: 0.00,
-                finish_date: pFinishDate
+                isValid: 0,
+                categories: pCategories
             }
-            await dbEventsManager.addNewEvent(newEvent);
-            req.statusCode = 200;
-            res.send("Novo Evento adicionado.");
+
+            if (await addNewEvent(newEvent))
+            {
+                req.statusCode = 200;
+                res.send("Novo Evento adicionado.");
+            }else{
+                res.statusCode = 409;
+                res.send("Erro inesperado ao criar o evento");
+            }
         }else{
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
+    }
+
+    async function getNewEvents()
+    {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+
+        const newEventsList: OracleDB.Result<Event> = 
+            await connection.execute(
+                `
+                SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES 
+                FROM EVENTS
+                WHERE ISVALID = 0
+                `
+        );
+        await connection.close();
+        console.log("Eventos retornados:", newEventsList.rows);
+        return newEventsList.rows;
     }
 
     export const evaluateNewEventHandler: RequestHandler =
@@ -63,19 +121,19 @@ export namespace EventsManager
             return;
         }
 
-    
+        console.log(req.session.role);
         const pEventID = req.get('eventID');
         const pValidate = req.get('validate');
 
         if(pEventID && pValidate)
         {
             const connection:OracleDB.Connection = 
-            await DataBaseManager.get_connection();
+                await DataBaseManager.get_connection();
             
             await connection.execute(
                 `
                 UPDATE EVENTS
-                SET status_event = 1
+                SET ISVALID = 1
                 WHERE ID_EVENT = :id_event
                 `,
                 { id_event: pEventID } 
@@ -84,15 +142,11 @@ export namespace EventsManager
             await connection.commit();
             await connection.close();
 
-            const updatedEventsList = 
-            await DataBaseManager.getNewEvents();
-
+            const updatedEventsList = await getNewEvents();
             res.statusCode = 200;
             res.send(updatedEventsList);
         }
-
-        const newEventsList = 
-        await DataBaseManager.getNewEvents();
+        const newEventsList = await getNewEvents();
 
         if(newEventsList)
         {
@@ -103,68 +157,82 @@ export namespace EventsManager
             res.send('Nenhum evento encontrado!');
             return;
         }
-    }
+    }   
 
-    export const finishEventHandler: RequestHandler =
-    async (req: Request, res: Response) => {
-        // e distribuir os fundos dos apostadores proporcionalmente aos vencedores). 
-        if(!req.session.token)
-        {
-            res.statusCode = 401;
-            res.send("Usuário não está logado");
-        }else if(req.session.role === 0){
-            res.statusCode = 401;
-            res.send("Rota permitida apenas para moderadores");
-        }
+    export const deleteEventHandler: RequestHandler = 
+     async (req: Request, res: Response) => {
 
-        const pIdEvent = Number(req.get('eventId'));
-        const pVerdictCode = Number(req.get('verdictCode'));
-        // 1 para aconteceu 2 para não aconteceu
+            const pEventID = req.get('id_event');
 
-        if(pIdEvent && pVerdictCode){
-            await dbEventsManager.finishEvent(pIdEvent, pVerdictCode);
-            await dbEventsManager.shareEventFunds(pIdEvent, pVerdictCode);
+            if (!pEventID){
+                res.statusCode = 400;
+                res.send("Formato de requisição inválido");
+                return;
+            }
 
-            res.statusCode = 200;
-            res.send('Evento finalizado e ganhos distribuídos!');
-        }else{
-            res.statusCode = 400;
-            res.send("Formato de requisição inválido.");
-        }        
-    };    
+            const connection: OracleDB.Connection = 
+                await DataBaseManager.get_connection();
 
-    export const searchEventHandler: RequestHandler =
-    async (req: Request, res: Response) => {
 
-        if(!req.session.role){
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
-        
-        const pStringBusca = req.get('title_request')
+            try {
+                const eventCheck = await connection.execute(
+                    `SELECT ISVALID, (SELECT COUNT(*) 
+                    FROM BETS WHERE fk_ID_Event = :id_event) AS HAS_BETS 
+                    FROM EVENTS 
+                    WHERE ID_EVENT = :id_event`,
+                    {id_event: pEventID}
+                );
 
-        if(pStringBusca){
-            try{
-                
-                const events = await dbEventsManager.searchEvent(pStringBusca);
+                const eventRow = eventCheck.rows?.[0] as 
+                {ISVALID: number, HAS_BETS: number}
 
-                if(events){
+                if (!eventRow){
                     res.statusCode = 404;
-                    res.send('Evento não encontrado.');
-                }else{
-                    res.statusCode = 200;
-                    res.send(events);
+                    res.send("Evento não encontrado.");
+                    return;
+                }
+
+                if (eventRow.ISVALID == 1){
+                    res.statusCode = 406;
+                    res.send("Requisição não aceitável. Evento se encontra ativo.")
+                    return;
+                }
+
+                if (eventRow.ISVALID == 2){
+                    res.statusCode = 406;
+                    res.send("Requisição não aceitável. Evento se encontra encerrado.")
+                    return;
                 }
                 
-            } catch (error){
-                console.error('Erro no servidor ao encontrar eventos.', error);
-            }
-        }else{
-            res.statusCode = 400;
-            res.send('Erro inesperado ao realizar busca de eventos');
+                if (eventRow.ISVALID == 3){
+                    res.statusCode = 406;
+                    res.send("Requisição não aceitável. Evento foi negado.")
+                    return;
+                }
+
+                if (eventRow.HAS_BETS > 0){
+                    res.statusCode = 406;
+                    res.send("Requisição não aceitável. Evento possui apostas ativas.")
+                    return;
+                }
+
+                await connection.execute(
+                    `UPDATE EVENTS
+                    SET ISVALID = 4
+                    WHERE ID_EVENT = :id_event`,
+                    {id_event: pEventID}
+                );
+
+                await connection.commit();
+                res.statusCode = 200;
+                res.send("Evento removido com sucesso.");
         }
-        
-            
-    }
+        catch(error){
+            console.error("Erro ao deletar evento", error);
+            res.statusCode = 500;
+            res.send("Erro ao processar a requisição");
+        }finally{
+            await connection.close();
+        }   
+    }        
 }
