@@ -73,6 +73,7 @@ export namespace AccountsManager {
         const result = await dbAccountsManager.login(pEmail, pPassword);
         if(result && result.length > 0)
         {
+
             const account = 
             await DataBaseManager.getUserByToken(result[0].TOKEN);
 
@@ -80,6 +81,8 @@ export namespace AccountsManager {
             {
                 req.session.token = account[0].TOKEN;
                 req.session.role = account[0].ROLE;
+                console.log(`Usuário logado\nToken: ${req.session.token}`)
+                console.log(`Role: ${req.session.role}`)
             } 
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);

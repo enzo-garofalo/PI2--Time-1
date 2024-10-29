@@ -10,9 +10,7 @@ import {FundsManager} from "./funds/funds";
 import {betsManager} from "./bets/bets";
 
 /*
-/signUp falta criar uma wallet pro novo user (falta testar)                    
-/login falta tirar duvida sobre criar session salvando id
-
+/addNewEvent                  
 /getEvent (falta)
 /deleteEvent(falta)
 

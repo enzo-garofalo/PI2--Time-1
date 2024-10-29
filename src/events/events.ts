@@ -11,13 +11,17 @@ export namespace EventsManager
         title: string,
         description: string,
         status_event: number,
-        categories: string
+        categories: string,
+        register_date: string | undefined,
+        bets_funds: number,
+        finish_date: string
     }
 
     export const addNewEventHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
-        if(!req.session.role){
+        if(req.session.role === undefined){
+            console.log(req.session.token);
             res.statusCode = 401;
             res.send('Usuário não está logado!');
             return;
@@ -26,8 +30,9 @@ export namespace EventsManager
         const pTitle = req.get('Title');
         const pDescription = req.get('Description');
         const pCategories = req.get('Categories');
+        const pFinishDate = req.get('finishDate');
 
-        if(pTitle && pDescription && pCategories)
+        if(pTitle && pDescription && pCategories && pFinishDate)
         {
             const newEvent: Event = 
             {
@@ -35,11 +40,14 @@ export namespace EventsManager
                 title: pTitle,
                 description: pDescription,
                 status_event: 0,
-                categories: pCategories
+                categories: pCategories,
+                register_date: undefined,
+                bets_funds: 0.00,
+                finish_date: pFinishDate
             }
-                await DataBaseManager.addNewEvent(newEvent);
-                req.statusCode = 200;
-                res.send("Novo Evento adicionado.");
+            await dbEventsManager.addNewEvent(newEvent);
+            req.statusCode = 200;
+            res.send("Novo Evento adicionado.");
         }else{
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
@@ -124,7 +132,6 @@ export namespace EventsManager
             res.send("Formato de requisição inválido.");
         }        
     };    
-
 
     export const getEventHandler: RequestHandler =
     async (req: Request, res: Response) => {

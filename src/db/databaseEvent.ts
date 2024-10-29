@@ -8,6 +8,39 @@ import { FundsManager } from "../funds/funds";
 
 export namespace dbEventsManager
 {
+
+    export async function addNewEvent(event:EventsManager.Event){
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+
+        await connection.execute(
+            `
+            INSERT INTO EVENTS
+            (ID_EVENT, TITLE, DESCRIPTION, CATEGORIES, STATUS_EVENT, 
+            REGISTER_DATE, BETS_FUNDS, FINISH_DATE)
+            VALUES
+            (SEQ_EVENTS.NEXTVAL, :title, :description, :categories,
+            :status_event, :register_date, :bets_funds, :finish_date)
+            `,
+            {
+                title: event.title,
+                description: event.description,
+                categories: event.categories,
+                status_event: event.status_event,
+                register_date: event.register_date,
+                bets_funds: event.bets_funds || 0.00,
+                finish_date: event.finish_date
+            }
+        );
+                    
+        await connection.commit();
+        await connection.close();
+
+    }
+    
     async function calculateBetsFunds(idEvent: number) 
     {
         let connection = await DataBaseManager.get_connection();
