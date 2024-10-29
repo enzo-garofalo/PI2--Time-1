@@ -9,7 +9,8 @@ import { FundsManager } from "../funds/funds";
 export namespace dbEventsManager
 {
 
-    export async function addNewEvent(event:EventsManager.Event){
+    export async function addNewEvent(event:EventsManager.Event)
+    {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -23,14 +24,13 @@ export namespace dbEventsManager
             REGISTER_DATE, BETS_FUNDS, FINISH_DATE)
             VALUES
             (SEQ_EVENTS.NEXTVAL, :title, :description, :categories,
-            :status_event, :register_date, :bets_funds, :finish_date)
+            :status_event, :bets_funds, :finish_date)
             `,
             {
                 title: event.title,
                 description: event.description,
                 categories: event.categories,
                 status_event: event.status_event,
-                register_date: event.register_date,
                 bets_funds: event.bets_funds || 0.00,
                 finish_date: event.finish_date
             }

@@ -7,20 +7,19 @@ import {Request, Response, Router} from "express";
 import { AccountsManager } from "./accounts/accounts";
 import { EventsManager } from "./events/events";
 import {FundsManager} from "./funds/funds";
+import {betsManager} from "./bets/bets";
 
 /*
-/signUp
-/login
+/addNewEvent                  
+/getEvent (falta)
+/deleteEvent(falta)
 
-/getEvent
-/deleteEvent
-
-/finishEvent
-/searchEvent
+/finishEvent (falta)
+/searchEvent (falta)
 
 /betOnEvent (falta testar)
-/addFounds
-/widrawFounds
+/addFunds (falta testar)
+/widrawFunds falta testa
 */
 
 //__________________________________________________
@@ -39,6 +38,7 @@ server.use(session({
   saveUninitialized: true,
   cookie: { secure: false },
 }));
+
 const routes = Router();
 
 routes.get('/', (req: Request, res: Response)=>{
@@ -53,14 +53,15 @@ routes.post('/login', AccountsManager.loginHandler);
 //Rotas de Eventos
 routes.put('/addNewEvent', EventsManager.addNewEventHandler);
 routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
-routes.get('/searchEvent', EventsManager.searchEventHandler);
+routes.post('/finishEvent', EventsManager.finishEventHandler)
+routes.get('/getEvent', EventsManager.searchEventHandler);
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
-routes.get('/withdrawFunds', FundsManager.withdrawFundsHandler);
+routes.post('/withdrawFunds', FundsManager.withdrawFundsHandler);
 
 //Rotas de bets
-routes.put('/betOnEvent')
+routes.put('/betOnEvent', betsManager.betOnEventHandler)
 
 server.use(routes);
 
