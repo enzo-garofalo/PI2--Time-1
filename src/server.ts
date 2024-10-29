@@ -55,6 +55,7 @@ routes.put('/addNewEvent', EventsManager.addNewEventHandler);
 routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
 routes.post('/finishEvent', EventsManager.finishEventHandler)
 routes.get('/getEvent', EventsManager.searchEventHandler);
+routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
