@@ -129,7 +129,7 @@ export namespace dbEventsManager
         await connection.close();
     }
     
-    export async function getEvent(stringBusca: string)
+    export async function searchEvent(stringBusca: string)
     {
         
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;

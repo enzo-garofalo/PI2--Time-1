@@ -133,7 +133,7 @@ export namespace EventsManager
         }        
     };    
 
-    export const getEventHandler: RequestHandler =
+    export const searchEventHandler: RequestHandler =
     async (req: Request, res: Response) => {
 
         if(!req.session.role){
@@ -147,7 +147,7 @@ export namespace EventsManager
         if(pStringBusca){
             try{
                 
-                const events = await dbEventsManager.getEvent(pStringBusca);
+                const events = await dbEventsManager.searchEvent(pStringBusca);
 
                 if(events){
                     res.statusCode = 404;
