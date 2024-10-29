@@ -1,5 +1,6 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
+import { dbAccountsManager } from "../db/databaseAccounts";
 import OracleDB from "oracledb";
 import { FundsManager } from "../funds/funds";
 
@@ -41,7 +42,7 @@ export namespace AccountsManager {
                 value: 0
             }
 
-            if( await DataBaseManager.saveNewAccount(newAccount, newAccountFunds))
+            if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
             {
                 res.statusCode = 200;
                 res.send("Nova conta adicionada.");
@@ -55,23 +56,7 @@ export namespace AccountsManager {
         }
     }
 
-    async function login(email:string, password: string) {
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
-        const connection:OracleDB.Connection = await DataBaseManager.get_connection();
-
-        const result: OracleDB.Result<{ TOKEN: string }> = 
-        await connection.execute(
-            `
-            SELECT TOKEN 
-            FROM ACCOUNTS 
-            WHERE EMAIL = :email AND PASSWORD = :password
-            `, {email, password}
-        );
-
-        await connection.close();
-        return result.rows;
-    }
 
     export const loginHandler: RequestHandler = 
     async (req: Request, res: Response) => 
@@ -85,7 +70,7 @@ export namespace AccountsManager {
             res.send("Formato de requisição inválido.");
             return;
         }
-        const result = await login(pEmail, pPassword);
+        const result = await dbAccountsManager.login(pEmail, pPassword);
         if(result && result.length > 0)
         {
             const account = 
