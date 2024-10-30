@@ -2,6 +2,8 @@ import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
 
+import { dbFundsManager } from "../db/databaseFunds";
+
 export namespace FundsManager{
 
     export type Funds = {
@@ -21,38 +23,44 @@ export namespace FundsManager{
         }
 
         const pCredit = Number(req.get('Credit'));
-        if(pCredit)
-        {
-            const id_user = 
-            await DataBaseManager.getUserID(req.session.token);
-                
-            if(id_user)
-            {
-                const resultSearch_IdWallet = 
-                await DataBaseManager.getIdWallet(id_user[0]);
         
-                if(resultSearch_IdWallet)
+        if (isNaN(pCredit) || pCredit <= 0) {
+            res.statusCode = 400;
+            res.send("Valor de crédito inválido.");
+            return;
+        }
+
+
+        const id_user = 
+        await DataBaseManager.getUserID(req.session.token);
+                
+        if(id_user)
+        {
+            const resultSearch_IdWallet = 
+            await DataBaseManager.getIdWallet(id_user[0]);
+            console.log(resultSearch_IdWallet);
+            if(resultSearch_IdWallet)
+            {
+                const idWallet = resultSearch_IdWallet[0].ID_WALLET;
+                const newCredit: Funds = {
+                    idWallet: idWallet,
+                    typeTransaction: 'Credito',
+                    value: pCredit
+                };
+                if(await dbFundsManager.addNewFunds(newCredit))
                 {
-                    const idWallet = resultSearch_IdWallet[0].ID_WALLET;
-                    const newCredit: Funds = {
-                        idWallet: idWallet,
-                        typeTransaction: 'Credito',
-                        value: pCredit
-                    };
-                    if(await DataBaseManager.addNewFunds(newCredit))
-                    {
-                        req.statusCode = 200;
-                        res.send("Novo Valor adicionado.");
-                    }else{
-                        res.statusCode = 409;
-                        res.send("Erro inesperado ao colocar o valor.");
-                    }
+                    req.statusCode = 200;
+                    res.send("Novo Valor adicionado.");
                 }else{
-                    res.statusCode = 400;
-                    res.send("Parâmetros inválidos ou faltantes.");
+                    res.statusCode = 409;
+                    res.send("Erro inesperado ao colocar o valor.");
                 }
+            }else{
+                res.statusCode = 400;
+                res.send("Parâmetros inválidos ou faltantes.");
             }
         }
+        
     }   
     export async function withdrawFunds(idWallet:number, qtdSacar:number){
 

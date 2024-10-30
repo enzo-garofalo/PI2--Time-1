@@ -5,6 +5,7 @@ dotenv.config();
 import { DataBaseManager } from "./connection";
 import { EventsManager } from "../events/events";
 import { FundsManager } from "../funds/funds";
+import { dbFundsManager } from "./databaseFunds";
 
 export namespace dbEventsManager
 {
@@ -100,7 +101,7 @@ export namespace dbEventsManager
                             typeTransaction: 'Ganho',
                             value: winnersValue
                         }
-                        await DataBaseManager.addNewFunds(newTransaction);
+                        await dbFundsManager.addNewFunds(newTransaction);
                     }
                 }
             }
