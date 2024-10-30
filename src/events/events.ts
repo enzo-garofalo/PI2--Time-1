@@ -8,17 +8,17 @@ export namespace EventsManager
 {
     
     export type Event = {
-        idEvent: number|undefined,
-        title: string,
-        description: string,
-        status_event: number,
-        categories: string,
-        register_date: string | undefined,
-        bets_funds: number,
-        finish_date: string
+        ID_EVENT: number|undefined,
+        TITLE: string,
+        DESCRIPTION : string,
+        CATEGORIES: string,
+        STATUS_EVENT: string,
+        RESULT_EVENT: number | undefined,
+        REGISTER_DATE: string | undefined,
+        BETS_FUNDS: number,
+        FINISH_DATE: string
     }
 
-    //função que coloca o evento no BD (medina)
 
     export const addNewEventHandler: RequestHandler = 
     async (req: Request, res: Response) => {
@@ -39,14 +39,15 @@ export namespace EventsManager
         {
             const newEvent: Event = 
             {
-                idEvent: undefined,
-                title: pTitle,
-                description: pDescription,
-                status_event: 0,
-                categories: pCategories,
-                register_date: undefined,
-                bets_funds: 0.00,
-                finish_date: pFinishDate
+                ID_EVENT: undefined,
+                TITLE: pTitle,
+                DESCRIPTION : pDescription,
+                CATEGORIES: pCategories,
+                STATUS_EVENT: 'Pendente',
+                RESULT_EVENT: undefined,
+                REGISTER_DATE: undefined,
+                BETS_FUNDS: 0.00,
+                FINISH_DATE: pFinishDate
             }
             await dbEventsManager.addNewEvent(newEvent);
             req.statusCode = 200;
@@ -55,26 +56,6 @@ export namespace EventsManager
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
-    }
-
-    async function getNewEvents()
-    {
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-
-        const connection:OracleDB.Connection = 
-            await DataBaseManager.get_connection();
-
-        const newEventsList: OracleDB.Result<Event> = 
-            await connection.execute(
-                `
-                SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES 
-                FROM EVENTS
-                WHERE ISVALID = 0
-                `
-        );
-        await connection.close();
-        console.log("Eventos retornados:", newEventsList.rows);
-        return newEventsList.rows;
     }
 
     export const evaluateNewEventHandler: RequestHandler =
@@ -88,30 +69,44 @@ export namespace EventsManager
 
         console.log(req.session.role);
         const pEventID = req.get('eventID');
-        const pValidate = req.get('validate');
+        // 1 para é aprovado, 0 para não aprovado
+        const pIsValid = Number(req.get('isValid'));
 
-        if(pEventID && pValidate)
+        if(pEventID && pIsValid)
         {
             const connection:OracleDB.Connection = 
-                await DataBaseManager.get_connection();
+            await DataBaseManager.get_connection();
             
+            var newStatus = '';
+
+            if(pIsValid === 1){
+                newStatus = 'Aprovado';
+            }else if(pIsValid === 0){
+                newStatus = 'Reprovado';
+            }else{
+                res.statusCode = 400;
+                res.send('Formato de requisição inválido!');
+                await connection.close();
+                return;
+            }
+
             await connection.execute(
                 `
                 UPDATE EVENTS
-                SET ISVALID = 1
-                WHERE ID_EVENT = :id_event
+                SET STATUS_EVENT = :newStatus 
+                WHERE ID_EVENT = :idEvent
                 `,
-                { id_event: pEventID } 
+                { newStatus :newStatus, idEvent: pEventID } 
             );
 
             await connection.commit();
             await connection.close();
 
-            const updatedEventsList = await getNewEvents();
+            const updatedEventsList = await dbEventsManager.getNewEvents();
             res.statusCode = 200;
             res.send(updatedEventsList);
         }
-        const newEventsList = await getNewEvents();
+        const newEventsList = await dbEventsManager.getNewEvents();
 
         if(newEventsList)
         {
