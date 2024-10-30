@@ -155,19 +155,19 @@ export namespace EventsManager
             return;
         }
         
-        const pStringBusca = req.get('title_request')
+        const pStringBusca = req.get('stringBusca')
 
         if(pStringBusca){
             try{
                 
                 const events = await dbEventsManager.searchEvent(pStringBusca);
 
-                if(events){
-                    res.statusCode = 404;
-                    res.send('Evento não encontrado.');
-                }else{
+                if(events && events.length > 0){
                     res.statusCode = 200;
                     res.send(events);
+                }else{
+                    res.statusCode = 404;
+                    res.send('Evento não encontrado.');
                 }
                 
             } catch (error){
@@ -176,9 +176,7 @@ export namespace EventsManager
         }else{
             res.statusCode = 400;
             res.send('Erro inesperado ao realizar busca de eventos');
-        }
-        
-            
+        }   
     }
 
     export const deleteEventHandler: RequestHandler = 
