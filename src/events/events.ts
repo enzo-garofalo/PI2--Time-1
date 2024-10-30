@@ -70,7 +70,7 @@ export namespace EventsManager
         console.log(req.session.role);
         const pEventID = req.get('eventID');
         // 1 para é aprovado, 0 para não aprovado
-        const pIsValid = Number(req.get('isValid'));
+        const pIsValid = req.get('isValid');
 
         if(pEventID && pIsValid)
         {
@@ -79,9 +79,9 @@ export namespace EventsManager
             
             var newStatus = '';
 
-            if(pIsValid === 1){
+            if(Number(pIsValid) === 1){
                 newStatus = 'Aprovado';
-            }else if(pIsValid === 0){
+            }else if(Number(pIsValid) === 0){
                 newStatus = 'Reprovado';
             }else{
                 res.statusCode = 400;
@@ -103,15 +103,27 @@ export namespace EventsManager
             await connection.close();
 
             const updatedEventsList = await dbEventsManager.getNewEvents();
-            res.statusCode = 200;
-            res.send(updatedEventsList);
+            if(updatedEventsList?.length === 0)
+            {
+                res.statusCode = 200;
+                res.send('Não há eventos pendentes!');
+            }else{
+                res.statusCode = 200;
+                res.send(updatedEventsList);
+            }
+            return;
         }
         const newEventsList = await dbEventsManager.getNewEvents();
 
         if(newEventsList)
         {
-            res.statusCode = 200;
-            res.send(newEventsList);
+            if(newEventsList.length === 0){
+                res.statusCode = 200;
+                res.send('Não há eventos pendentes!');
+            }else{
+                res.statusCode = 200;
+                res.send(newEventsList);
+            }
         }else{
             res.statusCode = 404;
             res.send('Nenhum evento encontrado!');
