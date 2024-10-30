@@ -95,12 +95,12 @@ export namespace dbEventsManager
                     
                     if(idWallet){
                         // TEM QUE MELHORAR TYPE FUNDS!!
-                        const newTransaction: FundsManager.Funds = {
-                            idWallet: Number(idWallet[0].ID_WALLET),
+                        const newTransaction: FundsManager.Historic = {
+                            fkIdWallet: Number(idWallet[0].ID_WALLET),
                             typeTransaction: 'Ganho',
                             value: winnersValue
                         }
-                        await dbFundsManager.addNewFunds(newTransaction);
+                        await dbFundsManager.addLineHistoric(newTransaction);
                     }
                 }
             }

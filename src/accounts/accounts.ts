@@ -35,11 +35,10 @@ export namespace AccountsManager {
                 ROLE: 0,
                 TOKEN: undefined
             }
-            const newAccountFunds: FundsManager.Funds =
+            const newAccountFunds: FundsManager.Wallet =
             {
                 idWallet: undefined,
-                typeTransaction: 'Credito',
-                value: 0
+                balance: 0
             }
 
             if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))

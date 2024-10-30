@@ -9,7 +9,7 @@ import { DataBaseManager } from "./connection";
 export namespace dbAccountsManager
 {
     export async function saveNewAccount
-    (account: AccountsManager.userAccount, newAccountWallet: FundsManager.Funds) 
+    (account: AccountsManager.userAccount, newAccountWallet: FundsManager.Wallet) 
     {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -61,7 +61,7 @@ export namespace dbAccountsManager
                             :BALANCE, :FK_ID_USER
                         )`,
                         {
-                            BALANCE: Number(newAccountWallet.value),
+                            BALANCE: Number(newAccountWallet.balance),
                             FK_ID_USER: Number(idUsuario)
                         }
                     );

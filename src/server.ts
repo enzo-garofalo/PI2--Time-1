@@ -62,7 +62,7 @@ routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
-routes.post('/withdrawFunds', FundsManager.withdrawFundsHandler);
+routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
 
 //Rotas de bets
 routes.put('/betOnEvent', betsManager.betOnEventHandler)

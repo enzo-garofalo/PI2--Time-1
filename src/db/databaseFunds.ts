@@ -7,7 +7,7 @@ import { FundsManager } from "../funds/funds";
 
 export namespace dbFundsManager
 {
-    export async function addNewFunds(newFund: FundsManager.Funds) {
+    export async function addLineHistoric(newFund: FundsManager.Historic) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
         const connection: OracleDB.Connection = 
@@ -18,15 +18,44 @@ export namespace dbFundsManager
                 `
                 INSERT INTO HISTORIC 
                 (TRANSACTION_ID, TRANSACTION_TYPE, TRANSACTION_VALUE, FK_ID_WALLET) 
-                VALUES (SEQ_TRANSACTION.NEXTVAL, :typeTransaction, :credit, :id_wallet )
+                VALUES (SEQ_TRANSACTION.NEXTVAL, :typeTransaction, :value, :id_wallet )
                 `,
                 {
                     typeTransaction: newFund.typeTransaction,
-                    credit: newFund.value,
-                    id_wallet: newFund.idWallet
+                    value: newFund.value,
+                    id_wallet: newFund.fkIdWallet
                 }
             );
             
+            await connection.commit();
+        }catch{
+            console.log('erro inesperado');
+            return false;
+        }finally{
+            await connection.close();
+            return true;
+        }
+    }
+
+    export async function upDateBalance(updateWallet: FundsManager.Wallet, Credit: number) {
+
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        const connection: OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+
+        try{
+            await connection.execute(
+                `
+                UPDATE WALLETS
+                SET BALANCE = :balance
+                WHERE ID_WALLET = :idwallet
+                `,
+                {
+                    balance: updateWallet.balance + Credit,
+                    idwallet: updateWallet.idWallet
+                }
+            
+            );
             await connection.commit();
         }catch{
             console.log('erro inesperado');

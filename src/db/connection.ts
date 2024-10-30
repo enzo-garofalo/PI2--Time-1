@@ -173,5 +173,22 @@ export namespace DataBaseManager
         console.log("Eventos retornados:", newEventsList.rows);
         return newEventsList.rows;
     }
+
+    export async function joinTables(token:string) {
+
+        const connection = await DataBaseManager.get_connection()
+        
+        const userID : OracleDB.Result<{IDUSER: number, IDWALLET: number, BALANCE: number}> = 
+            await connection.execute(
+                `SELECT AC.ID AS IDUSER, WL.ID_WALLET AS IDWALLET, WL.BALANCE AS BALANCE
+                FROM ACCOUNTS AC
+                JOIN WALLETS WL ON AC.ID = WL.FK_ID_USER
+                WHERE AC.TOKEN = :token`,
+                {token}
+        );
+
+        return userID.rows;
+        
+    }
     
 }
