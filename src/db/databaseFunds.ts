@@ -15,17 +15,15 @@ export namespace dbFundsManager
 
         try{
             await connection.execute(
-                `INSERT INTO HISTORIC 
+                `
+                INSERT INTO HISTORIC 
                 (TRANSACTION_ID, TRANSACTION_TYPE, TRANSACTION_VALUE, FK_ID_WALLET) 
-                VALUES
-                (
-                    SEQ_TRANSACTION.NEXTVAL, 
-                    :typeTransaction, :credit, :id_wallet
-                )`,
+                VALUES (SEQ_TRANSACTION.NEXTVAL, :typeTransaction, :credit, :id_wallet )
+                `,
                 {
-                    typeTransaction: { val: newFund.typeTransaction, type: OracleDB.STRING },
-                    credit: { val: newFund.value, type: OracleDB.NUMBER },
-                    id_wallet: { val: newFund.idWallet, type: OracleDB.NUMBER }
+                    typeTransaction: newFund.typeTransaction,
+                    credit: newFund.value,
+                    id_wallet: newFund.idWallet
                 }
             );
             

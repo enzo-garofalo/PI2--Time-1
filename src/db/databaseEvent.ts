@@ -10,7 +10,7 @@ import { dbFundsManager } from "./databaseFunds";
 export namespace dbEventsManager
 {
 
-    export async function addNewEvent(event:EventsManager.Event)
+    export async function addNewEvent(newEvent:EventsManager.Event)
     {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
@@ -25,15 +25,15 @@ export namespace dbEventsManager
             REGISTER_DATE, BETS_FUNDS, FINISH_DATE)
             VALUES
             (SEQ_EVENTS.NEXTVAL, :title, :description, :categories,
-            :status_event, :bets_funds, :finish_date)
+            :status_event, SYSDATE, :bets_funds, :finish_date)
             `,
             {
-                title: event.title,
-                description: event.description,
-                categories: event.categories,
-                status_event: event.status_event,
-                bets_funds: event.bets_funds || 0.00,
-                finish_date: event.finish_date
+                title: newEvent.TITLE,
+                description: newEvent.DESCRIPTION,
+                categories: newEvent.CATEGORIES,
+                status_event: newEvent.STATUS_EVENT,
+                bets_funds: newEvent.BETS_FUNDS,
+                finish_date: newEvent.FINISH_DATE
             }
         );
                     
@@ -156,6 +156,26 @@ export namespace dbEventsManager
             
     }
     
+    export async function getNewEvents()
+    {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+            await DataBaseManager.get_connection();
+
+        const newEventsList: OracleDB.Result<Event> = 
+            await connection.execute(
+                `
+                SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES, STATUS_EVENT 
+                FROM EVENTS
+                WHERE STATUS_EVENT = 'Pendente'
+                `
+        );
+        await connection.close();
+        console.log("Eventos retornados:", newEventsList.rows);
+        return newEventsList.rows;
+    }
+
 }
 
 
