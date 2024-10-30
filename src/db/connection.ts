@@ -121,7 +121,7 @@ export namespace DataBaseManager
         const balance : OracleDB.Result<{BALANCE: number}>  = 
             await connection.execute(
                 `
-                SELECT SUM(TRANSACTION_VALUE) 
+                SELECT SUM(TRANSACTION_VALUE) AS BALANCE
                 FROM HISTORIC 
                 WHERE FK_ID_WALLET = :id_wallet
                 `,

@@ -1,4 +1,5 @@
 import { betsManager } from "../bets/bets";
+import { EventsManager } from "../events/events"; 
 import { DataBaseManager } from "./connection";
 import OracleDB from "oracledb";
 
@@ -12,19 +13,19 @@ export namespace dbBetsManager
         const connection: OracleDB.Connection = 
         await DataBaseManager.get_connection();
         try{
-            await connection.execute
-            (
+            await connection.execute(
                 `INSERT INTO BETS
                 (ID_BET, BET, VALUE_BET, ID_USER, ID_EVENT) 
-                VALUES( SEQ_BETS.NEXTVAL, :userBet, :valuesBet, 
+                VALUES(SEQ_BETS.NEXTVAL, :userBet, :valuesBet, 
                 :fk_ID_User, :fk_ID_Event)`,
                 {   
                     userBet: bet.bet,
                     valuesBet: bet.valuesBet,
                     fk_ID_User: bet.fk_ID_User,
-                    fk_ID_Events: bet.fk_ID_Event
+                    fk_ID_Event: bet.fk_ID_Event
                 }
             );
+            
             await connection.commit();
 
         }catch (error){
@@ -35,4 +36,20 @@ export namespace dbBetsManager
         }
         return true;
     }
+
+    export async function searchForEvents() {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        
+        const connection: OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+        
+        const eventList: OracleDB.Result<EventsManager.Event> = await connection.execute(
+            `SELECT * 
+            FROM EVENT
+            WHERE STATUS_EVENT = 'Ocorrendo'
+            `
+        );
+        return eventList.rows;
+    }
+    
 }

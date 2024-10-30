@@ -42,54 +42,53 @@ export namespace dbEventsManager
 
     }
     
-    async function calculateBetsFunds(idEvent: number) 
-    {
+    async function calculateBetsFunds(idEvent: number) {
         let connection = await DataBaseManager.get_connection();
-        const totalBetsFunds: OracleDB.Result<{VALUE_BET: number}> = 
+        const totalBetsFunds: OracleDB.Result<{ VALUE_BET: number }> =
         await connection.execute(
             `
-            SELECT SUM(VALUE_BET)
+            SELECT SUM(VALUE_BET) AS VALUE_BET
             FROM BETS
-            WHERE ID_EVENT
+            WHERE ID_EVENT = :idEvent
             `, { idEvent }
         );
         await connection.close();
-        if(totalBetsFunds.rows)
-            return totalBetsFunds.rows[0].VALUE_BET;
+        return totalBetsFunds.rows?.[0]?.VALUE_BET || 0;
     }
+    
 
-    export async function shareEventFunds(idEvent:number, verdictCode:number)
+    export async function shareEventFunds(idEvent:number, verdict:string)
     {
         let connection = await DataBaseManager.get_connection();
 
-        const totalEventFunds = Number(calculateBetsFunds(idEvent));
+        const totalEventFunds = await calculateBetsFunds(idEvent);
 
         const countWinners: OracleDB.Result<{TOTAL_BETTORS : number}> = 
         await connection.execute(
             `
             SELECT COUNT(ID_USER) AS TOTAL_BETTORS
             FROM BETS
-            WHERE ID_EVENT = :idEvent AND BET = :verdictBet
-            `, { idEvent, verdictCode }
+            WHERE ID_EVENT = :idEvent AND BET = :verdict
+            `, { idEvent, verdict }
         );
 
-        var winnersValue = null;
-        if(countWinners.rows){
+        const totalWinners = countWinners.rows?.[0]?.TOTAL_BETTORS || 0;
+        
+        if(totalWinners > 0){
             //Cálculo do ganhado por cada winner
-            const totalWinners = countWinners.rows[0].TOTAL_BETTORS;
-            winnersValue = totalEventFunds/totalWinners;
+            const winnersValue = totalEventFunds/totalWinners;
 
             // lista do id de ganhadores para fazer transações
             const idWinnersList: OracleDB.Result<{ID_USER: number}> =
             await connection.execute(
                `SELECT ID_USER
                 FROM BETS
-                WHERE ID_EVENT = :idEvent AND BET = :verdictBet
-                `, { idEvent, verdictCode }
+                WHERE ID_EVENT = :idEvent AND BET = :verdict
+                `, { idEvent, verdict }
             );
 
             if(idWinnersList.rows){
-                for(const winner of idWinnersList.rows)
+                for(const winner of idWinnersList.rows || [])
                 {
                     const idUser = winner.ID_USER;
                     const idWallet = await DataBaseManager.getIdWallet(idUser);
@@ -105,24 +104,25 @@ export namespace dbEventsManager
                     }
                 }
             }
+            await connection.close();
         }
     }
 
-    export async function finishEvent(idEvent: number, verdictCode: number)
+    export async function finishEvent(idEvent: number, verdict: string)
     {
         let connection = await DataBaseManager.get_connection();
-        const EventFunds = calculateBetsFunds(idEvent);
+        const EventFunds = await calculateBetsFunds(idEvent);
 
         await connection.execute(
            `UPDATE EVENTS
-            SET RESULT_EVENT = :verdictCode,
-            STATUS_EVENT = 2,
-            BETS_FUNDS = :totalEventFunds
+            SET RESULT_EVENT = :verdict,
+                STATUS_EVENT = 'Finalizado',
+                BETS_FUNDS = :totalEventFunds
             WHERE ID_EVENT = :idEvent`, 
             { 
-                verdictCode: verdictCode, 
+                verdict: verdict, 
                 idEvent: idEvent, 
-                totalEventFunds : Number(EventFunds) 
+                totalEventFunds : EventFunds 
             }
         );
 

@@ -13,7 +13,7 @@ export namespace EventsManager
         DESCRIPTION : string,
         CATEGORIES: string,
         STATUS_EVENT: string,
-        RESULT_EVENT: number | undefined,
+        RESULT_EVENT: string | undefined,
         REGISTER_DATE: string | undefined,
         BETS_FUNDS: number,
         FINISH_DATE: string
@@ -143,12 +143,12 @@ export namespace EventsManager
         }
 
         const pIdEvent = Number(req.get('eventId'));
-        const pVerdictCode = Number(req.get('verdictCode'));
-        // 1 para aconteceu 2 para não aconteceu
+        const pVerdict = req.get('aconteceu');
+        // 1 para aconteceu 0 para não aconteceu
 
-        if(pIdEvent && pVerdictCode){
-            await dbEventsManager.finishEvent(pIdEvent, pVerdictCode);
-            await dbEventsManager.shareEventFunds(pIdEvent, pVerdictCode);
+        if(pIdEvent && pVerdict){
+            await dbEventsManager.finishEvent(pIdEvent, pVerdict);
+            await dbEventsManager.shareEventFunds(pIdEvent, pVerdict);
 
             res.statusCode = 200;
             res.send('Evento finalizado e ganhos distribuídos!');

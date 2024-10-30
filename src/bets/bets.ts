@@ -5,7 +5,7 @@ export namespace betsManager
 {
     export type newBet = 
     {
-        bet: number;
+        bet: string;
         valuesBet: number;
         fk_ID_User: number;
         fk_ID_Event: number;
@@ -14,8 +14,7 @@ export namespace betsManager
 
     export const betOnEventHandler: RequestHandler =
     async (req: Request, res : Response) => 
-    {
-                
+    {        
         if(!req.session.token)
         {
             res.statusCode = 401;
@@ -29,15 +28,22 @@ export namespace betsManager
         if(resultSearchUser)
         {
             const IdUser = Number(resultSearchUser[0].ID);
-        
             const pIdEvent = Number(req.get('idEvent'));
-            const pBet = Number(req.get('aposta'));
+            const pBet = req.get('acontecera');
             const pBetValue = Number(req.get('valorAposta'));
 
             if(pIdEvent && pBet && pBetValue)
             {
-                const newBet: newBet = 
-                {
+                if(pBet != 'sim' && pBet != 'não'){
+                    res.statusCode = 400;
+                    res.send('Faça uma bet válida');
+                    return;
+                }
+
+                const newBet: newBet = {
+                    // bet: é a aposta em si
+                    // sim para o evento vai ocorrer
+                    // não para não vai ocorrer
                     bet : pBet,
                     valuesBet : pBetValue,
                     fk_ID_User : IdUser,
@@ -48,12 +54,13 @@ export namespace betsManager
                 {
                     req.statusCode = 200;
                     res.send("Bet feita.")
-                } else{
+                }else{
                     res.statusCode = 409;
                     res.send("Erro inesperado ao fazer o bet.");
                 }
             }else{
-                // const eventsAvaliableToBet = await dbBetsManager.searchForEvents();
+                res.statusCode = 400;
+                res.send("Parâmetros inválidos ou faltantes");
             }
         }
     }
