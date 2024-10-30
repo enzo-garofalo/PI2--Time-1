@@ -19,6 +19,7 @@ export namespace EventsManager
         FINISH_DATE: string
     }
 
+
     export const addNewEventHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
@@ -257,4 +258,61 @@ export namespace EventsManager
             await connection.close();
         }   
     }        
+
+    export const getEventHandler: RequestHandler = 
+    async (req: Request, res: Response) => {
+        
+        if (req.session.role === undefined) {
+            res.statusCode = 401;
+            res.send('Usuário não está logado!');
+            return;
+        }
+
+        const pStatus = req.query.status as string;
+        let consulta = '';
+
+        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
+
+        try {
+            switch (pStatus) {
+                case "aguardando aprovação":
+                    consulta = `SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES,
+                                REGISTER_DATE, FINISH_DATE
+                                FROM EVENTS
+                                WHERE STATUS_EVENT = 0`;
+                    break;
+
+                case "eventos já ocorridos":
+                    consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
+                                REGISTER_DATE, FINISH_DATE
+                                FROM EVENTS
+                                WHERE STATUS_EVENT = 1 AND FINISH_DATE < SYSDATE`;
+                    break;
+
+                case "eventos futuros":
+                    consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
+                                REGISTER_DATE, FINISH_DATE
+                                FROM EVENTS
+                                WHERE STATUS_EVENT = 1 AND FINISH_DATE >= SYSDATE`;
+                    break;
+
+                default:
+                    res.statusCode = 400;
+                    res.send("Status inválido. Tente usar 'aguardando_aprovacao', 'ocorridos' ou 'futuros'.");
+                    return;
+            }
+
+            const result: OracleDB.Result<Event> = await connection.execute(consulta);
+            res.statusCode = 200;
+            res.send(result.rows);
+
+        } catch (error){
+            console.error("Erro ao obter eventos:", error);
+            res.statusCode = 500;
+            res.send("Erro ao processar a requisição");
+
+        } finally{
+            await connection.close();
+        }
+    }
 }
