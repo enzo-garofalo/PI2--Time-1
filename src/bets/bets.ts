@@ -1,7 +1,6 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
-import OracleDB from "oracledb";
-
+import { dbBetsManager } from "../db/databaseBets";
 export namespace betsManager
 {
     export type newBet = 
@@ -12,29 +11,6 @@ export namespace betsManager
         fk_ID_Event: number;
     }
 
-    async function betting(bet:newBet) 
-    {    
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-        
-        const connection: OracleDB.Connection = 
-        await DataBaseManager.get_connection();
-            await connection.execute
-            (
-                `INSERT INTO BETS
-                (ID_BET, BET, VALUE_BET, ID_USER, ID_EVENT) 
-                VALUES( SEQ_BETS.NEXTVAL, :userBet, :valuesBet, 
-                :fk_ID_User, :fk_ID_Event)`,
-                {   
-                    userBet: bet.bet,
-                    valuesBet: bet.valuesBet,
-                    fk_ID_User: bet.fk_ID_User,
-                    fk_ID_Events: bet.fk_ID_Event
-                }
-            );
-        await connection.commit();
-        await connection.close();
-        return true;
-    }
 
     export const betOnEventHandler: RequestHandler =
     async (req: Request, res : Response) => 
@@ -68,17 +44,16 @@ export namespace betsManager
                     fk_ID_Event : pIdEvent
                 };            
                 //deu bom
-                if (await betting(newBet))
+                if (await dbBetsManager.betting(newBet))
                 {
                     req.statusCode = 200;
-                    res.send("Bet feito.")
+                    res.send("Bet feita.")
                 } else{
                     res.statusCode = 409;
                     res.send("Erro inesperado ao fazer o bet.");
                 }
             }else{
-                res.statusCode = 400;
-                res.send("Parâmetros inválidos ou faltantes.");
+                // const eventsAvaliableToBet = await dbBetsManager.searchForEvents();
             }
         }
     }

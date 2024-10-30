@@ -53,8 +53,11 @@ routes.post('/login', AccountsManager.loginHandler);
 //Rotas de Eventos
 routes.put('/addNewEvent', EventsManager.addNewEventHandler);
 routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
-routes.post('/finishEvent', EventsManager.finishEventHandler)
+
 routes.get('/searchEvent', EventsManager.searchEventHandler);
+routes.get('/getEvent', EventsManager.getEventHandler);
+
+routes.post('/finishEvent', EventsManager.finishEventHandler)
 routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 
 //Rotas de Wallet

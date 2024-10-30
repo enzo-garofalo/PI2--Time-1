@@ -80,9 +80,9 @@ export namespace EventsManager
             var newStatus = '';
 
             if(Number(pIsValid) === 1){
-                newStatus = 'Aprovado';
+                newStatus = 'Ocorrendo';
             }else if(Number(pIsValid) === 0){
-                newStatus = 'Reprovado';
+                newStatus = 'Deletado';
             }else{
                 res.statusCode = 400;
                 res.send('Formato de requisição inválido!');
@@ -133,7 +133,6 @@ export namespace EventsManager
 
     export const finishEventHandler: RequestHandler =
     async (req: Request, res: Response) => {
-        // e distribuir os fundos dos apostadores proporcionalmente aos vencedores). 
         if(!req.session.token)
         {
             res.statusCode = 401;
@@ -278,44 +277,55 @@ export namespace EventsManager
             return;
         }
 
-        const pStatus = req.query.status as string;
+        const pStatus = req.get('status');
         let consulta = '';
 
         const connection: OracleDB.Connection = await DataBaseManager.get_connection();
 
         try {
             switch (pStatus) {
-                case "aguardando aprovação":
+                case "pendente":
                     consulta = `SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES,
                                 REGISTER_DATE, FINISH_DATE
                                 FROM EVENTS
-                                WHERE STATUS_EVENT = 0`;
+                                WHERE STATUS_EVENT = 'Pendente'`;
                     break;
 
-                case "eventos já ocorridos":
+                case "finalizado":
                     consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
                                 REGISTER_DATE, FINISH_DATE
                                 FROM EVENTS
-                                WHERE STATUS_EVENT = 1 AND FINISH_DATE < SYSDATE`;
+                                WHERE STATUS_EVENT = 'Finalizado'`;
                     break;
 
-                case "eventos futuros":
+                case "ocorrendo":
                     consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
                                 REGISTER_DATE, FINISH_DATE
                                 FROM EVENTS
-                                WHERE STATUS_EVENT = 1 AND FINISH_DATE >= SYSDATE`;
+                                WHERE STATUS_EVENT = 'Ocorrendo'`;
+                    break;
+
+                case "deletado":
+                    consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
+                                REGISTER_DATE, FINISH_DATE
+                                FROM EVENTS
+                                WHERE STATUS_EVENT = 'Deletado'`;
                     break;
 
                 default:
                     res.statusCode = 400;
-                    res.send("Status inválido. Tente usar 'aguardando_aprovacao', 'ocorridos' ou 'futuros'.");
+                    res.send("Status inválido. Tente usar 'pendente', 'finalizado', 'ocorrendo' ou 'deletado'.");
                     return;
             }
 
             const result: OracleDB.Result<Event> = await connection.execute(consulta);
-            res.statusCode = 200;
-            res.send(result.rows);
-
+            if(result.rows?.length === 0){
+                res.statusCode = 200;
+                res.send(`Não há eventos do status: ${pStatus}`);
+            }else{
+                res.statusCode = 200;
+                res.send(result.rows);
+            }
         } catch (error){
             console.error("Erro ao obter eventos:", error);
             res.statusCode = 500;
@@ -323,6 +333,7 @@ export namespace EventsManager
 
         } finally{
             await connection.close();
+            return;
         }
     }
 }
