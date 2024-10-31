@@ -37,7 +37,7 @@ export namespace FundsManager{
         if(id_user)
         {
             const resultSearch_IdWallet = 
-            await DataBaseManager.getIdWallet(id_user[0]);
+            await DataBaseManager.getIdWallet(id_user);
             console.log(resultSearch_IdWallet);
             if(resultSearch_IdWallet)
             {
@@ -99,7 +99,7 @@ export namespace FundsManager{
         if(id_user)
         {
             const resultSearch_IdWallet = 
-            await DataBaseManager.getIdWallet(id_user[0]);
+            await DataBaseManager.getIdWallet(id_user);
 
             if(resultSearch_IdWallet)
             {

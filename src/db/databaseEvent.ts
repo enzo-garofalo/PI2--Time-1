@@ -22,10 +22,10 @@ export namespace dbEventsManager
             `
             INSERT INTO EVENTS
             (ID_EVENT, TITLE, DESCRIPTION, CATEGORIES, STATUS_EVENT, 
-            REGISTER_DATE, BETS_FUNDS, FINISH_DATE)
+            REGISTER_DATE, BETS_FUNDS, FINISH_DATE, FK_ID_USER)
             VALUES
             (SEQ_EVENTS.NEXTVAL, :title, :description, :categories,
-            :status_event, SYSDATE, :bets_funds, :finish_date)
+            :status_event, SYSDATE, :bets_funds, :finish_date, :fk_id_user)
             `,
             {
                 title: newEvent.TITLE,
@@ -33,8 +33,9 @@ export namespace dbEventsManager
                 categories: newEvent.CATEGORIES,
                 status_event: newEvent.STATUS_EVENT,
                 bets_funds: newEvent.BETS_FUNDS,
-                finish_date: newEvent.FINISH_DATE
-            }
+                finish_date: newEvent.FINISH_DATE,
+                fk_id_user: newEvent.FK_ID_USER
+            },
         );
                     
         await connection.commit();
@@ -42,7 +43,8 @@ export namespace dbEventsManager
 
     }
     
-    async function calculateBetsFunds(idEvent: number) {
+    export async function calculateBetsFunds(idEvent: number) 
+    {
         let connection = await DataBaseManager.get_connection();
         const totalBetsFunds: OracleDB.Result<{ VALUE_BET: number }> =
         await connection.execute(
@@ -108,10 +110,10 @@ export namespace dbEventsManager
         }
     }
 
-    export async function finishEvent(idEvent: number, verdict: string)
+    export async function finishEvent(pIdEvent: number, verdict: string)
     {
         let connection = await DataBaseManager.get_connection();
-        const EventFunds = await calculateBetsFunds(idEvent);
+        const EventFunds = await calculateBetsFunds(pIdEvent);
 
         await connection.execute(
            `UPDATE EVENTS
@@ -121,7 +123,7 @@ export namespace dbEventsManager
             WHERE ID_EVENT = :idEvent`, 
             { 
                 verdict: verdict, 
-                idEvent: idEvent, 
+                idEvent: pIdEvent, 
                 totalEventFunds : EventFunds 
             }
         );
@@ -135,7 +137,7 @@ export namespace dbEventsManager
         
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
         const connection: OracleDB.Connection = await DataBaseManager.get_connection();
-
+        
         try{
             const returnEvent: OracleDB.Result<{Event: string}> =
             await connection.execute(
@@ -176,6 +178,69 @@ export namespace dbEventsManager
         return newEventsList.rows;
     }
 
+    export async function deleteEvent(pEventID: number)
+    {
+        let connection = await DataBaseManager.get_connection();
+        
+        try{
+            await connection.execute(
+                `UPDATE EVENTS
+                SET STATUS_EVENT = 'Deletado'
+                WHERE ID_EVENT = :idEvent`, 
+                { idEvent : pEventID }
+            );
+
+            await connection.commit();
+
+        }catch(error){
+            console.error('Erro ao deletar evento.', error);
+        }finally{
+            await connection.close();
+        }
+    }
+
+    export async function verifyPropertyEvent(token:string, idEvent: number) 
+    {
+        let connection = await DataBaseManager.get_connection();
+
+        const id_user = await DataBaseManager.getUserID(token);
+
+        const searchForEventOwner: OracleDB.Result<{FK_ID_USER: number}> =
+        await connection.execute(
+            `SELECT FK_ID_USER
+            FROM EVENTS
+            WHERE ID_EVENT = :id_event`,
+            { id_event: idEvent }
+        );
+
+        await connection.close();
+        const eventOwner = searchForEventOwner.rows?.[0].FK_ID_USER
+        if(eventOwner === id_user)
+            return true;
+
+        return false;
+    }
+
+    export async function isPending(idEvent: number)
+    {
+        let connection = await DataBaseManager.get_connection();
+
+        
+        const status: OracleDB.Result<{STATUS_EVENT: string}> =
+        await connection.execute(
+            `SELECT STATUS_EVENT
+            FROM EVENTS
+            WHERE ID_EVENT = :id_event`,
+            { id_event: idEvent }
+        );
+
+        await connection.close();
+        const result = status.rows?.[0].STATUS_EVENT;
+        if(result === 'Pendente')
+            return true;
+
+        return false;
+    }
 }
 
 

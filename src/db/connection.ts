@@ -24,19 +24,19 @@ export namespace DataBaseManager
         return connection;
     }
 
-    export async function getUserID(token:string)
-    {
-        const connection = await get_connection()
-        
-        const userID : OracleDB.Result<number>  = 
-            await connection.execute(
-                `SELECT ID FROM ACCOUNTS
-                WHERE TOKEN = :token`,
-                {token}
+    export async function getUserID(token: string) {
+        const connection = await get_connection();
+    
+        const userID: OracleDB.Result<{ ID: number }> = await connection.execute(
+            `SELECT ID FROM ACCOUNTS WHERE TOKEN = :token`,
+            { token }
         );
-
-        return userID.rows;
+    
+        await connection.close();
+    
+        return userID.rows ? userID.rows[0]?.ID : undefined; // Retorna o ID diretamente ou undefined
     }
+    
 
     export async function getUserByToken(token: string)
     {
@@ -152,26 +152,6 @@ export namespace DataBaseManager
         }
         await connection.commit();
         await connection.close();
-    }
-
-    export async function getNewEvents()
-    {
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-
-        const connection:OracleDB.Connection = 
-            await DataBaseManager.get_connection();
-
-        const newEventsList: OracleDB.Result<Event> = 
-            await connection.execute(
-                `
-                SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES 
-                FROM EVENTS
-                WHERE status_event = 0
-                `
-        );
-        await connection.close();
-        console.log("Eventos retornados:", newEventsList.rows);
-        return newEventsList.rows;
     }
     
 }
