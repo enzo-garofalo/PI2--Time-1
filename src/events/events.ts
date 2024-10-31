@@ -16,15 +16,15 @@ export namespace EventsManager
         RESULT_EVENT: string | undefined,
         REGISTER_DATE: string | undefined,
         BETS_FUNDS: number,
-        FINISH_DATE: string
+        FINISH_DATE: string,
+        FK_ID_USER: number | undefined
     }
 
 
     export const addNewEventHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
-        if(req.session.role === undefined){
-            console.log(req.session.token);
+        if(req.session.token === undefined){
             res.statusCode = 401;
             res.send('Usuário não está logado!');
             return;
@@ -35,8 +35,13 @@ export namespace EventsManager
         const pCategories = req.get('Categories');
         const pFinishDate = req.get('finishDate');
 
-        if(pTitle && pDescription && pCategories && pFinishDate)
+        const id_user  = 
+        await DataBaseManager.getUserID(req.session.token);
+
+        if(pTitle && pDescription && pCategories && pFinishDate && id_user)
         {
+
+            console.log('Id do usuário porra: ' + id_user)
             const newEvent: Event = 
             {
                 ID_EVENT: undefined,
@@ -47,7 +52,8 @@ export namespace EventsManager
                 RESULT_EVENT: undefined,
                 REGISTER_DATE: undefined,
                 BETS_FUNDS: 0.00,
-                FINISH_DATE: pFinishDate
+                FINISH_DATE: pFinishDate,
+                FK_ID_USER: id_user
             }
             await dbEventsManager.addNewEvent(newEvent);
             req.statusCode = 200;
@@ -80,7 +86,7 @@ export namespace EventsManager
             var newStatus = '';
 
             if(Number(pIsValid) === 1){
-                newStatus = 'Ocorrendo';
+                newStatus = 'Aprovado';
             }else if(Number(pIsValid) === 0){
                 newStatus = 'Deletado';
             }else{
@@ -193,79 +199,51 @@ export namespace EventsManager
 
     export const deleteEventHandler: RequestHandler = 
      async (req: Request, res: Response) => {
+        
+        // Verifica se user está logado
+        if(!req.session.token){
+            res.statusCode = 401;
+            res.send('Usuário não está logado!');
+            return;
+        }
 
-            const pEventID = req.get('id_event');
+        const pEventID = Number(req.get('id_event'));
+        const userToken = req.session.token;
+        
+        // Verifica se o user é dono do evento a ser modificado
+        const isOwner: boolean = 
+        await dbEventsManager.verifyPropertyEvent(userToken, pEventID);
 
-            if (!pEventID){
-                res.statusCode = 400;
-                res.send("Formato de requisição inválido");
+        if(pEventID && isOwner)
+        {
+            //Verifica se há apostas no evento
+            const EventFunds = 
+            await dbEventsManager.calculateBetsFunds(pEventID);
+            
+            // Verifica se o evento é está no status 'Pendente',
+            // Não deve ser possível deletar em outro status
+            const isPending: boolean = await dbEventsManager.isPending(pEventID)
+            if( EventFunds > 0 || isPending === false ){
+                res.statusCode = 200;
+                res.send('Não é possível deletar o evento! \
+                        \nHá apostas no evento ou ele está aberto!');
                 return;
             }
 
-            const connection: OracleDB.Connection = 
-                await DataBaseManager.get_connection();
+            await dbEventsManager.deleteEvent(pEventID);
 
-
-            try {
-                const eventCheck = await connection.execute(
-                    `SELECT ISVALID, (SELECT COUNT(*) 
-                    FROM BETS WHERE fk_ID_Event = :id_event) AS HAS_BETS 
-                    FROM EVENTS 
-                    WHERE ID_EVENT = :id_event`,
-                    {id_event: pEventID}
-                );
-
-                const eventRow = eventCheck.rows?.[0] as 
-                {ISVALID: number, HAS_BETS: number}
-
-                if (!eventRow){
-                    res.statusCode = 404;
-                    res.send("Evento não encontrado.");
-                    return;
-                }
-
-                if (eventRow.ISVALID == 1){
-                    res.statusCode = 406;
-                    res.send("Requisição não aceitável. Evento se encontra ativo.")
-                    return;
-                }
-
-                if (eventRow.ISVALID == 2){
-                    res.statusCode = 406;
-                    res.send("Requisição não aceitável. Evento se encontra encerrado.")
-                    return;
-                }
-                
-                if (eventRow.ISVALID == 3){
-                    res.statusCode = 406;
-                    res.send("Requisição não aceitável. Evento foi negado.")
-                    return;
-                }
-
-                if (eventRow.HAS_BETS > 0){
-                    res.statusCode = 406;
-                    res.send("Requisição não aceitável. Evento possui apostas ativas.")
-                    return;
-                }
-
-                await connection.execute(
-                    `UPDATE EVENTS
-                    SET ISVALID = 4
-                    WHERE ID_EVENT = :id_event`,
-                    {id_event: pEventID}
-                );
-
-                await connection.commit();
-                res.statusCode = 200;
-                res.send("Evento removido com sucesso.");
+            res.statusCode = 200;
+            res.send('Evento deletado com sucesso!');
+            
+        }else if(!isOwner){
+            res.statusCode = 401;
+            res.send("Usuário não é proprietário do evento!");
+        }else{
+            res.statusCode = 404;
+            res.send('Formato de requisição inválido!')
         }
-        catch(error){
-            console.error("Erro ao deletar evento", error);
-            res.statusCode = 500;
-            res.send("Erro ao processar a requisição");
-        }finally{
-            await connection.close();
-        }   
+        
+        return;
     }        
 
     export const getEventHandler: RequestHandler = 
@@ -298,11 +276,11 @@ export namespace EventsManager
                                 WHERE STATUS_EVENT = 'Finalizado'`;
                     break;
 
-                case "ocorrendo":
+                case "aprovado":
                     consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
                                 REGISTER_DATE, FINISH_DATE
                                 FROM EVENTS
-                                WHERE STATUS_EVENT = 'Ocorrendo'`;
+                                WHERE STATUS_EVENT = 'Aprovado'`;
                     break;
 
                 case "deletado":
@@ -314,7 +292,7 @@ export namespace EventsManager
 
                 default:
                     res.statusCode = 400;
-                    res.send("Status inválido. Tente usar 'pendente', 'finalizado', 'ocorrendo' ou 'deletado'.");
+                    res.send("Status inválido. Tente usar 'pendente', 'finalizado', 'aprovado' ou 'deletado'.");
                     return;
             }
 

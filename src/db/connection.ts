@@ -23,7 +23,24 @@ export namespace DataBaseManager
         return connection;
     }
 
+
+    export async function getUserID(token: string) {
+        const connection = await get_connection();
+    
+        const userID: OracleDB.Result<{ ID: number }> = await connection.execute(
+            `SELECT ID FROM ACCOUNTS WHERE TOKEN = :token`,
+            { token }
+        );
+    
+        await connection.close();
+    
+        return userID.rows ? userID.rows[0]?.ID : undefined; // Retorna o ID diretamente ou undefined
+    }
+    
+
+
     /*Retorna o ID do usuário pelo token do usuário*/
+
     export async function getUserByToken(token: string)
     {
         const connection = await get_connection()
@@ -71,6 +88,34 @@ export namespace DataBaseManager
                 {token}
         );
 
+
+        await connection.close;
+        return balance.rows;
+    }
+
+    export async function refreshBalance(id_wallet:number) 
+    {
+        const connection:OracleDB.Connection = await get_connection();
+        const balance = await getBalanceById(id_wallet);
+        
+        if(balance){
+            await connection.execute(
+                `
+                UPDATE WALLET
+                SET BALANCE = :balance
+                WHERE ID_WALLET = :id_wallet
+                `,
+                {
+                    balance: balance[0].BALANCE, 
+                    id_wallet: id_wallet
+                }
+            );
+        }
+        await connection.commit();
+        await connection.close();
+    }
+    
         return userID.rows;
     }
+
 }
