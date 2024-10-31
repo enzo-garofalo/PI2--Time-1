@@ -23,31 +23,6 @@ export namespace FundsManager{
     async (req: Request, res: Response) => {
 
         if(!req.session.token)
-        {
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
-
-        const pCredit = Number(req.get('Credit'));
-        
-        if (isNaN(pCredit) || pCredit <= 0) {
-            res.statusCode = 400;
-            res.send("Valor de crédito inválido.");
-            return;
-        }
-
-
-        const id_user = 
-        await DataBaseManager.getUserID(req.session.token);
-                
-        if(id_user)
-        {
-            const resultSearch_IdWallet = 
-            await DataBaseManager.getIdWallet(id_user);
-            console.log(resultSearch_IdWallet);
-            if(resultSearch_IdWallet)
-
             {
                 res.statusCode = 401;
                 res.send('Usuário não está logado!');
@@ -113,18 +88,9 @@ export namespace FundsManager{
             return;
         }
         const joinTables = 
-        await DataBaseManager.joinTables(req.session.token);
-
-        const id_user = 
-        await DataBaseManager.getUserID(req.session.token);
-        
-        if(id_user)
-        {
-            const resultSearch_IdWallet = 
-            await DataBaseManager.getIdWallet(id_user);
+            await DataBaseManager.joinTables(req.session.token);
 
         if(joinTables){
-
 
             if(joinTables[0].BALANCE >= pDebit){
 
