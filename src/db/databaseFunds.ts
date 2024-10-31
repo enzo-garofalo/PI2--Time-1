@@ -7,6 +7,8 @@ import { FundsManager } from "../funds/funds";
 
 export namespace dbFundsManager
 {
+
+    /*Função que adiciona linhas no histórico*/
     export async function addLineHistoric(newFund: FundsManager.Historic) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
@@ -37,7 +39,8 @@ export namespace dbFundsManager
         }
     }
 
-    export async function upDateBalance(updateWallet: FundsManager.Wallet, Credit: number) {
+    /*Altera o valor do Balance de acordo com o valor passado*/
+    export async function upDateBalance(updateWallet: FundsManager.Wallet, Value: number) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
         const connection: OracleDB.Connection = 
@@ -51,7 +54,7 @@ export namespace dbFundsManager
                 WHERE ID_WALLET = :idwallet
                 `,
                 {
-                    balance: updateWallet.balance + Credit,
+                    balance: updateWallet.balance + Value,
                     idwallet: updateWallet.idWallet
                 }
             

@@ -1,14 +1,13 @@
 import OracleDB from "oracledb";
 import dotenv from "dotenv";
 dotenv.config(); 
-
-import { FundsManager } from "../funds/funds";
 import { AccountsManager } from "../accounts/accounts";
-import { EventsManager } from "../events/events";
+
 
 export namespace DataBaseManager
 {
-    
+
+    /*Faz a conexão com o BD com as credenciais*/
     export async function get_connection()
     {
         let connection: OracleDB.Connection;
@@ -24,6 +23,7 @@ export namespace DataBaseManager
         return connection;
     }
 
+    /*Retorna o ID do usuário pelo token do usuário*/
     export async function getUserByToken(token: string)
     {
         const connection = await get_connection()
@@ -40,7 +40,8 @@ export namespace DataBaseManager
         await connection.close();
         return account.rows;
     }
-        
+    
+    /*Retorna o ID da Wallet pelo ID do usuário*/
     export async function getIdWallet(id_user:number) 
     {
         
@@ -55,6 +56,8 @@ export namespace DataBaseManager
 
     }
 
+    /*Faz Join nas tabelas de Usuários e carteiras e retorna ID do Usuário e Carteira
+     e o balanço da carteira recebendo o Token*/
     export async function joinTables(token:string) {
 
         const connection = await DataBaseManager.get_connection()

@@ -1,22 +1,24 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
-import OracleDB from "oracledb";
-
 import { dbFundsManager } from "../db/databaseFunds";
 
 export namespace FundsManager{
 
+    /*Cria o tipo Wallet*/
     export type Wallet = {
         idWallet: number | undefined,
         balance: number        
     }
 
+    /*Cria o tipo histórico*/
     export type Historic = {
         typeTransaction: string,
         value: number,
         fkIdWallet: number | undefined
     }
 
+    /*Recebe o valor que quer colocar na carteira e adiciona no Balance e 
+    adiciona linha no histórico*/
     export const addNewFundsHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
@@ -92,18 +94,19 @@ export namespace FundsManager{
 
             if(joinTables[0].BALANCE >= pDebit){
 
+                /*PERGUNTA - Como fazer e onde fazer? É necessário guardar o valor que o site ganha dos usuários?*/
                 //verificação do valor para taxar!
-                if(pDebit <= 100){
-                    //4%
-                }else if(pDebit <= 1000){
-                    //3%
-                }else if(pDebit <=5000){
-                    //2%
-                }else if(pDebit <=100000){
-                    //1%
-                }else{
-                    //Isento
-                }
+                // if(pDebit <= 100){
+                //     //4%
+                // }else if(pDebit <= 1000){
+                //     //3%
+                // }else if(pDebit <=5000){
+                //     //2%
+                // }else if(pDebit <=100000){
+                //     //1%
+                // }else{
+                //     //Isento
+                // }
                 const idWallet = joinTables[0].IDWALLET;
                 const newCredit: Historic = {
                     fkIdWallet: idWallet,
