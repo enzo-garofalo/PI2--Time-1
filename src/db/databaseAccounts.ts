@@ -8,8 +8,10 @@ import { DataBaseManager } from "./connection";
 
 export namespace dbAccountsManager
 {
+
+    /*Função que salva nova conta do BD*/
     export async function saveNewAccount
-    (account: AccountsManager.userAccount, newAccountWallet: FundsManager.Funds) 
+    (account: AccountsManager.userAccount, newAccountWallet: FundsManager.Wallet) 
     {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
@@ -38,7 +40,8 @@ export namespace dbAccountsManager
                         role: account.ROLE
                     }
                 );
-    
+                
+                /*Sempre fazer commit após alterações no BD*/
                 await connection.commit();
     
                 const resultadoID: OracleDB.Result<{ ID: Number }> = 
@@ -61,7 +64,7 @@ export namespace dbAccountsManager
                             :BALANCE, :FK_ID_USER
                         )`,
                         {
-                            BALANCE: Number(newAccountWallet.value),
+                            BALANCE: Number(newAccountWallet.balance),
                             FK_ID_USER: Number(idUsuario)
                         }
                     );
@@ -81,6 +84,7 @@ export namespace dbAccountsManager
         return successful;
     }
 
+    /*Faz o login do usuário no sistema se receber email e senha cadastrados*/
     export async function login(email:string, password: string) 
     {
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;

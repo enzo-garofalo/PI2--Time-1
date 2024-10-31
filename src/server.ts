@@ -9,19 +9,6 @@ import { EventsManager } from "./events/events";
 import {FundsManager} from "./funds/funds";
 import {betsManager} from "./bets/bets";
 
-/*
-/addNewEvent                  
-/getEvent (falta)
-/deleteEvent(falta)
-
-/finishEvent (falta)
-/searchEvent (falta)
-
-/betOnEvent (falta testar)
-/addFunds (falta testar)
-/widrawFunds falta testa
-*/
-
 //__________________________________________________
 const port = 3000; 
 export const server = express();
@@ -62,7 +49,7 @@ routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
-routes.post('/withdrawFunds', FundsManager.withdrawFundsHandler);
+routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
 
 //Rotas de bets
 routes.put('/betOnEvent', betsManager.betOnEventHandler)

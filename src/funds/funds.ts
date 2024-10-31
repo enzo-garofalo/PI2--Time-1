@@ -1,17 +1,24 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
-import OracleDB from "oracledb";
-
 import { dbFundsManager } from "../db/databaseFunds";
 
 export namespace FundsManager{
 
-    export type Funds = {
+    /*Cria o tipo Wallet*/
+    export type Wallet = {
         idWallet: number | undefined,
-        typeTransaction: string,
-        value: number        
+        balance: number        
     }
 
+    /*Cria o tipo histórico*/
+    export type Historic = {
+        typeTransaction: string,
+        value: number,
+        fkIdWallet: number | undefined
+    }
+
+    /*Recebe o valor que quer colocar na carteira e adiciona no Balance e 
+    adiciona linha no histórico*/
     export const addNewFundsHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
@@ -40,46 +47,54 @@ export namespace FundsManager{
             await DataBaseManager.getIdWallet(id_user);
             console.log(resultSearch_IdWallet);
             if(resultSearch_IdWallet)
+
             {
-                const idWallet = resultSearch_IdWallet[0].ID_WALLET;
-                const newCredit: Funds = {
-                    idWallet: idWallet,
-                    typeTransaction: 'Credito',
-                    value: pCredit
-                };
-                if(await dbFundsManager.addNewFunds(newCredit))
-                {
-                    req.statusCode = 200;
-                    res.send("Novo Valor adicionado.");
-                }else{
-                    res.statusCode = 409;
-                    res.send("Erro inesperado ao colocar o valor.");
-                }
-            }else{
+                res.statusCode = 401;
+                res.send('Usuário não está logado!');
+                return;
+            }
+    
+            const pCredit = Number(req.get('Credit'));
+            
+    
+            if (isNaN(pCredit) || pCredit <= 0) {
                 res.statusCode = 400;
-                res.send("Parâmetros inválidos ou faltantes.");
+                res.send("Valor de crédito inválido.");
+                return;
             }
-        }
-        
-    }   
-    export async function withdrawFunds(idWallet:number, qtdSacar:number){
-
-        const result = await DataBaseManager.getSaldoAtual(idWallet);
-        
-        if(result)
-        {
-            const currentBalance = result[0].BALANCE;
-            if(currentBalance < qtdSacar)
+            
+            const joinTables = 
+            await DataBaseManager.joinTables(req.session.token);
+                
+            console.log(joinTables)
+            if(joinTables)
             {
-                console.log('Erro inesperado ao realizar saque.');
-                return false;
-            }else{
-                await DataBaseManager.newfoundWithdraw(qtdSacar, idWallet);
-                return true;
-            }
-        }
+            
+                    const idWallet = joinTables[0].IDWALLET;
+                    const newCredit: Historic = {
+                        fkIdWallet: idWallet,
+                        typeTransaction: 'Credito',
+                        value: pCredit
+                    };
+                    const updateWallet: Wallet = {
+                        idWallet: idWallet,
+                        balance: joinTables[0].BALANCE
+                    };
+    
+                    if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, +(newCredit.value)))
+                    {
+                        req.statusCode = 200;
+                        res.send("Novo Valor adicionado.");
+                    }else{
+                        res.statusCode = 409;
+                        res.send("Erro inesperado ao colocar o valor.");
+                    }
+                }else{
+                    res.statusCode = 400;
+                    res.send("Parâmetros inválidos ou faltantes.");
+                }
     }
-
+    
     export const withdrawFundsHandler: RequestHandler =
     async (req: Request, res: Response) => {
         
@@ -89,9 +104,16 @@ export namespace FundsManager{
             res.send('Usuário não está logado!');
             return;
         }
+        const pDebit = Number(req.get('Debit'));
             
-        const connection:OracleDB.Connection = 
-        await DataBaseManager.get_connection();
+    
+        if (isNaN(pDebit) || pDebit <= 0) {
+            res.statusCode = 400;
+            res.send("Valor de saque inválido.");
+            return;
+        }
+        const joinTables = 
+        await DataBaseManager.joinTables(req.session.token);
 
         const id_user = 
         await DataBaseManager.getUserID(req.session.token);
@@ -101,23 +123,50 @@ export namespace FundsManager{
             const resultSearch_IdWallet = 
             await DataBaseManager.getIdWallet(id_user);
 
-            if(resultSearch_IdWallet)
-            {
-                const idWallet = resultSearch_IdWallet[0].ID_WALLET;
-                await DataBaseManager.refreshBalance(idWallet);
-                
-                const qtdSacar = Number(req.get('valorSacar'));
-                
-                if(await withdrawFunds(idWallet, qtdSacar))
+        if(joinTables){
+
+
+            if(joinTables[0].BALANCE >= pDebit){
+
+                /*PERGUNTA - Como fazer e onde fazer? É necessário guardar o valor que o site ganha dos usuários?*/
+                //verificação do valor para taxar!
+                // if(pDebit <= 100){
+                //     //4%
+                // }else if(pDebit <= 1000){
+                //     //3%
+                // }else if(pDebit <=5000){
+                //     //2%
+                // }else if(pDebit <=100000){
+                //     //1%
+                // }else{
+                //     //Isento
+                // }
+                const idWallet = joinTables[0].IDWALLET;
+                const newCredit: Historic = {
+                    fkIdWallet: idWallet,
+                    typeTransaction: 'Debito',
+                    value: pDebit
+                };
+                const updateWallet: Wallet = {
+                    idWallet: idWallet,
+                    balance: joinTables[0].BALANCE
+                };
+
+                if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, -(newCredit.value)))
                 {
-                   res.statusCode = 200
-                   res.send("Saque realizado com sucesso.");
+                    req.statusCode = 200;
+                    res.send("Valor sacado.");
                 }else{
-                    res.statusCode = 409
-                    res.send("Erro inesperado ao realizar saque. ")
+                    res.statusCode = 409;
+                    res.send("Erro inesperado ao sacar valor.");
                 }
+
+            }else{
+                res.statusCode = 400;
+                res.send(`Valor acima do balanço da carteira - Valor disponível ${joinTables[0].BALANCE}`)
             }
         }
+        
     }         
 }
     

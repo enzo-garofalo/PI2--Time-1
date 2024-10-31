@@ -1,8 +1,12 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import { dbBetsManager } from "../db/databaseBets";
+
 export namespace betsManager
 {
+
+    /*Criação do type BETS*/
+
     export type newBet = 
     {
         bet: string;
@@ -11,6 +15,7 @@ export namespace betsManager
         fk_ID_Event: number;
     }
 
+    /*Recebe em qual evento será a aposta, sim ou não para a aposta e o valor da aposta*/
 
     export const betOnEventHandler: RequestHandler =
     async (req: Request, res : Response) => 
@@ -41,9 +46,9 @@ export namespace betsManager
                 }
 
                 const newBet: newBet = {
-                    // bet: é a aposta em si
+                    /* bet: é a aposta em si
                     // sim para o evento vai ocorrer
-                    // não para não vai ocorrer
+                     não para não vai ocorrer*/
                     bet : pBet,
                     valuesBet : pBetValue,
                     fk_ID_User : IdUser,

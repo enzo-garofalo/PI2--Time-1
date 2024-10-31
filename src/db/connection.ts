@@ -1,14 +1,13 @@
 import OracleDB from "oracledb";
 import dotenv from "dotenv";
 dotenv.config(); 
-
-import { FundsManager } from "../funds/funds";
 import { AccountsManager } from "../accounts/accounts";
-import { EventsManager } from "../events/events";
+
 
 export namespace DataBaseManager
 {
-    
+
+    /*Faz a conexão com o BD com as credenciais*/
     export async function get_connection()
     {
         let connection: OracleDB.Connection;
@@ -24,6 +23,7 @@ export namespace DataBaseManager
         return connection;
     }
 
+
     export async function getUserID(token: string) {
         const connection = await get_connection();
     
@@ -37,6 +37,9 @@ export namespace DataBaseManager
         return userID.rows ? userID.rows[0]?.ID : undefined; // Retorna o ID diretamente ou undefined
     }
     
+
+
+    /*Retorna o ID do usuário pelo token do usuário*/
 
     export async function getUserByToken(token: string)
     {
@@ -55,7 +58,7 @@ export namespace DataBaseManager
         return account.rows;
     }
     
-    
+    /*Retorna o ID da Wallet pelo ID do usuário*/
     export async function getIdWallet(id_user:number) 
     {
         
@@ -70,63 +73,21 @@ export namespace DataBaseManager
 
     }
 
-    export async function getSaldoAtual(idWallet: number) 
-    {
-        //verificar saldo atual
-        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-        const connection:OracleDB.Connection = 
-        await DataBaseManager.get_connection();
+    /*Faz Join nas tabelas de Usuários e carteiras e retorna ID do Usuário e Carteira
+     e o balanço da carteira recebendo o Token*/
+    export async function joinTables(token:string) {
 
-        const result: OracleDB.Result<{BALANCE: number}> = 
-        await connection.execute(
-            'SELECT BALANCE FROM WALLET WHERE ID = :idWallet',
-            {idWallet}
-        ); 
-
-        await connection.close();
-        return result.rows;
-    }
-
-    export async function newfoundWithdraw(qtdSacar: number, idWallet:number) 
-    {
+        const connection = await DataBaseManager.get_connection()
         
-        const connection:OracleDB.Connection = 
-        await DataBaseManager.get_connection();
-        
-
-        await connection.execute(
-        `
-            INSERT INTO HISTORIC(
-            TRANSACTION_ID,
-            TRANSACTION_TYPE,
-            TRANSACTION_VALUE,
-            FK_ID_WALLET
-            )values(
-            SEQ_TRANSACTION.NEXTVAL,
-            'SACAR',
-            :-qtdSacar,
-            :idWallet
-            )`,
-            {qtdSacar, idWallet}
-        );
-
-        await connection.commit();
-        await connection.close();
-    }
-
-    export async function getBalanceById(id_wallet : number)
-    {
-        const connection:OracleDB.Connection = await get_connection();
-
-        const balance : OracleDB.Result<{BALANCE: number}>  = 
+        const userID : OracleDB.Result<{IDUSER: number, IDWALLET: number, BALANCE: number}> = 
             await connection.execute(
-                `
-                SELECT SUM(TRANSACTION_VALUE) AS BALANCE
-                FROM HISTORIC 
-                WHERE FK_ID_WALLET = :id_wallet
-                `,
-                {id_wallet}
+                `SELECT AC.ID AS IDUSER, WL.ID_WALLET AS IDWALLET, WL.BALANCE AS BALANCE
+                FROM ACCOUNTS AC
+                JOIN WALLETS WL ON AC.ID = WL.FK_ID_USER
+                WHERE AC.TOKEN = :token`,
+                {token}
         );
+
 
         await connection.close;
         return balance.rows;
@@ -154,4 +115,7 @@ export namespace DataBaseManager
         await connection.close();
     }
     
+        return userID.rows;
+    }
+
 }
