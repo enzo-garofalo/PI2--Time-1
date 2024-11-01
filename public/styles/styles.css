@@ -1,0 +1,16 @@
+body{
+    background-color: azure;
+    font-family: 'JetBrains Mono';
+}
+#message-box{
+    background-color: darkred;
+    border: 3px solid rgb(189, 76, 76);
+    border-radius: 2px;
+    color: white;
+    margin-top: 20px;
+    display: none;
+}
+#message-box p{
+    margin: 10px;
+    padding: 0;
+}

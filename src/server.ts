@@ -2,16 +2,25 @@ import express from "express";
 import session from 'express-session';
 import {Request, Response, Router} from "express";
 
-
-//colocar as rotas adicionadas
 import { AccountsManager } from "./accounts/accounts";
 import { EventsManager } from "./events/events";
 import {FundsManager} from "./funds/funds";
 import {betsManager} from "./bets/bets";
 
-//__________________________________________________
+import cors from "cors"
+
+
 const port = 3000; 
 export const server = express();
+
+
+// CORS (Cross-Origin Resource Sharing) é como um segurança na porta de um restaurante.
+// Ele controla quem pode acessar recursos de um site. 
+// Se um site (origem) tenta acessar dados de outro site, 
+// o navegador pergunta se o outro site permite isso.
+// Se permitido, o navegador deixa passar; se não, bloqueia o acesso.
+// Isso ajuda a proteger contra ataques de segurança, como o Cross-Site Scripting (XSS).
+server.use(cors())
 
 declare module 'express-session' {
   interface SessionData {

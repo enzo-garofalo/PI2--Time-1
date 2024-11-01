@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>PUC BET</title>
+    <link rel="stylesheet" href="./styles/styles.css">
+  </head>
+  <body>
+      <h1>Login</h1>
+      <form action="">
+        <p>
+          <label for="fEmail">Email:</label><br>
+          <input type="text" id="fEmail" onfocus="hideMessage()">
+        </p>
+
+        <p>
+          <label for="fPassword">Password:</label><br>
+          <input type="password" id="fPassword" onfocus="hideMessage()">
+        </p>
+
+        <button type="button" id="btnSignIn" onclick="signIn()">
+          Sign In
+        </button> 
+        
+        <div id="message-box">
+          <p id="message"></p>
+        </div>
+
+      </form>
+    <script src="./js/login.js" async defer></script>
+  </body>
+</html>

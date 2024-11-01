@@ -30,7 +30,9 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@types/cors": "^2.8.17",
     "connect-redis": "^7.1.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "express-session": "^1.18.1",

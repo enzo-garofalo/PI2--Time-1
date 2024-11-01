@@ -4,7 +4,7 @@ dotenv.config();
 
 import { FundsManager } from "../funds/funds";
 import { AccountsManager } from "../accounts/accounts";
-import { DataBaseManager } from "./connection";
+import { DataBaseManager } from "../db/connection";
 
 export namespace dbAccountsManager
 {

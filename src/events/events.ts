@@ -1,5 +1,5 @@
 import {Request, RequestHandler, Response} from "express";
-import { dbEventsManager } from "../db/databaseEvent";
+import { dbEventsManager } from "./databaseEvent";
 import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
 

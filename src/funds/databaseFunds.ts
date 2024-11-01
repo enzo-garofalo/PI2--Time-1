@@ -2,7 +2,7 @@ import OracleDB from "oracledb";
 import dotenv from "dotenv";
 dotenv.config(); 
 
-import { DataBaseManager } from "./connection";
+import { DataBaseManager } from "../db/connection";
 import { FundsManager } from "../funds/funds";
 
 export namespace dbFundsManager

@@ -1,7 +1,8 @@
 import {Request, RequestHandler, Response} from "express";
+
 import { DataBaseManager } from "../db/connection";
-import { dbAccountsManager } from "../db/databaseAccounts";
-import OracleDB from "oracledb";
+import { dbAccountsManager } from "./databaseAccounts";
+
 import { FundsManager } from "../funds/funds";
 
 /*arquivo .ts relacionado a contas*/
@@ -19,7 +20,10 @@ export namespace AccountsManager {
         TOKEN: string | undefined;
     };
 
-    /*Recebe requisição e trata os dados e coloca em nova conta e cria uma carteira vazia*/
+    /* 
+        Recebe requisição e trata os dados e 
+        coloca em nova conta e cria uma carteira vazia
+    */
 
     export const signUpHandler: RequestHandler = 
     async (req: Request, res: Response) => 
@@ -61,9 +65,11 @@ export namespace AccountsManager {
     }
 
 
-    /*Recebe email e senha e faz o login
-    colocamos função para armazenar token e regra do negócio
-    1(ADM do sistema) / 0 (Usuário comum)*/
+    /*
+        Recebe email e senha e faz o login
+        colocamos função para armazenar token e regra do negócio
+        1(ADM do sistema) / 0 (Usuário comum)
+    */
     
     export const loginHandler: RequestHandler = 
     async (req: Request, res: Response) => 

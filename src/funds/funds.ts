@@ -1,6 +1,6 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
-import { dbFundsManager } from "../db/databaseFunds";
+import { dbFundsManager } from "./databaseFunds";
 
 export namespace FundsManager{
 

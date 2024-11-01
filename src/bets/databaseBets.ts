@@ -1,6 +1,6 @@
 import { betsManager } from "../bets/bets";
 import { EventsManager } from "../events/events"; 
-import { DataBaseManager } from "./connection";
+import { DataBaseManager } from "../db/connection";
 import OracleDB from "oracledb";
 
 
