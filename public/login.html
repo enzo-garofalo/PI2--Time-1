@@ -4,29 +4,42 @@
   <head>
     <title>PUC BET</title>
     <link rel="stylesheet" href="./styles/styles.css">
-  </head>
-  <body>
-      <h1>Login</h1>
-      <form action="">
-        <p>
-          <label for="fEmail">Email:</label><br>
-          <input type="text" id="fEmail" onfocus="hideMessage()">
-        </p>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+</head>
+<body>
+    <div class="wrapper">
+      <!--CABEÇALHO-->
+      <div class="title">
+        <span>PUC BET</span>
+      </div>
 
-        <p>
-          <label for="fPassword">Password:</label><br>
-          <input type="password" id="fPassword" onfocus="hideMessage()">
-        </p>
-
-        <button type="button" id="btnSignIn" onclick="signIn()">
-          Sign In
-        </button> 
+      <form>
+        <div class="row">
+          <!-- <label for="fEmail">Email:</label><br> -->
+          <i class="fas fa-user"></i>
+          <input type="text" id="fEmail" onfocus="hideMessage()" placeholder="Email" required>
+        </div>
+        
+        <div class="row">
+          <!-- <label for="fPassword">Password:</label><br> -->
+          <i class="fas fa-lock"></i>
+          <input type="password" id="fPassword" onfocus="hideMessage()" placeholder="Password" required>
+        </div>
+        
+        <div class="pass">
+          <div class="row button">
+            <button type="button" value="Login" onclick="signIn()">
+              <p>Sign In</p>  
+            </button>
+          </div>
+        </div>
         
         <div id="message-box">
           <p id="message"></p>
         </div>
 
       </form>
+    </div>  
     <script src="./js/login.js" async defer></script>
   </body>
 </html>

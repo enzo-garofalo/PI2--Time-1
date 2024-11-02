@@ -94,9 +94,8 @@ export namespace AccountsManager {
             {
                 req.session.token = account[0].TOKEN;
                 req.session.role = account[0].ROLE;
-                console.log(`Usuário logado\nToken: ${req.session.token}`)
-                console.log(`Role: ${req.session.role}`)
             } 
+            
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
         }else{
