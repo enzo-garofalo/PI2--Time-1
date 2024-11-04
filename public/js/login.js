@@ -1,5 +1,3 @@
-const { error } = require("console");
-
 function showMessage(content, type){
     document.getElementById('message').innerHTML = content;
     var mb = document.getElementById('message-box');
@@ -44,14 +42,14 @@ async function signIn(){
         loginData.append('password', password);
     
         const res = await fetch(
-            'http://192.168.1.9:3000/login',{
+            'http://192.168.1.10:3000/login',{
                 method: 'POST',
                 headers: loginData
             }
         );
     
         if(res.ok){
-            showMessage('Login efetuado!', 'success');
+            window.location.href = './home.html';
         }else{
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             showMessage(errorMessage, 'error');

@@ -1,109 +1,138 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Manrope:wght@200..800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Modak&display=swap');
+:root {
+  --lapis-azuli: #05668d;
+  --teal: #028090;
+  --persian-green: #00a896;
+  --mint: #02c39a;
+  --cream: #2b2b2b;
+  --primary-color: var(--lapis-azuli);
+  --accent-color: var(--teal);
+  --font-color: #ffffff;
+  --input-bg: #3b3b3b;
+  --border-color: #444;
+  --background-color: rgba(43, 43, 43, 0.95);
+  --font-title: "Modak", sans-serif;
+  --font-text: 
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins", sans-serif;
 }
+
 body {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    padding: 15px;
-    background: rgb(1,0,9);
-background: linear-gradient(31deg, rgba(1,0,9,1) 0%, rgba(3,2,54,1) 25%, rgba(4,3,64,1) 33%,
-                             rgba(9,9,121,1) 56%, rgba(6,84,170,1) 73%, rgba(5,116,191,1) 83%);
-    overflow: hidden;
-}
-#message-box{
-    background-color: darkred;
-    border: 3px solid rgb(189, 76, 76);
-    align-items: center;
-    border-radius: 2px;
-    color: white;
-    margin-top: 20px;
-    display: none;
-    font-weight: 500;
-}
-#message-box p{
-    align-items: center;
-    margin: 10px;
-    padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 15px;
+  background: var(--cream);
+  color: var(--font-color);
+  overflow: hidden;
 }
 
 .wrapper {
-    max-width: 500px;
-    width: 100%;
-    background: #fff;
-    border-radius: 5px;
-    box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
-  }
+  max-width: 500px;
+  width: 100%;
+  background: var(--background-color);
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.7);
+  border: 2px solid var(--lapis-azuli);
+}
+
 .wrapper .title {
-    height: 120px;
-    background: #007991;
-    border-radius: 5px 5px 0 0;
-    color: #fff;
-    font-size: 50px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  height: 100px;
+  font-size: 48px;
+  background-color: var(--lapis-azuli);
+  color: var(--font-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Modak", sans-serif;
 }
+
 .wrapper form {
-    padding: 25px 35px 25px;
+  padding: 20px 35px 35px;
 }
+
 .wrapper form .row {
-    height: 60px;
-    margin-top: 15px;
-    position: relative;
+  height: 55px;
+  margin-top: 20px;
+  position: relative;
 }
+
 .wrapper form .row input {
-    height: 100%;
-    width: 100%;
-    outline: none;
-    padding-left: 70px;
-    border-radius: 5px;
-    border: 1px solid lightgrey;
-    font-size: 18px;
-    transition: all 0.3s ease;
+  height: 100%;
+  width: 100%;
+  padding-left: 60px;
+  border-radius: 5px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  font-size: 18px;
+  color: var(--font-color);
+  transition: border-color 0.3s ease;
+  font-family: "Kanit", sans-serif;
 }
-form .row input:focus {
-    border-color: #007991;
+
+.wrapper form .row input:focus {
+  border-color: var(--lapis-azuli); 
+  outline: none;
 }
-form .row input::placeholder {
-    color: #999;
+
+.wrapper form .row input::placeholder {
+  color: #bbb;
 }
+
 .wrapper form .row i {
-    position: absolute;
-    width: 55px;
-    height: 100%;
-    color: #fff;
-    font-size: 22px;
-    background: #007991;
-    border: 1px solid #007991;
-    border-radius: 5px 0 0 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: absolute;
+  width: 50px;
+  height: 100%;
+  color: var(--font-color);
+  font-size: 22px;
+  background: var(--primary-color);
+  border-radius: 5px 0 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.wrapper form .pass {
-    margin-top: 12px;
-}
+
 .wrapper form .button button {
-    margin-top: 20px;
-    color: #fff;
-    font-size: 20px;
-    font-weight: 500;
-    padding-left: 0px;
-    background: #007991;
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-    border: none;
-    border-radius: 5px;
-    transition: all 0.3s ease;
+  font-family: "Kanit", sans-serif;
+  margin-top: 20px;
+  color: var(--font-color);
+  font-size: 20px;
+  font-weight: 500;
+  background: var(--primary-color);
+  cursor: pointer;
+  height: 50px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0px 4px 10px rgba(0, 86, 125, 0.3);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
-form .button button:hover {
-    background: #005591;
+
+.wrapper form .button button:hover {
+  background: var(--accent-color);
+  box-shadow: 0px 4px 12px rgba(0, 40, 144, 0.4);
+}
+
+#message-box {
+  font-family: "Kanit", sans-serif;
+  background-color: #c9302c;
+  border: 2px solid #d9534f;
+  text-align: center;
+  border-radius: 5px;
+  color: white;
+  font-size: 25px;
+  padding: 10px;
+  font-weight: 500;
+  margin-top: 25px;
+  display: none;
+}
+
+#message-box p {
+  margin: 0;
 }
