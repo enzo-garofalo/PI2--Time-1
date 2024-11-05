@@ -31,6 +31,16 @@ function isValid(email, password){
     return valid;
 }
 
+function isValidSignUp(name, email, password, birthdate){
+    var valid = false;
+    if(name.length > 0 && email.length > 0 && password.length > 0 && birthdate.length>0){
+        valid = true;
+    }else{
+        showMessage('Please fill out all the fields', 'error');
+    }
+    return valid;
+}
+
 async function signIn(){
 
     var email = document.getElementById('fEmail').value;
@@ -42,9 +52,40 @@ async function signIn(){
         loginData.append('password', password);
     
         const res = await fetch(
-            'http://192.168.1.10:3000/login',{
+            'http://192.168.102.110:3000/login',{
                 method: 'POST',
                 headers: loginData
+            }
+        );
+    
+        if(res.ok){
+            window.location.href = './home.html';
+        }else{
+            const errorMessage = await res.text(); // Lê o erro retornado do servidor
+            showMessage(errorMessage, 'error');
+        }
+    }
+}
+
+async function signUp() {
+
+    var name = document.getElementById('fName').value;
+    var email = document.getElementById('fEmail').value;
+    var password = document.getElementById('fPassword').value;
+    var birthdate = document.getElementById('fBirthdate').value;
+
+    if(isValidSignUp(name, email, password, birthdate)){
+        const signUpData = new Headers();
+        signUpData.append('name', name);
+        signUpData.append('email', email);
+        signUpData.append('password', password);
+        signUpData.append('birthdate', birthdate);
+
+
+        const res = await fetch(
+            'http://192.168.102.110:3000/signUp',{
+                method: 'PUT',
+                headers: signUpData
             }
         );
     

@@ -16,15 +16,37 @@
     <!-- Inicio do formulário de cadastro - FORM 1 -->
     <form>
         <div class="row">
-            <i class="das da-user"></i>
-            <input type="text" id="fEmail" onfocus="hideMessage()" placeholder="Email" required>
-
+            <i class="fas fa-user"></i>
+            <input type="text" id="fName" onfocus="hideMessage()" placeholder="Name" required>
         </div>
-
-    <i class="fas fa-calendar-days">
+        <div class="row">
+            <i class="fas fa-envelope"></i>
+            <input type="text" id="fEmail" onfocus="hideMessage()" placeholder="Email" required>
+        </div>
+        <div class="row">
+            <i class="fas fa-lock"></i>
+            <input type="text" id="fPassword" onfocus="hideMessage()" placeholder="Password" required>
+        </div>
+        <div class="row">
+            <i class="fas fa-calendar-days"></i>
+            <input type="text" id="fBirthdate" onfocus="hideMessage()" placeholder="Birthdate" required>
+        </div>
+        <div class="pass">
+            <div class="row button">
+              <button type="button" id="btnSignUp" onclick="signup()">
+                <p>Sign Up</p>  
+              </button>
+            </div>
+        </div>
+        <div id="message-box">
+          <p id="message"></p>
+        </div>
+    
 
 
     <!--Fazer tratamento de dados e voltar botões: usuário cadastrado / Conta já existente-->
     </form> <!-- Fim do formulário - FORM 1 -->
+    </div>
+    <script src="../js/login.js" async defer></script>
 </body>
 </html>
