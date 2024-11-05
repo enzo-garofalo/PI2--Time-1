@@ -6,11 +6,71 @@
         <title>PUC BET</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script src="https://kit.fontawesome.com/66b8c02613.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="../styles/styles.css">
+        <link rel="stylesheet" href="../styles/carousel.css">
+        <link rel="stylesheet" href="../styles/navBar.css">
     </head>
     <body>
-       <h1>eita mundo bom</h1>
+        <nav class="navbar">
+            <div class="navbar-left">
+                <a href="#" class="brand">PUC Bet</a>
+            </div>
+
+            <!-- Search Bar -->
+            <!-- <div class="navbar-center">
+                <input type="text" class="search-bar" placeholder="Search...">
+            </div> -->
+
+            <div class="navbar-right">
+                
+                <div class="link-config">
+                    <a href="#">
+                        <i class="fa-solid fa-wallet"></i>
+                        My Wallet
+                    </a>
+                </div>
+
+                <div class="link-config">
+                    <a href="#">
+                        <i class="fa-solid fa-money-bill"></i>
+                        My Bets
+                    </a>
+                </div>
+
+                <div class="link-config">
+                    <div class="dropdown">
+                        <a href="#" class="dropbtn">
+                            <i class="fa-solid fa-caret-down"></i>
+                            Events
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="#">Upcoming Events</a>
+                            <a href="#">Past Events</a>
+                            <a href="#">Popular Events</a>
+                            <a href="#">All Events</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="image1.jpg" alt="Image 1">
+                </div>
+                <div class="carousel-item">
+                    <img src="image2.jpg" alt="Image 2">
+                </div>
+                <div class="carousel-item">
+                    <img src="image3.jpg" alt="Image 3">
+                </div>
+            </div>
+            <button class="carousel-control prev" onclick="moveSlide(-1)">❮</button>
+            <button class="carousel-control next" onclick="moveSlide(1)">❯</button>
+        </div>
         
-        <script src="" async defer></script>
+        <script src="../js/carousel.js"></script>
     </body>
 </html>

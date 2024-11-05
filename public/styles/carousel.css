@@ -1,0 +1,54 @@
+/* Carousel Container */
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 500px; /* Fixed height for the carousel */
+    overflow: hidden;
+    margin-top: 20px;
+}
+
+/* Carousel Inner */
+.carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%; /* Matches the fixed height */
+}
+
+/* Carousel Item */
+.carousel-item {
+    min-width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image fills the entire carousel item */
+}
+
+/* Carousel Controls */
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 48px;
+    color: var(--cream);
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0 15px;
+    transition: background 0.3s ease;
+}
+
+.carousel-control.prev {
+    left: 10px;
+}
+
+.carousel-control.next {
+    right: 10px;
+}
+
+.carousel-control:hover {
+    background: rgba(12, 56, 187, 0.8);
+}

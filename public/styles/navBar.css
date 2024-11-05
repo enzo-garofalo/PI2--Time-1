@@ -1,0 +1,140 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --lapis-azuli: #05668d;
+    --teal: #028090;
+    --persian-green: #00a896;
+    --mint: #02c39a;
+    --cream: #f0f0f0;
+    --primary-color: var(--lapis-azuli);
+    --accent-color: var(--teal);
+    --font-color: #ffffff;
+    --input-bg: #3b3b3b;
+    --border-color: #444;
+    --background-color: rgba(43, 43, 43, 0.95);
+    --font-title: "Modak", sans-serif;
+    --font-text: "Kanit", sans-serif;
+}
+
+/* Navbar Styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px;
+    
+    background-color: var(--background-color);
+    border-bottom: 1px solid var(--accent-color);
+    color: var(--font-color);
+
+    font-family: var(--font-text);
+}
+
+/* Left Section - Brand */
+.navbar-left .brand {
+    font-size: 36px;
+    color: var(--cream);
+    font-family: var(--font-title);
+    text-decoration: none;
+}
+
+/* Center Section - Search Bar */
+.navbar-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* Right Section - Links */
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right a {
+    color: var(--font-color);
+    text-decoration: none;
+
+    font-size: 35px;
+    font-weight: 500;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Hover Effect for Links */
+.navbar-right a:hover {
+    color: var(--cream);
+    background-color: var(--teal); /* Changed to accent color for contrast */
+}
+
+/* Link Configuration */
+.link-config {
+    display: flex;
+    align-items: center; /* Align icon and text vertically */
+    margin-left: 1rem; /* Adjust margin between link configurations */
+}
+
+.link-config i {
+    margin-right: 0.5rem; /* Space between the icon and the link text */
+    font-size: 20px; /* You can adjust the icon size if needed */
+}
+
+.link-config a {
+    color: var(--font-color);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem; /* Padding for links */
+    font-size: 18px;
+}
+
+/* Dropdown Styling */
+.dropdown {
+    position: relative;
+}
+
+.dropbtn {
+    cursor: pointer;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background-color: var(--input-bg);
+    min-width: 200px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.dropdown-content a {
+    padding: 0.75rem 1rem; /* Increased padding for better touch area */
+    color: var(--font-color);
+    text-decoration: none;
+    display: block;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+/* Hover Effect for Dropdown Items */
+.dropdown-content a:hover, a:focus {
+    background-color: var(--teal);
+    color: var(--cream);
+}
+
+/* Show dropdown content on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Accessibility Focus States */
+.navbar-right a:focus, .dropdown-content a:focus {
+    outline: 2px solid var(--mint); /* Focus outline for better accessibility */
+    outline-offset: 2px;
+}

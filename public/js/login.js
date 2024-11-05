@@ -52,14 +52,15 @@ async function signIn(){
         loginData.append('password', password);
     
         const res = await fetch(
-            'http://192.168.102.110:3000/login',{
+            // configurar o fetch para o seu IP
+            'http://192.168.1.10:3000/login',{
                 method: 'POST',
                 headers: loginData
             }
         );
     
         if(res.ok){
-            window.location.href = './home.html';
+            window.location.href = '../view/home.html';
         }else{
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             showMessage(errorMessage, 'error');
@@ -83,7 +84,7 @@ async function signUp() {
 
 
         const res = await fetch(
-            'http://192.168.102.110:3000/signUp',{
+            'http://192.168.1.10:3000/signUp',{
                 method: 'PUT',
                 headers: signUpData
             }

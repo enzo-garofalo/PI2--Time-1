@@ -52,7 +52,7 @@ body {
   }
   
   .inputForm:focus-within {
-    border: 1.5px solid #2d79f3;
+    border: 1.5px solid var(--gold-metalic);
   }
   
   .flex-row {
