@@ -1,5 +1,8 @@
 body {
-    background-color: #003383;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%), linear-gradient(135deg, #6C2C1B, #F1C04D, #D1622B);
+  background-blend-mode: overlay;
+  min-height: 100vh;
+  margin: 0;
 }
 
 .form {
@@ -145,4 +148,50 @@ body {
 .img-puc{
     width: 35px;
     height: auto;
+}
+
+@media (max-width: 768px) { /*Usando um media querie com base no tamanho da janela de visualização. Nesse caso, para tablets.*/
+  .form {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .inputForm {
+    height: 45px;
+    padding-left: 8px;
+  }
+
+  .button-submit {
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .btn {
+    height: 45px;
+    font-size: 14px;
+  }
+
+  .p, .span, .flex-row > div > label { /*Aplicando estilos apenas a certos elementos em uma hierarquia específica. Pegando essa div específica dentro de .flex-row.*/
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) { /*Usando um media querie com base no tamanho da janela de visualização. Nesse caso, para celulares.*/
+  .form {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .inputForm {
+    height: 40px;
+  }
+
+  .button-submit, .btn {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .p, .span, .flex-row > div > label { /*Aplicando estilos apenas a certos elementos em uma hierarquia específica. Pegando essa div específica dentro de .flex-row.*/
+    font-size: 12px;
+  }
 }
