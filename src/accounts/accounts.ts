@@ -68,13 +68,18 @@ export namespace AccountsManager {
                 balance: 0
             }
 
-            if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
-            {
-                res.statusCode = 200;
-                res.send("Nova conta adicionada.");
-            }else{
-                res.statusCode = 409;
-                res.send("Erro inesperado ao criar nova conta.")
+                    if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
+                    {
+                        res.statusCode = 200;
+                        res.send("Nova conta adicionada.");
+                    }else{
+                        res.statusCode = 409;
+                        res.send("Erro inesperado ao criar nova conta.")
+                    }
+                }else{
+                    res.statusCode = 400;
+                    res.send("Email já cadastrado!");
+                }
             }
         }else{
             res.statusCode = 400;
