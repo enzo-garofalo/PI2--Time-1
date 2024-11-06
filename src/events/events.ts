@@ -41,7 +41,6 @@ export namespace EventsManager
         if(pTitle && pDescription && pCategories && pFinishDate && id_user)
         {
 
-            console.log('Id do usuário porra: ' + id_user)
             const newEvent: Event = 
             {
                 ID_EVENT: undefined,
