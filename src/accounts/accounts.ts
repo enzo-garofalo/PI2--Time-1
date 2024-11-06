@@ -4,6 +4,7 @@ import { DataBaseManager } from "../db/connection";
 import { dbAccountsManager } from "./databaseAccounts";
 
 import { FundsManager } from "../funds/funds";
+import { verify } from "crypto";
 
 /*arquivo .ts relacionado a contas*/
 
@@ -31,11 +32,23 @@ export namespace AccountsManager {
         const pName = req.get('name');
         const pEmail = req.get('email');
         const pPassword = req.get('password');
+        // o formato padrão que pBirthdate deve receber é esse (YYYY-MM-DD)
+        // Para que a verificação de data seja possível
         const pBirthdate = req.get('birthdate');
     
         if(pName && pEmail && pPassword && pBirthdate){
-            
-            
+
+            // if(await dbAccountsManager.verifyEmail(pEmail) == false){
+            //     res.statusCode = 400;
+            //     res.send('Email já utilizado!');
+            //     return
+            // }
+
+            if(dbAccountsManager.verifyAge(pBirthdate)){
+                res.statusCode = 400;
+                res.send('Site permitido apenas para maiores de 18 anos');
+                return;
+            }
             
             const newAccount: userAccount = 
             {

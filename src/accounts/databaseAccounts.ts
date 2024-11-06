@@ -25,7 +25,21 @@ export namespace dbAccountsManager
         );
     }
 
+    // Função para verificar a idade do usuário com base na data de nascimento
+    export function verifyAge(date: string): boolean {
+        const birthDate = new Date(date);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        // Verifica se o mês já passou, para pegar a data correta do user
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
 
+        if( age < 18) return false;
+
+        return true;
+    }
     /*Função que salva nova conta do BD*/
     export async function saveNewAccount
     (account: AccountsManager.userAccount, newAccountWallet: FundsManager.Wallet) 
