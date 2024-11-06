@@ -9,20 +9,22 @@ import { DataBaseManager } from "../db/connection";
 export namespace dbAccountsManager
 {
 
-    export async function verifyemail(email: string) {
+    export async function verifyEmail(email: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection: OracleDB.Connection = 
         await DataBaseManager.get_connection();
-        
-        const ConsultaID: OracleDB.Result<{ ID: number }> =  
+
+        const consultaID: OracleDB.Result<{ ID: number, name: string }> =  
         await connection.execute(
-            `(select ID AS ID
+            `(select ID, COMPLETE_NAME
             from accounts
             where email = :email)`,{
             email: email}
         );
+        
+        return consultaID.rows;
     }
 
 

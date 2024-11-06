@@ -35,31 +35,41 @@ export namespace AccountsManager {
     
         if(pName && pEmail && pPassword && pBirthdate){
             
-            
-            
-            const newAccount: userAccount = 
-            {
-                ID: undefined,
-                NAME: pName,
-                EMAIL: pEmail,
-                PASSWORD: pPassword,
-                BIRTHDATE: pBirthdate,
-                ROLE: 0,
-                TOKEN: undefined
-            }
-            const newAccountFunds: FundsManager.Wallet =
-            {
-                idWallet: undefined,
-                balance: 0
-            }
+            const verify = await dbAccountsManager.verifyEmail(pEmail);
 
-            if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
+            if(verify)
             {
-                res.statusCode = 200;
-                res.send("Nova conta adicionada.");
-            }else{
-                res.statusCode = 409;
-                res.send("Erro inesperado ao criar nova conta.")
+                console.log(verify)
+                if(!verify[0]){
+                    
+                    const newAccount: userAccount = 
+                    {
+                        ID: undefined,
+                        NAME: pName,
+                        EMAIL: pEmail,
+                        PASSWORD: pPassword,
+                        BIRTHDATE: pBirthdate,
+                        ROLE: 0,
+                        TOKEN: undefined
+                    }
+                    const newAccountFunds: FundsManager.Wallet =
+                    {
+                        idWallet: undefined,
+                        balance: 0
+                    }
+
+                    if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
+                    {
+                        res.statusCode = 200;
+                        res.send("Nova conta adicionada.");
+                    }else{
+                        res.statusCode = 409;
+                        res.send("Erro inesperado ao criar nova conta.")
+                    }
+                }else{
+                    res.statusCode = 400;
+                    res.send("Email já cadastrado!");
+                }
             }
         }else{
             res.statusCode = 400;
