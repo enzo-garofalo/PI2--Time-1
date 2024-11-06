@@ -34,6 +34,9 @@ export namespace AccountsManager {
         const pBirthdate = req.get('birthdate');
     
         if(pName && pEmail && pPassword && pBirthdate){
+            
+            
+            
             const newAccount: userAccount = 
             {
                 ID: undefined,
