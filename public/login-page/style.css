@@ -76,7 +76,9 @@ body {
     font-weight: 500;
     cursor: pointer;
   }
-  
+  a{
+    text-decoration: none;
+  }
   .button-submit {
     margin: 20px 0 10px 0;
     background-color: #151717;

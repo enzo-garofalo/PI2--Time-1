@@ -38,15 +38,17 @@ export namespace AccountsManager {
     
         if(pName && pEmail && pPassword && pBirthdate){
 
-            // if(await dbAccountsManager.verifyEmail(pEmail) == false){
-            //     res.statusCode = 400;
-            //     res.send('Email já utilizado!');
-            //     return
-            // }
-
-            if(dbAccountsManager.verifyAge(pBirthdate)){
+            // Se o email está duplicado
+            if(await dbAccountsManager.emailIsDuplicate(pEmail)){
                 res.statusCode = 400;
-                res.send('Site permitido apenas para maiores de 18 anos');
+                res.send('Email já utilizado!');
+                return
+            }
+
+            // Se o user é menor de 18 anos
+            if(dbAccountsManager.isUnderage(pBirthdate)){
+                res.statusCode = 400;
+                res.send('PUC BET é permitido apenas para maiores de 18 anos');
                 return;
             }
             

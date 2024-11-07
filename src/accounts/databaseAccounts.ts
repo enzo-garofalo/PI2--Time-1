@@ -8,37 +8,42 @@ import { DataBaseManager } from "../db/connection";
 
 export namespace dbAccountsManager
 {
-
-    export async function verifyemail(email: string) {
+    //Função que verifica se o email cadastrado está duplicado
+    export async function emailIsDuplicate(email: string) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection: OracleDB.Connection = 
         await DataBaseManager.get_connection();
         
-        const ConsultaID: OracleDB.Result<{ ID: number }> =  
+        const searchForDuplicate: OracleDB.Result<{ Num: number }> =  
         await connection.execute(
-            `(select ID AS ID
-            from accounts
-            where email = :email)`,{
-            email: email}
+           `SELECT 1
+            FROM accounts
+            WHERE email = :email`,
+            { email: email }
         );
+
+        if(searchForDuplicate.rows && searchForDuplicate.rows.length > 0)
+            return true;
+        
+        return false;
     }
 
     // Função para verificar a idade do usuário com base na data de nascimento
-    export function verifyAge(date: string): boolean {
+    export function isUnderage(date: string): boolean {
         const birthDate = new Date(date);
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
-        // Verifica se o mês já passou, para pegar a data correta do user
+        // Verifica se o mês já passou, para pegar a idade correta do user
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
 
-        if( age < 18) return false;
+        if( age < 18) return true;
 
-        return true;
+        return false;
     }
     /*Função que salva nova conta do BD*/
     export async function saveNewAccount
