@@ -53,7 +53,7 @@ async function signIn(){
     
         const res = await fetch(
             // configurar o fetch para o seu IP
-            'http://192.168.1.10:3000/login',{
+            'http://192.168.1.6:3000/login',{
                 method: 'POST',
                 headers: loginData
             }
@@ -84,7 +84,7 @@ async function signUp() {
 
 
         const res = await fetch(
-            'http://192.168.1.10:3000/signUp',{
+            'http://192.168.1.6:3000/signUp',{
                 method: 'PUT',
                 headers: signUpData
             }

@@ -1,6 +1,8 @@
 import {Request, RequestHandler, Response} from "express";
 import { dbEventsManager } from "./databaseEvent";
 import { DataBaseManager } from "../db/connection";
+
+import { emailSenderManager } from "./emailSender";
 import OracleDB from "oracledb";
 
 
@@ -87,7 +89,8 @@ export namespace EventsManager
             if(Number(pIsValid) === 1){
                 newStatus = 'Aprovado';
             }else if(Number(pIsValid) === 0){
-                newStatus = 'Deletado';
+                await emailSenderManager.sendMail();
+                newStatus = 'Reprovado';
             }else{
                 res.statusCode = 400;
                 res.send('Formato de requisição inválido!');
