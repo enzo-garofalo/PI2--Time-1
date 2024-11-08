@@ -153,32 +153,67 @@ export namespace EventsManager
         }
     }   
 
-    export const finishEventHandler: RequestHandler =
-    async (req: Request, res: Response) => {
-        if(!req.session.token)
-        {
-            res.statusCode = 401;
+    export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
+    
+        // Verifica se o usuário está logado (sessão válida com token)
+        if (!req.session.token) {
+            res.statusCode = 401; // Código 401: Não autorizado
             res.send("Usuário não está logado");
-        }else if(req.session.role === 0){
-            res.statusCode = 401;
-            res.send("Rota permitida apenas para moderadores");
+            return;
         }
-
+    
+        // Verifica se o usuário tem permissão de moderador (role !== 0)
+        else if (req.session.role === 0) {
+            res.statusCode = 401; // Código 401: Não autorizado
+            res.send("Rota permitida apenas para moderadores");
+            return;
+        }
+    
+        // Obtém o ID do evento e o veredicto de ocorrência do evento a partir do cabeçalho da requisição
         const pIdEvent = Number(req.get('eventId'));
-        const pVerdict = req.get('aconteceu');
-        // 1 para aconteceu 0 para não aconteceu
-
-        if(pIdEvent && pVerdict){
-            await dbEventsManager.finishEvent(pIdEvent, pVerdict);
+        const pVerdict = req.get('aconteceu'); // 'sim' para aconteceu, 'não' para não aconteceu
+    
+        // Verifica se o ID do evento e o veredicto foram fornecidos
+        if (pIdEvent && pVerdict) {
+            
+            // Busca o evento no banco de dados pelo ID
+            const event = await dbEventsManager.getEventById(pIdEvent);
+            
+            let eventFinishDate;
+            
+            // Verifica se o evento possui uma data de término (FINISH_DATE)
+            if (event?.[0]?.FINISH_DATE) {
+                eventFinishDate = new Date(event[0].FINISH_DATE); // Converte FINISH_DATE em um objeto Date
+            } else {
+                res.statusCode = 404; // Código 404: Não encontrado
+                res.send("Evento não encontrado ou sem data de término.");
+                return; // Encerra a execução para evitar continuar com erro
+            }
+            
+            // Obtém a data atual
+            const today = new Date();
+            
+            // Verifica se a data atual é anterior ou igual à data de término do evento
+            if (today <= eventFinishDate) {
+                res.statusCode = 400; // Código 400: Solicitação inválida
+                res.send("O evento ainda não terminou. Ele só pode ser finalizado após a data de término.");
+                return; // Encerra a execução para evitar continuar com erro
+            }
+    
+            // Se as verificações passarem, finaliza o evento e distribui os ganhos
+            await dbEventsManager.finishEvent(pIdEvent, pVerdict); 
             await dbEventsManager.shareEventFunds(pIdEvent, pVerdict);
-
-            res.statusCode = 200;
+            
+            res.statusCode = 200; 
             res.send('Evento finalizado e ganhos distribuídos!');
-        }else{
-            res.statusCode = 400;
+            return;
+        } else {
+            res.statusCode = 400; // Código 400: Solicitação inválida
             res.send("Formato de requisição inválido.");
-        }        
-    };    
+            return;
+        }
+    };
+    
 
     export const searchEventHandler: RequestHandler =
     async (req: Request, res: Response) => {

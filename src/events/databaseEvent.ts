@@ -6,7 +6,6 @@ import { DataBaseManager } from "../db/connection";
 import { EventsManager } from "../events/events";
 import { FundsManager } from "../funds/funds";
 import { dbFundsManager } from "../funds/databaseFunds";
-import exp from "constants";
 
 export namespace dbEventsManager
 {
@@ -105,6 +104,8 @@ export namespace dbEventsManager
         }finally{
             await connection.close();
         }
+
+        return;
     }
     export async function calculateBetsFunds(idEvent: number) 
     {
@@ -172,6 +173,7 @@ export namespace dbEventsManager
         }
     }
 
+    // Finalizar apenas eventos em um dia posterior a data de termino
     export async function finishEvent(pIdEvent: number, verdict: string)
     {
         let connection = await DataBaseManager.get_connection();
