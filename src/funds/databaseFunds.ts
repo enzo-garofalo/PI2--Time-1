@@ -54,8 +54,8 @@ export namespace dbFundsManager
                 WHERE ID_WALLET = :idwallet
                 `,
                 {
-                    balance: updateWallet.balance + Value,
-                    idwallet: updateWallet.idWallet
+                    balance: updateWallet.BALANCE + Value,
+                    idwallet: updateWallet.ID_WALLET
                 }
             
             );

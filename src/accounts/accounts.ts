@@ -64,8 +64,10 @@ export namespace AccountsManager {
             }
             const newAccountFunds: FundsManager.Wallet =
             {
-                idWallet: undefined,
-                balance: 0
+                ID_WALLET: undefined,
+                BALANCE: 0,
+                CREATED_AT: undefined,
+                FK_ID_USER: undefined
             }
 
             if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))

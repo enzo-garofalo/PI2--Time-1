@@ -6,8 +6,10 @@ export namespace FundsManager{
 
     /*Cria o tipo Wallet*/
     export type Wallet = {
-        idWallet: number | undefined,
-        balance: number        
+        ID_WALLET: number | undefined,
+        BALANCE: number,
+        CREATED_AT: undefined,
+        FK_ID_USER: undefined        
     }
 
     /*Cria o tipo histórico*/
@@ -41,7 +43,6 @@ export namespace FundsManager{
             const joinTables = 
             await DataBaseManager.joinTables(req.session.token);
                 
-            console.log(joinTables)
             if(joinTables)
             {
             
@@ -52,8 +53,10 @@ export namespace FundsManager{
                         value: pCredit
                     };
                     const updateWallet: Wallet = {
-                        idWallet: idWallet,
-                        balance: joinTables[0].BALANCE
+                        ID_WALLET: idWallet,
+                        BALANCE: joinTables[0].BALANCE,
+                        CREATED_AT: undefined,
+                        FK_ID_USER: undefined
                     };
     
                     if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, +(newCredit.value)))
@@ -114,9 +117,10 @@ export namespace FundsManager{
                     value: pDebit
                 };
                 const updateWallet: Wallet = {
-                    idWallet: idWallet,
-                    balance: joinTables[0].BALANCE
-                };
+                    ID_WALLET: idWallet,
+                    BALANCE: joinTables[0].BALANCE,
+                    CREATED_AT: undefined,
+                    FK_ID_USER: undefined                };
 
                 if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, -(newCredit.value)))
                 {
