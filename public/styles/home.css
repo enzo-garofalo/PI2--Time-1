@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    font-family: "Poppins", sans-serif;
+}
+
+.container-xxlarge{
+    background: black;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.container-xxlarge2{
+    background: linear-gradient(180deg, rgb(68, 216, 136), rgb(47, 158, 123));
+    height: 45vh;
+}
+
+.titleHomepage {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: left; /* Alinha o texto à esquerda */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 20px;
+    white-space: normal; /* Permite quebra de linha conforme HTML */
+    line-height: 1.1;
+    margin-left: 300px; /* Ajusta a margem para deixar mais à esquerda */
+}
+
+.ganhar-dinheiro {
+    color: rgb(68, 216, 136);
+}
+
+.descriptionHomepage {
+    font-size: 0.9rem;
+    color: #ffffff;
+    text-align: left; /* Alinha o texto à esquerda */
+    margin-top: -35px;
+    line-height: 1.5;
+    padding: 20px;
+    white-space: normal;
+    margin-left: 300px; /* Ajusta a margem para deixar mais à esquerda */
+}
