@@ -94,9 +94,11 @@ export namespace betsManager
                     res.statusCode = 409;
                     res.send("Erro inesperado ao fazer o bet.");
                 }
+                return;
             }else{
                 res.statusCode = 400;
                 res.send("Parâmetros inválidos ou faltantes");
+                return;
             }
         }
     }
