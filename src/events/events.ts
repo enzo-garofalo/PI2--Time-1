@@ -68,16 +68,17 @@ export namespace EventsManager
     export const evaluateNewEventHandler: RequestHandler =
     async (req : Request, res : Response) => {
     
-        if(req.session.role === 0 || !req.session.role){
+        if(req.session.role !== 1 || !req.session.token){
             res.statusCode = 401;
-            res.send('Rota autorizada apenas para moderadores');
+            res.send('Usuário deve estar logado como moderador');
             return;
         }
 
-        console.log(req.session.role);
         const pEventID = req.get('eventID');
-        // 1 para é aprovado, 0 para não aprovado
+
+        // sim para é aprovado, não para não aprovado
         const pIsValid = req.get('isValid');
+        const pReason =  req.get('reason');
 
         if(pEventID && pIsValid)
         {
@@ -86,11 +87,30 @@ export namespace EventsManager
             
             var newStatus = '';
 
-            if(Number(pIsValid) === 1){
+            if(pIsValid === 'sim'){
                 newStatus = 'Aprovado';
-            }else if(Number(pIsValid) === 0){
-                await emailSenderManager.sendMail();
-                newStatus = 'Reprovado';
+            }else if(pIsValid === 'não'){
+
+                if(!pReason){
+                    res.statusCode = 400;
+                    res.send('Ao reprovar um evento, um motivo deve ser enviado!');
+                    return;
+                }
+                // Colhendo email do user que criou o evento para envia-lo
+                const email = await dbEventsManager.getUserEmail(Number(pEventID));
+                // Colhendo título do evento recusado
+                const event = await dbEventsManager.getEventById(Number(pEventID));
+                const eventTitle = event?.[0].TITLE;
+                // Colhendo nome do moderador
+                const userModer = await DataBaseManager.getUserByToken(req?.session.token);
+                const userName = userModer?.[0].COMPLETE_NAME;
+
+
+
+                if(email && userName && eventTitle){
+                    await emailSenderManager.sendMail(userName, pReason, email, eventTitle);
+                    newStatus = 'Reprovado';
+                }
             }else{
                 res.statusCode = 400;
                 res.send('Formato de requisição inválido!');
@@ -98,17 +118,7 @@ export namespace EventsManager
                 return;
             }
 
-            await connection.execute(
-                `
-                UPDATE EVENTS
-                SET STATUS_EVENT = :newStatus 
-                WHERE ID_EVENT = :idEvent
-                `,
-                { newStatus :newStatus, idEvent: pEventID } 
-            );
-
-            await connection.commit();
-            await connection.close();
+            await dbEventsManager.changeStatusEvent(newStatus, Number(pEventID));
 
             const updatedEventsList = await dbEventsManager.getNewEvents();
             if(updatedEventsList?.length === 0)

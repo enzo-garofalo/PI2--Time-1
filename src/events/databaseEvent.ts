@@ -6,10 +6,11 @@ import { DataBaseManager } from "../db/connection";
 import { EventsManager } from "../events/events";
 import { FundsManager } from "../funds/funds";
 import { dbFundsManager } from "../funds/databaseFunds";
+import exp from "constants";
 
 export namespace dbEventsManager
 {
-
+    
     export async function addNewEvent(newEvent:EventsManager.Event)
     {
 
@@ -42,7 +43,69 @@ export namespace dbEventsManager
         await connection.close();
 
     }
+
+    // Função utilizado para devolver user criador do evento
+    export async function getUserEmail(eventId : number ) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+
+        const userEmail : OracleDB.Result<{EMAIL : string}> = 
+        await connection.execute(
+           `SELECT AC.EMAIL AS EMAIL
+            FROM EVENTS EV
+            JOIN ACCOUNTS AC ON EV.FK_ID_USER = AC.ID
+            WHERE ID_EVENT = :eventId`,
+            { eventId : eventId }
+        );
+        
+        await connection.close();
+        // Verifica se existe algum resultado
+        return userEmail.rows?.[0]?.EMAIL || null;
+    }
     
+    export async function changeStatusEvent(newStatus:string, eventId : number) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+
+        const connection:OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+
+        await connection.execute(
+            `
+            UPDATE EVENTS
+            SET STATUS_EVENT = :newStatus 
+            WHERE ID_EVENT = :idEvent
+            `,
+            { newStatus :newStatus, idEvent: eventId } 
+        );
+
+        await connection.commit();
+        await connection.close();
+    }
+
+    export async function getEventById(id:number) {
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
+        
+        try{
+            const returnEvent: OracleDB.Result<EventsManager.Event> =
+            await connection.execute(
+               `
+               SELECT *
+               FROM EVENTS
+               WHERE ID_EVENT = :eventID
+               `,
+               { eventId : id }
+           );
+           return returnEvent.rows;
+           
+        }catch(error){
+            console.error('Erro ao encontrar eventos.', error);
+        }finally{
+            await connection.close();
+        }
+    }
     export async function calculateBetsFunds(idEvent: number) 
     {
         let connection = await DataBaseManager.get_connection();
@@ -58,7 +121,6 @@ export namespace dbEventsManager
         return totalBetsFunds.rows?.[0]?.VALUE_BET || 0;
     }
     
-
     export async function shareEventFunds(idEvent:number, verdict:string)
     {
         let connection = await DataBaseManager.get_connection();
@@ -155,7 +217,7 @@ export namespace dbEventsManager
         }finally{
             await connection.close();
         }
-            
+         
     }
     
     export async function getNewEvents()

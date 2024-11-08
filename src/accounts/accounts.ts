@@ -13,7 +13,7 @@ export namespace AccountsManager {
     /*Criação do type para contas*/
     export type userAccount = {
         ID:number | undefined;
-        NAME: string;
+        COMPLETE_NAME: string;
         EMAIL:string;
         PASSWORD: string;
         BIRTHDATE: string;
@@ -55,7 +55,7 @@ export namespace AccountsManager {
             const newAccount: userAccount = 
             {
                 ID: undefined,
-                NAME: pName,
+                COMPLETE_NAME: pName,
                 EMAIL: pEmail,
                 PASSWORD: pPassword,
                 BIRTHDATE: pBirthdate,

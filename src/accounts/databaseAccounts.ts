@@ -70,7 +70,7 @@ export namespace dbAccountsManager
                                 DBMS_RANDOM.STRING('X', 32)
                             )`,
                             {
-                                name: account.NAME,
+                                name: account.COMPLETE_NAME,
                                 email: account.EMAIL,
                                 password: account.PASSWORD,
                                 birthdate: account.BIRTHDATE,
