@@ -8,13 +8,19 @@ import { DataBaseManager } from "../db/connection";
 
 export namespace dbAccountsManager
 {
+<<<<<<< HEAD
     //Função que verifica se o email cadastrado está duplicado
     export async function emailIsDuplicate(email: string) {
+=======
+
+    export async function verifyEmail(email: string) {
+>>>>>>> dfa9edc4fb321cda8eaa448b385ae51d198c9c37
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 
         const connection: OracleDB.Connection = 
         await DataBaseManager.get_connection();
+<<<<<<< HEAD
         
         const searchForDuplicate: OracleDB.Result<{ Num: number }> =  
         await connection.execute(
@@ -28,6 +34,18 @@ export namespace dbAccountsManager
             return true;
         
         return false;
+=======
+
+        const consultaID: OracleDB.Result<{ ID: number, name: string }> =  
+        await connection.execute(
+            `(select ID, COMPLETE_NAME
+            from accounts
+            where email = :email)`,{
+            email: email}
+        );
+        
+        return consultaID.rows;
+>>>>>>> dfa9edc4fb321cda8eaa448b385ae51d198c9c37
     }
 
     // Função para verificar a idade do usuário com base na data de nascimento
