@@ -82,9 +82,35 @@ export namespace FundsManager{
             res.send('Usuário não está logado!');
             return;
         }
-        const pDebit = Number(req.get('Debit'));
+        const pOpcao = (req.get('pixOUconta'));
+        let pDebit = Number(req.get('Debit'));
+
+        if(pOpcao !== 'Pix' && pOpcao !== "Conta bancaria"){
+            res.statusCode = 400;
+            res.send("Erro: Opcão inválida.")
+            return;
+        }
+        else if(pOpcao == "Conta bancaria"){
+            const pBanco = req.get('banco');
+            const pAgencia = req.get('agencia');
+            const pNumeroConta = req.get('numero_conta');
+
+            if(!pBanco || !pAgencia || !pNumeroConta){
+                res.statusCode = 400;
+                res.send("Erro: todos os valores da conta bancária são necessários.")
+                return;
+            }
+        }
+        else if(pOpcao == "Pix"){
+            const pChavePix = req.get('chave_pix');// e como validar? porque a chave pode ser CPF, CNPJ, EMAIL, TELEFONE, CHAVE, ALEATORIA...
             
-    
+            if(!pChavePix){
+                res.statusCode = 400;
+                res.send("Erro: A chave Pix é necessária.");
+                return;
+            }
+        }
+
         if (isNaN(pDebit) || pDebit <= 0) {
             res.statusCode = 400;
             res.send("Valor de saque inválido.");
@@ -92,24 +118,15 @@ export namespace FundsManager{
         }
         const joinTables = 
             await DataBaseManager.joinTables(req.session.token);
+        
+        if (!joinTables || joinTables.length === 0) {
+            res.statusCode = 500; //quando ocorre erro no lado do servidor sem saber o erro
+            res.send("Erro: Não foi possível acessar os dados da conta.");
+            return;
+        }
 
-        if(joinTables){
+        if(joinTables && joinTables.length > 0){
 
-            if(joinTables[0].BALANCE >= pDebit){
-
-                /*PERGUNTA - Como fazer e onde fazer? É necessário guardar o valor que o site ganha dos usuários?*/
-                //verificação do valor para taxar!
-                // if(pDebit <= 100){
-                //     //4%
-                // }else if(pDebit <= 1000){
-                //     //3%
-                // }else if(pDebit <=5000){
-                //     //2%
-                // }else if(pDebit <=100000){
-                //     //1%
-                // }else{
-                //     //Isento
-                // }
                 const idWallet = joinTables[0].IDWALLET;
                 const newCredit: Historic = {
                     fkIdWallet: idWallet,
@@ -124,10 +141,37 @@ export namespace FundsManager{
 
                 if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, -(newCredit.value)))
                 {
-                    req.statusCode = 200;
+                    if(joinTables[0].BALANCE >= pDebit){
+
+                        if(pDebit > 101000){
+                            res.statusCode = 400;
+                            res.send("Erro: Valor máximo de saque por dia é R$ 101.000,00");
+                            return;
+                        }
+
+                        let desconto = 0;
+        
+                         if(pDebit <= 100){
+                            desconto = 0.04;
+        
+                         }else if(pDebit <= 1000){
+                            desconto = 0.03;
+        
+                         }else if(pDebit <=5000){
+                            desconto = 0.02;
+        
+                         }else if(pDebit <=100000){
+                            desconto = 0.01;
+                        }
+        
+                        if(desconto > 0){
+                            pDebit -= pDebit * desconto;
+                        }
+
+                    res.statusCode = 200;
                     res.send("Valor sacado.");
                 }else{
-                    res.statusCode = 409;
+                    res.statusCode = 400;
                     res.send("Erro inesperado ao sacar valor.");
                 }
 
@@ -136,7 +180,6 @@ export namespace FundsManager{
                 res.send(`Valor acima do balanço da carteira - Valor disponível ${joinTables[0].BALANCE}`)
             }
         }
-        
     }         
 }
     
