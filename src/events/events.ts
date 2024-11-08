@@ -2,7 +2,7 @@ import {Request, RequestHandler, Response} from "express";
 import { dbEventsManager } from "./databaseEvent";
 import { DataBaseManager } from "../db/connection";
 
-import { emailSenderManager } from "./emailSender";
+import { emailServiceManager } from "./emailService";
 import OracleDB from "oracledb";
 
 
@@ -108,8 +108,12 @@ export namespace EventsManager
 
 
                 if(email && userName && eventTitle){
-                    await emailSenderManager.sendMail(userName, pReason, email, eventTitle);
+                    await emailServiceManager.sendMail(userName, pReason, email, eventTitle);
                     newStatus = 'Reprovado';
+                }else{
+                    res.statusCode = 400;
+                    res.send('Erro inesperado, tente novamente mais tarde!')
+                    return;
                 }
             }else{
                 res.statusCode = 400;
