@@ -107,6 +107,7 @@ export namespace dbEventsManager
 
         return;
     }
+    
     export async function calculateBetsFunds(idEvent: number) 
     {
         let connection = await DataBaseManager.get_connection();
