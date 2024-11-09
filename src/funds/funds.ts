@@ -49,7 +49,7 @@ export namespace FundsManager{
                     const idWallet = joinTables[0].IDWALLET;
                     const newCredit: Historic = {
                         fkIdWallet: idWallet,
-                        typeTransaction: 'Credito',
+                        typeTransaction: 'Crédito',
                         value: pCredit
                     };
                     const updateWallet: Wallet = {

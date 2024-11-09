@@ -2,7 +2,7 @@ import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import { dbBetsManager } from "./databaseBets";
 import { dbEventsManager } from "../events/databaseEvent";
-
+//Falta criar linha no histórico
 export namespace betsManager
 {
     /* Definição do tipo para uma nova aposta */
@@ -15,7 +15,8 @@ export namespace betsManager
     }
 
     /* Função para validar se todos os dados da aposta estão corretos */
-    async function isAllValid(eventId:number, pBet:string, IdUser:number, pBetValue:number, res: Response): Promise<boolean> {
+    async function isAllValid(eventId:number, pBet:string, IdUser:number, pBetValue:number, res: Response): Promise<boolean> 
+    {
         // Verifica se o evento existe
         const event = await dbEventsManager.getEventById(eventId)
         if(event?.[0] === undefined){

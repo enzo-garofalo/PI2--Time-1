@@ -123,13 +123,16 @@ export namespace dbEventsManager
         return totalBetsFunds.rows?.[0]?.VALUE_BET || 0;
     }
     
-    export async function shareEventFunds(idEvent:number, verdict:string)
+    export async function shareEventFunds(idEvent: number, verdict: string) 
     {
+        // Estabelece uma conexão com o banco de dados
         let connection = await DataBaseManager.get_connection();
-
+    
+        // Calcula o total de fundos apostados no evento
         const totalEventFunds = await calculateBetsFunds(idEvent);
-
-        const countWinners: OracleDB.Result<{TOTAL_BETTORS : number}> = 
+    
+        // Conta o número de apostadores que acertaram o resultado (ganhadores)
+        const countWinners: OracleDB.Result<{TOTAL_BETTORS: number}> = 
         await connection.execute(
             `
             SELECT COUNT(ID_USER) AS TOTAL_BETTORS
@@ -137,42 +140,59 @@ export namespace dbEventsManager
             WHERE ID_EVENT = :idEvent AND BET = :verdict
             `, { idEvent, verdict }
         );
-
+    
+        // Obtém o número total de ganhadores
         const totalWinners = countWinners.rows?.[0]?.TOTAL_BETTORS || 0;
-        
+    
+        // Se houver ganhadores
         if(totalWinners > 0){
-            //Cálculo do ganhado por cada winner
-            const winnersValue = totalEventFunds/totalWinners;
-
-            // lista do id de ganhadores para fazer transações
+            // Calcula o valor que cada ganhador receberá
+            const winnersValue = totalEventFunds / totalWinners;
+    
+            // Recupera a lista dos IDs dos ganhadores
             const idWinnersList: OracleDB.Result<{ID_USER: number}> =
             await connection.execute(
-               `SELECT ID_USER
+                `SELECT ID_USER
                 FROM BETS
                 WHERE ID_EVENT = :idEvent AND BET = :verdict
                 `, { idEvent, verdict }
             );
-
+    
+            // Se houver ganhadores na lista, processa cada um deles
             if(idWinnersList.rows){
-                for(const winner of idWinnersList.rows || [])
+                for(const winner of idWinnersList.rows || []) 
                 {
+                    // Obtém o ID do usuário ganhador
                     const idUser = winner.ID_USER;
+    
+                    // Recupera o ID da carteira do usuário
                     const idWallet = await DataBaseManager.getIdWallet(idUser);
                     
+                    // Se o ID da carteira for encontrado, atualiza o saldo
                     if(idWallet){
-                        // TEM QUE MELHORAR TYPE FUNDS!!
+                        await connection.execute(
+                            `UPDATE WALLETS
+                            SET BALANCE = (BALANCE + :winnersValue)
+                            WHERE FK_ID_USER = :fk_id_user`,
+                            { winnersValue: winnersValue, fk_id_user: idUser }
+                        );
+            
+                        // Cria um novo registro no histórico de transações
                         const newTransaction: FundsManager.Historic = {
                             fkIdWallet: Number(idWallet[0].ID_WALLET),
-                            typeTransaction: 'Ganho',
-                            value: winnersValue
-                        }
-                        await dbFundsManager.addLineHistoric(newTransaction);
+                            typeTransaction: 'Ganho',  // Indica o tipo de transação como "Ganho"
+                            value: winnersValue  // Valor recebido pelo ganhador
+                        };
+                        await dbFundsManager.addLineHistoric(newTransaction);  // Adiciona a linha ao histórico
                     }
                 }
             }
+            await connection.commit();  // Confirma as transações
+            // Fecha a conexão com o banco de dados após a distribuição dos fundos
             await connection.close();
         }
     }
+    
 
     // Finalizar apenas eventos em um dia posterior a data de termino
     export async function finishEvent(pIdEvent: number, verdict: string)
