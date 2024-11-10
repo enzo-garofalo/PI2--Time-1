@@ -157,7 +157,7 @@ export namespace dbEventsManager
                 WHERE ID_EVENT = :idEvent AND BET = :verdict
                 `, { idEvent, verdict }
             );
-    
+            // Perguntar sobre batch processing para o mateues
             // Se houver ganhadores na lista, processa cada um deles
             if(idWinnersList.rows){
                 for(const winner of idWinnersList.rows || []) 
@@ -186,14 +186,13 @@ export namespace dbEventsManager
                         await dbFundsManager.addLineHistoric(newTransaction);  // Adiciona a linha ao histórico
                     }
                 }
+                await connection.commit();  // Confirma as transações
             }
-            await connection.commit();  // Confirma as transações
             // Fecha a conexão com o banco de dados após a distribuição dos fundos
             await connection.close();
         }
     }
     
-
     // Finalizar apenas eventos em um dia posterior a data de termino
     export async function finishEvent(pIdEvent: number, verdict: string)
     {

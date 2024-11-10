@@ -25,161 +25,166 @@ export namespace FundsManager{
     async (req: Request, res: Response) => {
 
         if(!req.session.token)
-            {
-                res.statusCode = 401;
-                res.send('Usuário não está logado!');
-                return;
+        {
+            res.statusCode = 401;
+            res.send('Usuário não está logado!');
+            return;
+        }
+    
+        const pCredit = Number(req.get('Credit'));
+        
+
+        if (isNaN(pCredit) || pCredit <= 0) {
+            res.statusCode = 400;
+            res.send("Valor de crédito inválido.");
+            return;
+        }
+        
+        const joinTables = 
+        await DataBaseManager.joinTables(req.session.token);
+            
+        if(joinTables)
+        {
+            const idWallet = joinTables[0].IDWALLET;
+            const newCredit: Historic = {
+                fkIdWallet: idWallet,
+                typeTransaction: 'Crédito',
+                value: pCredit
+            };
+            const updateWallet: Wallet = {
+                ID_WALLET: idWallet,
+                BALANCE: joinTables[0].BALANCE,
+                CREATED_AT: undefined,
+                FK_ID_USER: undefined
+            };
+
+            if(await dbFundsManager.addLineHistoric(newCredit) && 
+            await dbFundsManager.updateBalance(updateWallet, +(newCredit.value))){
+                req.statusCode = 200;
+                res.send("Novo Valor adicionado.");
+            }else{
+                res.statusCode = 409;
+                res.send("Erro inesperado ao colocar o valor.");
             }
-    
-            const pCredit = Number(req.get('Credit'));
-            
-    
-            if (isNaN(pCredit) || pCredit <= 0) {
-                res.statusCode = 400;
-                res.send("Valor de crédito inválido.");
-                return;
-            }
-            
-            const joinTables = 
-            await DataBaseManager.joinTables(req.session.token);
-                
-            if(joinTables)
-            {
-            
-                    const idWallet = joinTables[0].IDWALLET;
-                    const newCredit: Historic = {
-                        fkIdWallet: idWallet,
-                        typeTransaction: 'Crédito',
-                        value: pCredit
-                    };
-                    const updateWallet: Wallet = {
-                        ID_WALLET: idWallet,
-                        BALANCE: joinTables[0].BALANCE,
-                        CREATED_AT: undefined,
-                        FK_ID_USER: undefined
-                    };
-    
-                    if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, +(newCredit.value)))
-                    {
-                        req.statusCode = 200;
-                        res.send("Novo Valor adicionado.");
-                    }else{
-                        res.statusCode = 409;
-                        res.send("Erro inesperado ao colocar o valor.");
-                    }
-                }else{
-                    res.statusCode = 400;
-                    res.send("Parâmetros inválidos ou faltantes.");
-                }
+        }else{
+            res.statusCode = 400;
+            res.send("Parâmetros inválidos ou faltantes.");
+        }
+        return;
     }
     
     export const withdrawFundsHandler: RequestHandler =
     async (req: Request, res: Response) => {
         
         // Verificar se o user está logado
-        if(!req.session.token){
+        if(!req.session.token)
+        {
             res.statusCode = 401;
             res.send('Usuário não está logado!');
             return;
         }
+
         const pOpcao = (req.get('pixOUconta'));
         let pDebit = Number(req.get('Debit'));
 
-        if(pOpcao !== 'Pix' && pOpcao !== "Conta bancaria"){
+        if(pOpcao !== 'Pix' && pOpcao !== "Conta bancaria")
+        {
             res.statusCode = 400;
             res.send("Erro: Opcão inválida.")
             return;
-        }
-        else if(pOpcao == "Conta bancaria"){
+        }else if(pOpcao == "Conta bancaria"){
             const pBanco = req.get('banco');
             const pAgencia = req.get('agencia');
             const pNumeroConta = req.get('numero_conta');
 
-            if(!pBanco || !pAgencia || !pNumeroConta){
+            if(!pBanco || !pAgencia || !pNumeroConta)
+            {
                 res.statusCode = 400;
                 res.send("Erro: todos os valores da conta bancária são necessários.")
                 return;
             }
-        }
-        else if(pOpcao == "Pix"){
+        }else if(pOpcao == "Pix"){
             const pChavePix = req.get('chave_pix');// e como validar? porque a chave pode ser CPF, CNPJ, EMAIL, TELEFONE, CHAVE, ALEATORIA...
             
-            if(!pChavePix){
+            if(!pChavePix)
+            {
                 res.statusCode = 400;
                 res.send("Erro: A chave Pix é necessária.");
                 return;
             }
         }
 
-        if (isNaN(pDebit) || pDebit <= 0) {
+        if (pDebit <= 0) 
+        {
             res.statusCode = 400;
             res.send("Valor de saque inválido.");
             return;
         }
-        const joinTables = 
-            await DataBaseManager.joinTables(req.session.token);
+
+        const joinTables = await DataBaseManager.joinTables(req.session.token);
         
-        if (!joinTables || joinTables.length === 0) {
+        if (!joinTables || joinTables.length === 0) 
+        {
             res.statusCode = 500; //quando ocorre erro no lado do servidor sem saber o erro
             res.send("Erro: Não foi possível acessar os dados da conta.");
             return;
         }
 
-        if(joinTables && joinTables.length > 0){
+       
 
-                const idWallet = joinTables[0].IDWALLET;
-                const newCredit: Historic = {
-                    fkIdWallet: idWallet,
-                    typeTransaction: 'Debito',
-                    value: pDebit
-                };
-                const updateWallet: Wallet = {
-                    ID_WALLET: idWallet,
-                    BALANCE: joinTables[0].BALANCE,
-                    CREATED_AT: undefined,
-                    FK_ID_USER: undefined                };
+        const idWallet = joinTables[0].IDWALLET;
+        const newCredit: Historic = {
+            fkIdWallet: idWallet,
+            typeTransaction: 'Débito',
+            value: pDebit
+        };
+        const updateWallet: Wallet = {
+            ID_WALLET: idWallet,
+            BALANCE: joinTables[0].BALANCE,
+            CREATED_AT: undefined,
+            FK_ID_USER: undefined                };
 
-                if(await dbFundsManager.addLineHistoric(newCredit) && await dbFundsManager.upDateBalance(updateWallet, -(newCredit.value)))
-                {
-                    if(joinTables[0].BALANCE >= pDebit){
+        if(pDebit <= joinTables[0].BALANCE){
+            if(pDebit > 101000)
+            {
+                res.statusCode = 400;
+                res.send("Erro: Valor máximo de saque por dia é R$ 101.000,00");
+                return;
+            }else if(await dbFundsManager.addLineHistoric(newCredit) && 
+            await dbFundsManager.updateBalance(updateWallet, -(newCredit.value)))
+            {
+                let desconto = 0;
 
-                        if(pDebit > 101000){
-                            res.statusCode = 400;
-                            res.send("Erro: Valor máximo de saque por dia é R$ 101.000,00");
-                            return;
-                        }
+                    if(pDebit <= 100){
+                    desconto = 0.04;
 
-                        let desconto = 0;
-        
-                         if(pDebit <= 100){
-                            desconto = 0.04;
-        
-                         }else if(pDebit <= 1000){
-                            desconto = 0.03;
-        
-                         }else if(pDebit <=5000){
-                            desconto = 0.02;
-        
-                         }else if(pDebit <=100000){
-                            desconto = 0.01;
-                        }
-        
-                        if(desconto > 0){
-                            pDebit -= pDebit * desconto;
-                        }
+                    }else if(pDebit <= 1000){
+                    desconto = 0.03;
 
-                    res.statusCode = 200;
-                    res.send("Valor sacado.");
-                }else{
-                    res.statusCode = 400;
-                    res.send("Erro inesperado ao sacar valor.");
+                    }else if(pDebit <=5000){
+                    desconto = 0.02;
+
+                    }else if(pDebit <=100000){
+                    desconto = 0.01;
                 }
 
+                if(desconto > 0){
+                    pDebit -= pDebit * desconto;
+                }
+
+                res.statusCode = 200;
+                res.send(`Valor sacado: ${pDebit}\n\
+                    Taxa da casa: ${desconto*100}%`);
             }else{
                 res.statusCode = 400;
-                res.send(`Valor acima do balanço da carteira - Valor disponível ${joinTables[0].BALANCE}`)
+                res.send("Erro inesperado ao sacar valora.");
             }
-        }
+
+        }else{
+            res.statusCode = 400;
+            res.send(`Valor acima do balanço da carteira - Valor disponível ${joinTables[0].BALANCE}`)
+            return;
+        }   
     }         
 }
     

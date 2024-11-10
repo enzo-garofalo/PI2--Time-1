@@ -40,7 +40,7 @@ export namespace dbFundsManager
     }
 
     /*Altera o valor do Balance de acordo com o valor passado*/
-    export async function upDateBalance(updateWallet: FundsManager.Wallet, Value: number) {
+    export async function updateBalance(updateWallet: FundsManager.Wallet, Value: number) {
 
         OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
         const connection: OracleDB.Connection = 
