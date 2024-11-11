@@ -55,7 +55,7 @@ export namespace emailServiceManager {
                     <div class="email-container">
                         <h1>Event Rejection Notice</h1>
                         <p>Dear User,</p>
-                        <p>We have reviewed your event,<strong>${eventName}</strong>, and unfortunately, it has been <span class="reason">rejected</span>.</p>
+                        <p>We have reviewed your event, <strong>${eventName}</strong>, and unfortunately, it has been <span class="reason">rejected</span>.</p>
                         <p><strong>Reason for rejection:</strong> ${reason}</p>
                         <p>This event was reviewed and rejected by <strong>${userName}</strong>.</p>
                         <div class="footer">
@@ -69,8 +69,8 @@ export namespace emailServiceManager {
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
-            to: `${email}`,
-            subject: 'Your Event was Rejected',
+            to: `${email}`, // email do user que vai receber o email
+            subject: 'Your Event was Rejected', // Assunto do email
             html: htmlContent // Corpo do e-mail em HTML
         };
 
