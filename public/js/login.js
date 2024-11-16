@@ -1,27 +1,12 @@
 function showMessage(content, type) {
-    const mb = document.getElementById('message-box');
-    const message = document.getElementById('message');
+    const alertBox = document.getElementById('alert-box');
+    const alertMessage = document.getElementById('alert-message');
     
-    message.innerHTML = content;
+    alertMessage.innerHTML = content;
     
-    // Verifica se o box já está visível, para evitar alterações desnecessárias no display
-    if (mb.style.display !== 'block') {
-        mb.style.display = 'block';
-        mb.classList.remove('hide'); // Caso a mensagem anterior tenha sido ocultada
-        mb.classList.add('show');
-    }
-    
-    switch(type) {
-        case 'error':
-            mb.style.backgroundColor = 'darkred';
-            mb.style.borderColor = 'rgb(189, 76, 76)';
-            break;
-
-        case 'success':
-            mb.style.backgroundColor = 'darkgreen';
-            mb.style.borderColor = 'green';
-            break;
-    }
+    // Exibe o alerta
+    alertBox.classList.remove('d-none');
+    alertBox.classList.add('show');
 }
 
 // Função para esconder a mensagem
@@ -88,6 +73,7 @@ async function signIn() {
         );
 
         if (res.ok) {
+            // Aqui redireciona se o login estiver correto
             window.location.href = '../view/home.html';
         } else {
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
@@ -95,7 +81,6 @@ async function signIn() {
         }
     }
 }
-
 // Função de cadastro
 async function signUp() {
     var name = document.getElementById('fName').value;

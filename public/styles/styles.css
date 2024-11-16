@@ -1,139 +1,169 @@
-@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap");
 :root {
-  /* Paleta de Cores */
   --background-dark: #151515;
   --background-light: #252525;
   --accent-color: #44d888;
   --highlight: #66e0a3;
+  --input-background: #2e2e2e;
   --input-border: #3d3d3d;
   --button-hover: #3a3a3a;
   --text-color: #ffffff;
   --label-color: #b0b0b0;
-  --focus-color: #88ffc3;
-
-  /* Tipografia */
+  --focus-color: #44d888;
+  --icon-color: #44d888;
   --font-family: 'Kanit', sans-serif;
 }
 
 body {
-  background-color: var(--background-dark);
-  font-family: var(--font-family);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+  background: #000; /* Fundo preto */
+  background: radial-gradient(
+      circle at bottom, 
+      rgb(44, 156, 96), /* Feixe de luz verde mais escuro */
+      rgb(0, 0, 0) 55% /* Transição para o fundo escuro */
+    ),
+    #000; /* Fundo preto */
+  font-family: var(--font-family); 
+  color: var(--text-color);
   margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
-.container {
+#login-container {
   background-color: var(--background-light);
   padding: 2rem;
-  width: 400px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  transition: box-shadow 0.3s ease;
+  border-radius: 12px; /* Borda mais arredondada */
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); /* Sombra mais suave */
+  transition: box-shadow 0.3s ease-in-out; /* Transição suave da sombra */
 }
 
-.container:hover {
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-}
-
-.title {
-  font-size: 2.2rem;
-  color: var(--accent-color);
+#title {
+  font-size: 2.5rem; /* Aumentar o tamanho do título */
   margin-bottom: 1.5rem;
-  font-weight: 700;
+  background: linear-gradient(to right, #00b36b, #00ff99);
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: bold;
 }
 
-.flex-column label {
+.form-label {
   color: var(--label-color);
-  font-size: 0.85rem;
-  text-align: left;
-  margin-bottom: 0.3rem;
-  display: block;
+  font-size: 0.95rem; /* Tamanho de fonte um pouco maior */
   font-weight: 600;
-  letter-spacing: 0.05rem;
   text-transform: uppercase;
-  transition: color 0.2s ease;
+  text-align: left; /* Alinha as labels à esquerda */
+  display: block;
 }
 
-.inputForm {
-  display: flex;
-  align-items: center;
+.input-group-text {
   border: 1px solid var(--input-border);
-  border-radius: 5px;
-  background-color: #1f1f1f;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  background-color: var(--input-background);
+  color: var(--accent-color);
+  border-radius: 5px; /* Bordas arredondadas */
 }
 
-.inputForm svg {
-  margin-right: 0.5rem;
-  fill: var(--highlight);
-  transition: fill 0.3s ease;
-}
-
-.input {
-  flex: 1;
-  background: none;
-  border: none;
+.form-control {
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background);
   color: var(--text-color);
-  font-size: 1rem;
-  padding: 0.5rem 0;
-  outline: none;
-  transition: color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  padding: 0.75rem; /* Aumentar o padding para mais conforto */
+  border-radius: 5px; /* Bordas arredondadas */
 }
 
-.input:focus ~ .inputForm {
+.form-control:focus {
   border-color: var(--focus-color);
   background-color: #2a2a2a;
+  box-shadow: 0 0 8px var(--focus-color); /* Caixa de foco mais evidente */
 }
 
-.input:focus ~ label {
-  color: var(--focus-color);
-}
-
-.input::placeholder {
-  color: #888888;
-}
-
-.button-submit {
-  width: 100%;
-  padding: 0.9rem;
-  font-size: 1.1rem;
-  font-weight: bold;
+#button-submit {
+  background: linear-gradient(135deg, #00b36b, #00ff99);
   color: var(--text-color);
-  background-color: var(--accent-color);
+  font-weight: bold;
   border: none;
-  border-radius: 5px;
+  padding: 0.85rem 1.5rem; /* Aumentar o padding */
+  border-radius: 8px; /* Bordas mais arredondadas */
+  width: 100%;
+  background-size: 200% 200%;
+  transition: background-position 0.8s ease, transform 0.2s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  margin-top: 1.5rem;
+  font-size: 20px;
 }
 
-.button-submit:hover {
-  background-color: var(--highlight);
-  transform: translateY(-2px);
+#button-submit:hover {
+  background-position: 100% 0; /* Mover o gradiente durante o hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Efeito de sombra mais forte */
 }
 
-.button-submit:active {
-  transform: translateY(0);
-}
 
-.p {
+#p {
   color: var(--label-color);
-  font-size: 0.9rem;
-  margin-top: 1.5rem;
+  font-size: 1rem; /* Tamanho maior para melhor legibilidade */
+  text-align: center;
+  margin-top: 1rem;
 }
 
-.span {
+#span {
   color: var(--highlight);
+  transition: color 0.3s ease, transform 0.2s ease;
   cursor: pointer;
-  transition: color 0.3s ease;
 }
 
-.span:hover {
+#span:hover {
   color: var(--focus-color);
+  transform: scale(1.1); /* Efeito de aumento ao passar o mouse */
 }
+
+/* Adicionar media queries para responsividade */
+@media (max-width: 600px) {
+  #login-container {
+    padding: 1.5rem;
+    max-width: 90%; /* Deixar o container mais responsivo */
+  }
+
+  #title {
+    font-size: 2rem; /* Ajuste do título em telas menores */
+  }
+
+  .form-label {
+    color: var(--label-color);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: left; /* Alinha as labels à esquerda */
+    display: block;   /* Garante que ocupem a largura total */
+    margin-bottom: 0.5rem;
+  }
+  
+
+  .form-control {
+    padding: 0.6rem; /* Ajuste no padding dos inputs */
+  }
+
+  #button-submit {
+    padding: 0.75rem 1.25rem; /* Ajustar o padding no botão */
+  }
+
+  #p {
+    font-size: 0.85rem; /* Ajuste no tamanho do texto */
+  }
+}
+
+i{
+  color: var(--background-dark);
+  font-size: 20px;
+}
+
+.logoPucBet {
+  width: 220px; 
+  height: auto;
+  padding-bottom: 20px;
+}
+
