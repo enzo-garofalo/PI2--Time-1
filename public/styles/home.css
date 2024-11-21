@@ -1,55 +1,188 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body{
-    font-family: "Poppins", sans-serif;
-}
-
-.container-xxlarge{
-    background: black;
+.container-xxlarge {
+    background: #151515;
     height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
     padding: 20px;
+    position: relative;
+    overflow: hidden; /* Garante que a imagem não ultrapasse o container */
 }
 
-.container-xxlarge2{
+.container-xxlarge2 {
     background: linear-gradient(180deg, rgb(68, 216, 136), rgb(47, 158, 123));
     height: 45vh;
+    position: relative; /* Necessário para o posicionamento absoluto dentro dele */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; 
+    padding: 20px; /* Corrigido para dar espaçamento interno */
+}
+
+.container-xxlarge3 {
+    background: rgb(21, 21, 21);
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden; /* Garante que a imagem não ultrapasse o container */
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1; /* Garante que o texto fique acima da imagem */
 }
 
 .titleHomepage {
+    font-family: 'Montserrat', sans-serif;
     font-size: 2.5rem;
     font-weight: bold;
     color: #ffffff;
-    text-align: left; /* Alinha o texto à esquerda */
+    text-align: left;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    margin: 0;
+    margin-left: 100px;
+    padding-right: 20px;
+}
+
+.titleHomepage2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 720;
+    color: #000000;
+    text-align: left;
+    letter-spacing: 0.8px;
+    line-height: 1.2;
+    margin: 0;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    padding: 20px;
-    white-space: normal; /* Permite quebra de linha conforme HTML */
-    line-height: 1.1;
-    margin-left: 300px; /* Ajusta a margem para deixar mais à esquerda */
+    padding-left: 20px; /* Ajusta o alinhamento */
+    margin-bottom: 0px; /* Um pouco de espaço abaixo */
+    margin-left: 900px;
+    margin-top: 0px;
+}
+
+.descriptionHomepage2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    color: #ffffff;
+    text-align: left;
+    line-height: 1.5;
+    padding-left: 20px; /* Ajusta o alinhamento do texto */
+    margin-left: 900px;
+    margin-top: 35px;
+}
+
+.logoPucBet {
+    width: 220px; 
+    height: auto;
+    margin-left: 50px; 
+    margin-bottom: 12px;
+    padding-right: 20px;
+}
+
+.header-image-container {
+    position: absolute;
+    right: -20px;
+    top: 100;
+    width: 1050px; 
+    height: 1000%;
+    z-index: 0; /* Garante que a imagem fique atrás do conteúdo */
+    overflow: hidden; 
+    object-fit: cover;
+}
+
+.header-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to right, 
+        rgba(21, 21, 21, 1),       /* Opacidade total no começo do gradiente */
+        rgba(21, 21, 21, 0.9) 30%, /* 90% opaco, cobrindo bem o lado esquerdo */
+        rgba(21, 21, 21, 0.6) 70%, /* Transição para o centro */
+        rgba(21, 21, 21, 0.3) 100% /* Final mais transparente para misturar melhor */
+    );
+    z-index: 5000;
+}
+
+.header-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    position: relative;
+    z-index: -1;
+}
+
+.header-image-esports {
+    position: relative;
+    width: 800px;
+    margin-left: 1100px;
+    z-index: 1; /* Garante que a imagem fique atrás do conteúdo */
+    object-fit: cover;
+}
+
+.soccerPlayer {
+    width: 700px;
+    height: auto;
+    position: absolute; /* Permite que a imagem entre no container-xxlarge */
+    top: -80px;
+    left: 30%; 
+    transform: translateX(-50%); 
+    z-index: 0; /* Garante que a imagem fique atrás do conteúdo, mas à frente do fundo */
 }
 
 .ganhar-dinheiro {
-    color: rgb(68, 216, 136);
+    background: linear-gradient(to right, #00b36b, #00ff99);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    font-weight: bold;
+}
+
+.gotyoucovered {
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    font-weight: bold;
 }
 
 .descriptionHomepage {
-    font-size: 0.9rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
     color: #ffffff;
-    text-align: left; /* Alinha o texto à esquerda */
-    margin-top: -35px;
+    text-align: left;
+    margin-top: 10px;
+    margin-left: 100px;
     line-height: 1.5;
-    padding: 20px;
-    white-space: normal;
-    margin-left: 300px; /* Ajusta a margem para deixar mais à esquerda */
+    padding-right: 220px;
+}
+
+.btn-signup {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(to right, #00b36b, #00ff99);
+    color: #000000;
+    padding: 10px 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+    margin-top: 20px;
+    margin-left: 100px;
+    align-self: flex-start;
+    box-shadow: 0px 4px 10px rgba(0, 255, 153, 0.4);
+}
+
+.btn-signup:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #00ff99, #00e676);
+    box-shadow: 0px 6px 12px rgba(0, 255, 153, 0.6);
 }

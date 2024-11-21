@@ -1,64 +1,72 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
   <head>
-    <title>PUC BET</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
     <link rel="stylesheet" href="../styles/styles.css">
-    <link rel="stylesheet" href="../login-page/style.css">
+    <link rel="stylesheet" href="../styles/bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   </head>
   <body>
-    <div class="container-login">
-      <div class="title">
-        <span>
-            PUC BET
-        </span>
-      </div>
-
-      <form class="form">
-        <div class="flex-column">
-          <label>Name</label>
+    <div class="container" id="login-container">
+      <form class="text-center" onsubmit="event.preventDefault(); signUp();">
+        <img src="../assets/logoPucBet.png" alt="logoPucBet" class="logoPucBet">
+        <!-- Alert for errors -->
+        <div id="alert-box" class="alert alert-danger d-none" role="alert">
+            <strong>Error!</strong> <span id="alert-message"></span>
         </div>
 
-        <div class="inputForm">
-            
-            <input type="text" id="fName" onfocus="hideMessage()" placeholder="Name" required>
+        <!-- Input para Name -->
+        <div class="form-group mb-3 position-relative">
+            <label for="fName" class="form-label">Name</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-user"></i>
+                </span>
+                <input type="text" id="fName" class="form-control" placeholder="Enter your Name" onfocus="hideMessage()" required>
+            </div>
         </div>
 
-        <div class="flex-column">
-          <label>Email</label>
+        <!-- Input para Email -->
+        <div class="form-group mb-3 position-relative">
+            <label for="fEmail" class="form-label">Email</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                <input type="email" id="fEmail" class="form-control" placeholder="Enter your Email" onfocus="hideMessage()" required>
+            </div>
         </div>
 
-        <div class="inputForm">
-          
-          <input type="text" id="fEmail" onfocus="hideMessage()" placeholder="Email" required>
+        <!-- Input para Password -->
+        <div class="form-group mb-3 position-relative">
+            <label for="fPassword" class="form-label">Password</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-lock"></i>
+                </span>
+                <input type="password" id="fPassword" class="form-control" placeholder="Enter your Password" onfocus="hideMessage()" required>
+            </div>
         </div>
 
-        <div class="flex-column">
-          <label>Password</label>
+        <!-- Input para Birthdate -->
+        <div class="form-group mb-3 position-relative">
+            <label for="fBirthdate" class="form-label">Birthdate</label>
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-calendar-days"></i>
+                </span>
+                <input type="date" id="fBirthdate" class="form-control" onfocus="hideMessage()" required>
+            </div>
         </div>
 
-        <div class="inputForm">
-          
-          <input type="password" id="fPassword" onfocus="hideMessage()" placeholder="Password" required>
-        </div>
+        <button type="submit" class="btn btn-block w-100" id="button-submit" onclick="signUp()">Sign Up</button>
 
-        <div class="flex-column">
-          <label>Birthdate</label>
-        </div>
-
-        <div class="inputForm">
-          
-          <input type="date" id="fBirthdate" onfocus="hideMessage()" placeholder="Birthdate" required>
-        </div>
-          
-        <button type="button" class="button-submit"  id="btnSignIn" onclick="signUp()">Sign In</button>
-          
-        <div id="message-box">
-            <p id="message"></p>
-        </div>
-          <!--Fazer tratamento de dados e voltar botões: usuário cadastrado / Conta já existente-->
-      </form> <!-- Fim do formulário - FORM 1 -->
+        <p id="p" class="mt-4">Already have an account? 
+            <a href="../view/login.html" class="text-decoration-none" id="span">Log In</a>
+        </p>
+      </form>
     </div>
     <script src="../js/login.js" async defer></script>
   </body>

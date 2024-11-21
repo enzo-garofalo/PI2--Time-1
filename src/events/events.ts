@@ -22,32 +22,41 @@ export namespace EventsManager
         FK_ID_USER: number | undefined
     }
 
+    export const addNewEventHandler: RequestHandler = async (req: Request, res: Response) => {
 
-    export const addNewEventHandler: RequestHandler = 
-    async (req: Request, res: Response) => {
-
-        if(req.session.token === undefined){
+        // Verifica se o usuário está logado
+        if (req.session.token === undefined) {
             res.statusCode = 401;
             res.send('Usuário não está logado!');
             return;
         }
-        
+    
+        // Obtém os parâmetros do cabeçalho da requisição
         const pTitle = req.get('Title');
         const pDescription = req.get('Description');
         const pCategories = req.get('Categories');
         const pFinishDate = req.get('finishDate');
-
-        const id_user  = 
-        await DataBaseManager.getUserID(req.session.token);
-
-        if(pTitle && pDescription && pCategories && pFinishDate && id_user)
-        {
-
-            const newEvent: Event = 
-            {
+    
+        // Busca o ID do usuário com base no token da sessão
+        const id_user = await DataBaseManager.getUserID(req.session.token);
+    
+        // Verifica se todos os parâmetros necessários estão presentes
+        if (pTitle && pDescription && pCategories && pFinishDate && id_user) {
+            
+            // Valida se a data de término é posterior à data atual
+            const today = new Date();
+            let eventDate = new Date(pFinishDate);
+            if (eventDate <= today) {
+                res.statusCode = 400;
+                res.send('Não é possível criar evento na data informada!');
+                return;
+            }
+    
+            // Cria o objeto do evento a ser adicionado
+            const newEvent: Event = {
                 ID_EVENT: undefined,
                 TITLE: pTitle,
-                DESCRIPTION : pDescription,
+                DESCRIPTION: pDescription,
                 CATEGORIES: pCategories,
                 STATUS_EVENT: 'Pendente',
                 RESULT_EVENT: undefined,
@@ -55,103 +64,127 @@ export namespace EventsManager
                 BETS_FUNDS: 0.00,
                 FINISH_DATE: pFinishDate,
                 FK_ID_USER: id_user
-            }
+            };
+    
+            // Adiciona o novo evento ao banco de dados
             await dbEventsManager.addNewEvent(newEvent);
-            req.statusCode = 200;
+            res.statusCode = 200;
             res.send("Novo Evento adicionado.");
-        }else{
+        } else {
+            // Responde com erro se parâmetros estão ausentes ou inválidos
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
-    }
+    };
 
     export const evaluateNewEventHandler: RequestHandler =
-    async (req : Request, res : Response) => {
-    
+    async (req: Request, res: Response) => 
+    {
+        // Verifica se o usuário está autenticado e é um moderador (role === 1)
         if(req.session.role !== 1 || !req.session.token){
-            res.statusCode = 401;
+            res.statusCode = 401;  // Status de não autorizado
             res.send('Usuário deve estar logado como moderador');
             return;
         }
-
+    
+        // Recupera o ID do evento da requisição
         const pEventID = req.get('eventID');
-
-        // sim para é aprovado, não para não aprovado
+    
+        // Recupera os parâmetros que indicam se o evento é válido e a razão da decisão
         const pIsValid = req.get('isValid');
         const pReason =  req.get('reason');
-
+    
+        // Verifica se os parâmetros essenciais foram enviados
         if(pEventID && pIsValid)
         {
-            const connection:OracleDB.Connection = 
+            // Estabelece uma conexão com o banco de dados
+            const connection: OracleDB.Connection = 
             await DataBaseManager.get_connection();
+    
+            // Obtém os dados do evento pelo ID fornecido
+            const event = await dbEventsManager.getEventById(Number(pEventID));
+    
+            // Verifica se o evento existe e se ele ainda está pendente de avaliação
+            if(event?.[0] === undefined){
+                res.statusCode = 400;  // Status de erro de requisição
+                res.send('Não foi possível encontrar evento!');
+                return;
+            } else if(event[0].STATUS_EVENT !== 'Pendente'){
+                res.statusCode = 200;  // Status de sucesso
+                res.send(`Evento já avaliado\n Status: ${event[0].STATUS_EVENT}`);
+                return;
+            }
             
-            var newStatus = '';
-
+            var newStatus = '';  // Inicializa a variável que armazenará o novo status do evento
+    
+            // Se o evento é aprovado, define o novo status como 'Aprovado'
             if(pIsValid === 'sim'){
                 newStatus = 'Aprovado';
-            }else if(pIsValid === 'não'){
-
+            } else if(pIsValid === 'não'){  // Se o evento é rejeitado
+                
+                // Caso de rejeição, verifica se um motivo foi fornecido
                 if(!pReason){
                     res.statusCode = 400;
                     res.send('Ao reprovar um evento, um motivo deve ser enviado!');
                     return;
                 }
-                // Colhendo email do user que criou o evento para envia-lo
+                // Obtém o e-mail do usuário que criou o evento para enviar uma notificação
                 const email = await dbEventsManager.getUserEmail(Number(pEventID));
-                // Colhendo título do evento recusado
-                const event = await dbEventsManager.getEventById(Number(pEventID));
+                // Obtém o título do evento rejeitado
                 const eventTitle = event?.[0].TITLE;
-                // Colhendo nome do moderador
+                // Obtém o nome do moderador que avaliou o evento
                 const userModer = await DataBaseManager.getUserByToken(req?.session.token);
                 const userName = userModer?.[0].COMPLETE_NAME;
-
-
-
+    
+                // Envia um e-mail de notificação ao usuário se todas as informações necessárias estiverem presentes
                 if(email && userName && eventTitle){
                     await emailServiceManager.sendMail(userName, pReason, email, eventTitle);
                     newStatus = 'Reprovado';
-                }else{
+                } else {
                     res.statusCode = 400;
-                    res.send('Erro inesperado, tente novamente mais tarde!')
+                    res.send('Erro inesperado, tente novamente mais tarde!');
                     return;
                 }
-            }else{
+            } else {
                 res.statusCode = 400;
                 res.send('Formato de requisição inválido!');
                 await connection.close();
                 return;
             }
-
+    
+            // Atualiza o status do evento no banco de dados
             await dbEventsManager.changeStatusEvent(newStatus, Number(pEventID));
-
+    
+            // Obtém a lista de eventos pendentes após a atualização
             const updatedEventsList = await dbEventsManager.getNewEvents();
-            if(updatedEventsList?.length === 0)
-            {
+            if(updatedEventsList?.length === 0) {
                 res.statusCode = 200;
                 res.send('Não há eventos pendentes!');
-            }else{
+            } else {
                 res.statusCode = 200;
-                res.send(updatedEventsList);
+                res.send(updatedEventsList);  // Retorna a lista de eventos pendentes
             }
             return;
         }
+        // Se não foram fornecidos parâmetros de evento, retorna a lista de eventos pendentes
         const newEventsList = await dbEventsManager.getNewEvents();
-
+    
+        // Verifica se há eventos pendentes e envia a lista
         if(newEventsList)
         {
             if(newEventsList.length === 0){
                 res.statusCode = 200;
                 res.send('Não há eventos pendentes!');
-            }else{
+            } else {
                 res.statusCode = 200;
                 res.send(newEventsList);
             }
-        }else{
-            res.statusCode = 404;
+        } else {
+            res.statusCode = 404;  // Status de não encontrado
             res.send('Nenhum evento encontrado!');
             return;
         }
-    }   
+    }
 
     export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
     
@@ -194,9 +227,11 @@ export namespace EventsManager
             const today = new Date();
             
             // Verifica se a data atual é anterior ou igual à data de término do evento
-            if (today <= eventFinishDate) {
+            if (today <= eventFinishDate || event?.[0]?.STATUS_EVENT !== 'aprovado') {
                 res.statusCode = 400; // Código 400: Solicitação inválida
-                res.send("O evento ainda não terminou. Ele só pode ser finalizado após a data de término.");
+                res.send('Não foi possível finalizar evento.\n \
+                - Verifique a data de término do evento.\n \
+                - Verifique se o evento já foi avaliado.');
                 return; // Encerra a execução para evitar continuar com erro
             }
     
@@ -212,8 +247,7 @@ export namespace EventsManager
             res.send("Formato de requisição inválido.");
             return;
         }
-    };
-    
+    }  
 
     export const searchEventHandler: RequestHandler =
     async (req: Request, res: Response) => {

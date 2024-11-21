@@ -1,7 +1,9 @@
 import OracleDB from "oracledb";
 import dotenv from "dotenv";
 dotenv.config(); 
+
 import { AccountsManager } from "../accounts/accounts";
+import { FundsManager } from "../funds/funds";
 
 
 export namespace DataBaseManager
@@ -68,6 +70,23 @@ export namespace DataBaseManager
         return idWallet.rows;
 
     }
+
+        /*Retorna o ID da Wallet pelo ID do usuário*/
+        export async function getWalletByID(id_user:number) 
+        {
+            
+            const connection:OracleDB.Connection = await get_connection();
+    
+            const wallet : OracleDB.Result<FundsManager.Wallet>  = 
+                await connection.execute(
+                   `SELECT * 
+                    FROM WALLETS 
+                    WHERE FK_ID_USER = :id_user`,
+                    {id_user}
+            );
+            return wallet.rows;
+    
+        }
 
     /*Faz Join nas tabelas de Usuários e carteiras e retorna ID do Usuário e Carteira
      e o balanço da carteira recebendo o Token*/

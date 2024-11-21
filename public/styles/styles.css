@@ -1,353 +1,169 @@
-@import url("https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Manrope:wght@200..800&display=swap");
-@import url('https://fonts.googleapis.com/css2?family=Modak&display=swap');
 :root {
-  --tawny: #cc5d28;
-  --seal-brown: #6c2d1b;
-  --saffron: #f7c846;
-  --french-gray: #d2d7df;
-  --gold-metalic: #c8ad55;
-  --smoky-black: #100704;
-
-  --lapis-azuli: #05668d;
-  --teal: #028090;
-  --persian-green: #00a896;
-  --mint: #02c39a;
-  --cream: #2b2b2b;
-  --primary-color: var(--lapis-azuli);
-  --accent-color: var(--teal);
-  --font-color: #ffffff;
-  --input-bg: #3b3b3b;
-  --border-color: #444;
-  --background-color: rgba(43, 43, 43, 0.95);
-  --font-title: "Modak", sans-serif;
-  --font-text: "Kanit", sans-serif;
+  --background-dark: #151515;
+  --background-light: #252525;
+  --accent-color: #44d888;
+  --highlight: #66e0a3;
+  --input-background: #2e2e2e;
+  --input-border: #3d3d3d;
+  --button-hover: #3a3a3a;
+  --text-color: #ffffff;
+  --label-color: #b0b0b0;
+  --focus-color: #44d888;
+  --icon-color: #44d888;
+  --font-family: 'Kanit', sans-serif;
 }
 
-* {
+body {
+  background: #000; /* Fundo preto */
+  background: radial-gradient(
+      circle at bottom, 
+      rgb(44, 156, 96), /* Feixe de luz verde mais escuro */
+      rgb(0, 0, 0) 55% /* Transição para o fundo escuro */
+    ),
+    #000; /* Fundo preto */
+  font-family: var(--font-family); 
+  color: var(--text-color);
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  height: 100vh;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, 
-                            rgba(255, 255, 255, 0) 70%), 
-                            linear-gradient(135deg, #6C2C1B, #F1C04D, #D1622B);
-  background-blend-mode: overlay;
-  color: var(--font-color);
-  overflow: hidden;
-}
-/* COLOCAR NA DIV PAI */
-.container-login{
   display: flex;
-  justify-content: center; /* Horizontal centering */
-  align-items: center;     /* Vertical centering */
-  height: 100vh;           /* Full viewport height to center vertically */
-}
-
-.wrapper {
-  max-width: 500px;
-  width: 100%;
-
-  background: var(--background-color);
-  border-radius: 8px;
-
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.7);
-  border: 2px solid var(--lapis-azuli);
-}
-
-.title {
-  height: 100px;
-  font-size: 48px;
-  color: var(--smoky-black);
-  display: flex;
-  align-items: center;
   justify-content: center;
-  font-family: "Modak", sans-serif;
-}
-
-.wrapper form {
-  padding: 20px 35px 35px;
-}
-
-.wrapper form .row {
-  height: 55px;
-  margin-top: 20px;
-  position: relative;
-}
-
-.wrapper form .row input {
-  height: 100%;
-  width: 100%;
-
-  padding-left: 60px;
-  border-radius: 5px;
-  background-color: var(--input-bg);
-  border: 1px solid var(--border-color);
-  font-size: 18px;
-  color: var(--font-color);
-  transition: border-color 0.3s ease;
-  font-family: "Kanit", sans-serif;
-}
-
-.wrapper form .row input:focus {
-  border-color: var(--lapis-azuli); 
-  outline: none;
-}
-
-.wrapper form .row input::placeholder {
-  color: #bbb;
-}
-
-.wrapper form .row i {
-  position: absolute;
-  width: 50px;
-  height: 100%;
-  color: var(--font-color);
-  font-size: 22px;
-  background: var(--primary-color);
-  border-radius: 5px 0 0 5px;
-  display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.wrapper form .button button {
-  font-family: "Kanit", sans-serif;
-  margin-top: 20px;
-  color: var(--font-color);
-  font-size: 20px;
-  font-weight: 500;
-  background: var(--primary-color);
-  cursor: pointer;
-  height: 50px;
-  width: 100%;
-  border: none;
-  border-radius: 5px;
-  box-shadow: 0px 4px 10px rgba(0, 86, 125, 0.3);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
-}
-
-.wrapper form .button button:hover {
-  background: var(--accent-color);
-  box-shadow: 0px 4px 12px rgba(0, 40, 144, 0.4);
-}
-
-#message-box {
-  font-family: "Kanit", sans-serif;
-  background-color: #c9302c;
-  border: 2px solid #d9534f;
-  text-align: center;
-  border-radius: 5px;
-  color: white;
-  font-size: 15px;
-  padding: 5px;
-  font-weight: 500;
-  margin-top: 25px;
-  display: none;
-}
-
-#message-box p {
-  margin: 0;
-}
-
-body {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 70%), linear-gradient(135deg, #6C2C1B, #F1C04D, #D1622B);
-  background-blend-mode: overlay;
   min-height: 100vh;
-  margin: 0;
 }
 
-.form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background-color: #ffffff;
-    padding: 30px;
-    width: 450px;
-    border-radius: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+#login-container {
+  background-color: var(--background-light);
+  padding: 2rem;
+  border-radius: 12px; /* Borda mais arredondada */
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); /* Sombra mais suave */
+  transition: box-shadow 0.3s ease-in-out; /* Transição suave da sombra */
+}
+
+#title {
+  font-size: 2.5rem; /* Aumentar o tamanho do título */
+  margin-bottom: 1.5rem;
+  background: linear-gradient(to right, #00b36b, #00ff99);
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  font-weight: bold;
+}
+
+.form-label {
+  color: var(--label-color);
+  font-size: 0.95rem; /* Tamanho de fonte um pouco maior */
+  font-weight: 600;
+  text-transform: uppercase;
+  text-align: left; /* Alinha as labels à esquerda */
+  display: block;
+}
+
+.input-group-text {
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background);
+  color: var(--accent-color);
+  border-radius: 5px; /* Bordas arredondadas */
+}
+
+.form-control {
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background);
+  color: var(--text-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  padding: 0.75rem; /* Aumentar o padding para mais conforto */
+  border-radius: 5px; /* Bordas arredondadas */
+}
+
+.form-control:focus {
+  border-color: var(--focus-color);
+  background-color: #2a2a2a;
+  box-shadow: 0 0 8px var(--focus-color); /* Caixa de foco mais evidente */
+}
+
+#button-submit {
+  background: linear-gradient(135deg, #00b36b, #00ff99);
+  color: var(--text-color);
+  font-weight: bold;
+  border: none;
+  padding: 0.85rem 1.5rem; /* Aumentar o padding */
+  border-radius: 8px; /* Bordas mais arredondadas */
+  width: 100%;
+  background-size: 200% 200%;
+  transition: background-position 0.8s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+#button-submit:hover {
+  background-position: 100% 0; /* Mover o gradiente durante o hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5); /* Efeito de sombra mais forte */
+}
+
+
+#p {
+  color: var(--label-color);
+  font-size: 1rem; /* Tamanho maior para melhor legibilidade */
+  text-align: center;
+  margin-top: 1rem;
+}
+
+#span {
+  color: var(--highlight);
+  transition: color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+#span:hover {
+  color: var(--focus-color);
+  transform: scale(1.1); /* Efeito de aumento ao passar o mouse */
+}
+
+/* Adicionar media queries para responsividade */
+@media (max-width: 600px) {
+  #login-container {
+    padding: 1.5rem;
+    max-width: 90%; /* Deixar o container mais responsivo */
   }
-  
-  ::placeholder {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+  #title {
+    font-size: 2rem; /* Ajuste do título em telas menores */
   }
-  
-  .form button {
-    align-self: flex-end;
-  }
-  
-  .flex-column > label {
-    color: #151717;
+
+  .form-label {
+    color: var(--label-color);
+    font-size: 0.95rem;
     font-weight: 600;
+    text-transform: uppercase;
+    text-align: left; /* Alinha as labels à esquerda */
+    display: block;   /* Garante que ocupem a largura total */
+    margin-bottom: 0.5rem;
   }
   
-  .inputForm {
-    border: 1.5px solid #ecedec;
-    border-radius: 10px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    padding-left: 10px;
-    transition: 0.2s ease-in-out;
-  }
-  
-  .input {
-    margin-left: 10px;
-    border-radius: 10px;
-    border: none;
-    width: 85%;
-    height: 100%;
-  }
-  
-  .input:focus {
-    outline: none;
-  }
-  
-  .inputForm:focus-within {
-    border: 1.5px solid var(--gold-metalic);
-  }
-  
-  .flex-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-    justify-content: space-between;
-  }
-  
-  .flex-row > div > label {
-    font-size: 14px;
-    color: black;
-    font-weight: 400;
-  }
-  
-  .span {
-    font-size: 14px;
-    margin-left: 5px;
-    color: #2d79f3;
-    font-weight: 500;
-    cursor: pointer;
-  }
-  a{
-    text-decoration: none;
-  }
-  .button-submit {
-    margin: 20px 0 10px 0;
-    background-color: #151717;
-    border: none;
-    color: white;
-    font-size: 15px;
-    font-weight: 500;
-    border-radius: 10px;
-    height: 50px;
-    width: 100%;
-    cursor: pointer;
-  }
-  
-  .button-submit:hover {
-    background-color: #252727;
-  }
-  
-  .p {
-    text-align: center;
-    color: black;
-    font-size: 14px;
-    margin: 5px 0;
-  }
-  
-  .btn {
-    margin-top: 10px;
-    width: 100%;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: 500;
-    gap: 10px;
-    border: 1px solid #ededef;
-    background-color: white;
-    cursor: pointer;
-    transition: 0.2s ease-in-out;
-  }
-  
-  .btn:hover {
-    border: 1px solid #2d79f3;
-    ;
-  }
-  
-.container{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
 
-.btnpucc{
-    justify-content: center;
-    display: flex;  
-}
-
-.puccampinas{
-    display: flex;
-    margin: 10px;
-}
-
-.puccampinas p{
-    font-weight: bold;
-    margin-left: -8px;
-
-}
-
-.img-puc{
-    width: 35px;
-    height: auto;
-}
-
-@media (max-width: 768px) { /*Usando um media querie com base no tamanho da janela de visualização. Nesse caso, para tablets.*/
-  .form {
-    width: 90%;
-    padding: 20px;
+  .form-control {
+    padding: 0.6rem; /* Ajuste no padding dos inputs */
   }
 
-  .inputForm {
-    height: 45px;
-    padding-left: 8px;
+  #button-submit {
+    padding: 0.75rem 1.25rem; /* Ajustar o padding no botão */
   }
 
-  .button-submit {
-    height: 45px;
-    font-size: 14px;
-  }
-
-  .btn {
-    height: 45px;
-    font-size: 14px;
-  }
-
-  .p, .span, .flex-row > div > label { /*Aplicando estilos apenas a certos elementos em uma hierarquia específica. Pegando essa div específica dentro de .flex-row.*/
-    font-size: 13px;
+  #p {
+    font-size: 0.85rem; /* Ajuste no tamanho do texto */
   }
 }
 
-@media (max-width: 480px) { /*Usando um media querie com base no tamanho da janela de visualização. Nesse caso, para celulares.*/
-  .form {
-    width: 100%;
-    padding: 15px;
-  }
-
-  .inputForm {
-    height: 40px;
-  }
-
-  .button-submit, .btn {
-    height: 40px;
-    font-size: 13px;
-  }
-
-  .p, .span, .flex-row > div > label { /*Aplicando estilos apenas a certos elementos em uma hierarquia específica. Pegando essa div específica dentro de .flex-row.*/
-    font-size: 12px;
-  }
+i{
+  color: var(--background-dark);
+  font-size: 20px;
 }
+
+.logoPucBet {
+  width: 220px; 
+  height: auto;
+  padding-bottom: 20px;
+}
+

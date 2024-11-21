@@ -101,7 +101,7 @@ export namespace dbAccountsManager
                                     :BALANCE, :FK_ID_USER
                                 )`,
                                 {
-                                    BALANCE: Number(newAccountWallet.balance),
+                                    BALANCE: Number(newAccountWallet.BALANCE),
                                     FK_ID_USER: Number(idUsuario)
                                 }
                             );
