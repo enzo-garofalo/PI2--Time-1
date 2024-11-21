@@ -4,6 +4,7 @@ import { DataBaseManager } from "../db/connection";
 
 import { emailServiceManager } from "./emailService";
 import OracleDB from "oracledb";
+import session from "express-session";
 
 
 export namespace EventsManager
@@ -80,13 +81,14 @@ export namespace EventsManager
     export const evaluateNewEventHandler: RequestHandler =
     async (req: Request, res: Response) => 
     {
+        console.log(req.session.token);
         // Verifica se o usuário está autenticado e é um moderador (role === 1)
-        if(req.session.role !== 1 || !req.session.token){
+        if(req.session.role === 0 || !req.session.token){
             res.statusCode = 401;  // Status de não autorizado
-            res.send('Usuário deve estar logado como moderador');
+            res.json('Usuário deve estar logado como moderador');
             return;
         }
-    
+        console.log(`Rota de evaluate\nToken: ${req.session.token}`);
         // Recupera o ID do evento da requisição
         const pEventID = req.get('eventID');
     
@@ -133,9 +135,14 @@ export namespace EventsManager
                 // Obtém o título do evento rejeitado
                 const eventTitle = event?.[0].TITLE;
                 // Obtém o nome do moderador que avaliou o evento
-                const userModer = await DataBaseManager.getUserByToken(req?.session.token);
-                const userName = userModer?.[0].COMPLETE_NAME;
-    
+                var userName = "teste";
+                if(req.session.token){
+                    const userModer = await DataBaseManager.getUserByToken(req.session.token);
+                    if(userModer)
+                        userName = userModer?.[0].COMPLETE_NAME;
+                }
+                
+
                 // Envia um e-mail de notificação ao usuário se todas as informações necessárias estiverem presentes
                 if(email && userName && eventTitle){
                     await emailServiceManager.sendMail(userName, pReason, email, eventTitle);

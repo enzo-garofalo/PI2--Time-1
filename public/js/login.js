@@ -14,9 +14,6 @@ function hideMessage() {
     const mb = document.getElementById('message-box');
     mb.classList.remove('show');
     mb.classList.add('hide');
-    setTimeout(() => {
-        mb.style.display = 'none';
-    }, 300); // Espera a animação desaparecer antes de esconder
 }
 
 // Validação para login
@@ -62,11 +59,12 @@ async function signIn() {
 
     if (isValid(email, password)) {
         const loginData = new Headers();
+        loginData.append('Connection', 'Keep-alive');
         loginData.append('email', email);
         loginData.append('password', password);
 
         const res = await fetch(
-            'http://192.168.1.2:3000/login', {
+            'http://127.0.0.1:3000/login', {
                 method: 'POST',
                 headers: loginData
             }
@@ -74,7 +72,7 @@ async function signIn() {
 
         if (res.ok) {
             // Aqui redireciona se o login estiver correto
-            window.location.href = '../view/home.html';
+            window.location.href = '../view/evaluateNewEvent.html';
         } else {
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             showMessage(errorMessage, 'error');
@@ -96,14 +94,14 @@ async function signUp() {
         signUpData.append('birthdate', birthdate);
 
         const res = await fetch(
-            'http://192.168.1.2:3000/signUp', {
+            'http://127.0.0.1:3000/signUp', {
                 method: 'PUT',
                 headers: signUpData
             }
         );
 
         if (res.ok) {
-            window.location.href = './home.html';
+            window.location.href = '../view/home.html';
         } else {
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             showMessage(errorMessage, 'error');

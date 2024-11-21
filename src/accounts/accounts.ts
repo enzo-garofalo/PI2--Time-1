@@ -114,8 +114,16 @@ export namespace AccountsManager {
             {
                 req.session.token = account[0].TOKEN;
                 req.session.role = account[0].ROLE;
-            } 
+            }
             
+            req.session.save((err) => {
+                if (err) {
+                    console.error('Erro ao salvar a sessão:', err);
+                    res.status(500).send('Erro interno. Tente novamente mais tarde.');
+                    return;
+                }
+            });
+            console.log("Rota de login | Token: " +req.session.token)
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
         }else{

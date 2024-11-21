@@ -20,7 +20,7 @@ export const server = express();
 // o navegador pergunta se o outro site permite isso.
 // Se permitido, o navegador deixa passar; se não, bloqueia o acesso.
 // Isso ajuda a proteger contra ataques de segurança, como o Cross-Site Scripting (XSS).
-server.use(cors())
+server.use(cors());
 
 declare module 'express-session' {
   interface SessionData {
@@ -29,10 +29,13 @@ declare module 'express-session' {
   }
 }
 server.use(session({
-  secret: 'key', 
+  secret: 'seuSegredoSeguro',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false },
+  saveUninitialized: false,
+  cookie: {
+      secure: false,
+      httpOnly: true
+  }
 }));
 
 const routes = Router();

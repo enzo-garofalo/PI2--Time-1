@@ -9,13 +9,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   </head>
   <body>
+    
+    <div class="container">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error!</strong> <span id="alert-message">opa</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    
+    
+    
+    <!-- Div para form -->
     <div class="container" id="login-container">
-      <form class="text-center" onsubmit="event.preventDefault(); signUp();">
+
+      <form class="text-center">
         <img src="../assets/logoPucBet.png" alt="logoPucBet" class="logoPucBet">
         <!-- Alert for errors -->
-        <div id="alert-box" class="alert alert-danger d-none" role="alert">
-            <strong>Error!</strong> <span id="alert-message"></span>
-        </div>
 
         <!-- Input para Name -->
         <div class="form-group mb-3 position-relative">
@@ -57,7 +65,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-calendar-days"></i>
                 </span>
-                <input type="date" id="fBirthdate" class="form-control" onfocus="hideMessage()" required>
+                <input type="date" id="fBirthdate" class="form-control" placeholder="Enter your Birthdate" onfocus="hideMessage()" required>
             </div>
         </div>
 
@@ -68,6 +76,7 @@
         </p>
       </form>
     </div>
+    <script src="../js/bootstrap.js" async defer></script>
     <script src="../js/login.js" async defer></script>
   </body>
 </html>
