@@ -43,9 +43,9 @@ export namespace AccountsManager {
                 res.statusCode = 400;
                 res.send('Email já utilizado!');
                 return
-            }
+            }else
 
-            // Se o user é menor de 18 anos
+                // Se o user é menor de 18 anos
             if(dbAccountsManager.isUnderage(pBirthdate)){
                 res.statusCode = 400;
                 res.send('PUC BET é permitido apenas para maiores de 18 anos');
@@ -78,16 +78,13 @@ export namespace AccountsManager {
                         res.statusCode = 409;
                         res.send("Erro inesperado ao criar nova conta.")
                     }
-                }else{
-                    res.statusCode = 400;
-                    res.send("Email já cadastrado!");
-                }
-            }
         }else{
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
     }
+    
+    
 
 
     /*

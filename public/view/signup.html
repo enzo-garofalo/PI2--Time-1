@@ -10,7 +10,7 @@
   </head>
   <body>
     <div class="container" id="login-container">
-      <form class="text-center" onsubmit="event.preventDefault(); signUp();">
+      <form class="text-center" onsubmit="event.preventDefault(); newUserRequest();">
         <img src="../assets/logoPucBet.png" alt="logoPucBet" class="logoPucBet">
         <!-- Alert for errors -->
         <div id="alert-box" class="alert alert-danger d-none" role="alert">
@@ -57,11 +57,11 @@
                 <span class="input-group-text">
                     <i class="fas fa-calendar-days"></i>
                 </span>
-                <input type="date" id="fBirthdate" class="form-control" onfocus="hideMessage()" required>
+                <input type="text" id="fBirthdate" class="form-control" onfocus="hideMessage()" required>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-block w-100" id="button-submit" onclick="signUp()">Sign Up</button>
+        <button type="submit" class="btn btn-block w-100" id="button-submit" onclick="newUserRequest()">Sign Up</button>
 
         <p id="p" class="mt-4">Already have an account? 
             <a href="../view/login.html" class="text-decoration-none" id="span">Log In</a>
@@ -69,5 +69,54 @@
       </form>
     </div>
     <script src="../js/login.js" async defer></script>
+    <script>
+
+        //variáveis para mandar na função
+
+        var name = document.getElementById("fName");
+        var email = document.getElementById("fEmail");
+        var password = document.getElementById("fPassword");
+        var birthdate = document.getElementById("fBirthdate");
+
+        async function newUserRequest(){
+            try{
+                const nameValue = name.value.trim();
+                const emailValue = email.value.trim();
+                const passwordValue = password.value.trim();
+                const birthdateValue = birthdate.value.trim();
+
+                // Verifica se todos os campos foram preenchidos
+                if (!nameValue || !emailValue || !passwordValue || !birthdateValue) {
+                    showMessage("Please fill in all fields!");
+                    return;
+                }
+                const reqHeaders = new Headers();
+                reqHeaders.append("name", name);
+                reqHeaders.append("email", email);
+                reqHeaders.append("password", password);
+                reqHeaders.append("birthdate", birthdate);
+
+                const newUser = await fetch("http://127.0.0.1:3000/signUp", {
+                method: "PUT",
+                headers: reqHeaders,
+                });
+
+                const messageSignUp = await newUser.text();
+                if(newUser.ok){
+                    alert(messageSignUp);
+                    window.location.href="login.html"
+
+                }
+                else{
+                    alert(`Erro! ${messageSignUp}`)
+                }
+           
+            }    
+            catch(error){
+                console.error(error);
+            }
+        }
+    
+    </script>
   </body>
 </html>
