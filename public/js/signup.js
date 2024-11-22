@@ -19,12 +19,24 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
+async function showAlert(message, type){
+    const alertContainer = document.getElementById('alert-box');
+
+    alertContainer.className = `alert alert-${type} alert-dismissible fade show`;
+    alertContainer.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="location.reload()></button>
+        `;
+    alertContainer.classList.remove('d-none');
+}
+
 
 async function newUserRequest(){
     var name = document.getElementById("fName").value.trim();
     var email = document.getElementById("fEmail").value.trim();
     var password = document.getElementById("fPassword").value.trim();
     var birthdate = document.getElementById("fBirthdate").value.trim();
+    const submitButton = document.getElementById("button-submit");
 
     try{
         // Verifica se todos os campos foram preenchidos
@@ -32,6 +44,9 @@ async function newUserRequest(){
             alert("Please fill in all fields!");
             return;
         }
+
+        submitButton.disabled = true;
+
         const reqHeaders = new Headers();
         reqHeaders.append("name", name);
         reqHeaders.append("email", email);
@@ -45,15 +60,19 @@ async function newUserRequest(){
 
         const messageSignUp = await newUser.text();
         if(newUser.ok){
-            alert(messageSignUp);
+            showAlert(messageSignUp,'success')
             window.location.href="login.html"
         }
         else{
-            alert(`Erro! ${messageSignUp}`)
+            showAlert(messageSignUp,'danger')
         }
     
     }    
     catch(error){
+        showAlert(messageSignUp,'warning')
         console.error(error);
+    }
+    finally{
+        submitButton.disabled = false;
     }
 }

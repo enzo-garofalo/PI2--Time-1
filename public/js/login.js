@@ -34,26 +34,7 @@ function isValid(email, password) {
     return valid;
 }
 
-// Validação para cadastro
-function isValidSignUp(name, email, password, birthdate) {
-    var valid = false;
-    if (name.length > 0 && email.length > 0 && password.length > 0 && birthdate.length > 0) {
-        if (!isValidEmail(email)) {
-            showMessage('Please enter a valid email address.', 'error');
-        } else {
-            valid = true;
-        }
-    } else {
-        showMessage('Please fill out all the fields', 'error');
-    }
-    return valid;
-}
 
-// Função para validar o formato do email usando regex
-function isValidEmail(email) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return emailRegex.test(email);
-}
 
 // Função de login
 async function signIn() {
