@@ -25,7 +25,7 @@ async function showAlert(message, type){
     alertContainer.className = `alert alert-${type} alert-dismissible fade show`;
     alertContainer.innerHTML = `
         ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="location.reload()></button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="location.reload()"></button>
         `;
     alertContainer.classList.remove('d-none');
 }
