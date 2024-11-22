@@ -24,7 +24,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-user"></i>
                 </span>
-                <input type="text" id="fName" class="form-control" placeholder="Enter your Name" onfocus="hideMessage()" required>
+                <input type="text" id="fName" class="form-control" placeholder="Enter your Name" required>
             </div>
         </div>
 
@@ -35,7 +35,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-envelope"></i>
                 </span>
-                <input type="email" id="fEmail" class="form-control" placeholder="Enter your Email" onfocus="hideMessage()" required>
+                <input type="email" id="fEmail" class="form-control" placeholder="Enter your Email" required>
             </div>
         </div>
 
@@ -46,7 +46,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-lock"></i>
                 </span>
-                <input type="password" id="fPassword" class="form-control" placeholder="Enter your Password" onfocus="hideMessage()" required>
+                <input type="password" id="fPassword" class="form-control" placeholder="Enter your Password" required>
             </div>
         </div>
 
@@ -57,7 +57,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-calendar-days"></i>
                 </span>
-                <input type="text" id="fBirthdate" class="form-control" onfocus="hideMessage()" required>
+                <input type="date" id="fBirthdate" class="form-control" required>
             </div>
         </div>
 
@@ -68,55 +68,6 @@
         </p>
       </form>
     </div>
-    <script src="../js/login.js" async defer></script>
-    <script>
-
-        //variáveis para mandar na função
-
-        var name = document.getElementById("fName");
-        var email = document.getElementById("fEmail");
-        var password = document.getElementById("fPassword");
-        var birthdate = document.getElementById("fBirthdate");
-
-        async function newUserRequest(){
-            try{
-                const nameValue = name.value.trim();
-                const emailValue = email.value.trim();
-                const passwordValue = password.value.trim();
-                const birthdateValue = birthdate.value.trim();
-
-                // Verifica se todos os campos foram preenchidos
-                if (!nameValue || !emailValue || !passwordValue || !birthdateValue) {
-                    showMessage("Please fill in all fields!");
-                    return;
-                }
-                const reqHeaders = new Headers();
-                reqHeaders.append("name", name);
-                reqHeaders.append("email", email);
-                reqHeaders.append("password", password);
-                reqHeaders.append("birthdate", birthdate);
-
-                const newUser = await fetch("http://127.0.0.1:3000/signUp", {
-                method: "PUT",
-                headers: reqHeaders,
-                });
-
-                const messageSignUp = await newUser.text();
-                if(newUser.ok){
-                    alert(messageSignUp);
-                    window.location.href="login.html"
-
-                }
-                else{
-                    alert(`Erro! ${messageSignUp}`)
-                }
-           
-            }    
-            catch(error){
-                console.error(error);
-            }
-        }
-    
-    </script>
+    <script src="../js/signup.js" async defer></script>
   </body>
 </html>
