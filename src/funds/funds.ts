@@ -1,6 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import { dbFundsManager } from "./databaseFunds";
+import { AccountsManager } from "../accounts/accounts";
 
 export namespace FundsManager{
 
@@ -24,12 +25,7 @@ export namespace FundsManager{
     export const addNewFundsHandler: RequestHandler = 
     async (req: Request, res: Response) => {
 
-        if(!req.session.token)
-        {
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req, res)) return;
     
         const pCredit = Number(req.get('Credit'));
         
@@ -41,7 +37,7 @@ export namespace FundsManager{
         }
         
         const joinTables = 
-        await DataBaseManager.joinTables(req.session.token);
+        await DataBaseManager.joinTables(req.cookies.token);
             
         if(joinTables)
         {
@@ -77,11 +73,7 @@ export namespace FundsManager{
     async (req: Request, res: Response) => {
         
         // Verificar se o usuário está logado
-        if(!req.session.token) {
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req, res)) return;
     
         // Obtém o tipo de saque ("Pix" ou "Conta bancaria") e o valor a ser debitado
         const pOpcao = (req.get('pixOUconta'));
@@ -123,7 +115,7 @@ export namespace FundsManager{
         }
     
         // Busca os dados da carteira do usuário
-        const joinTables = await DataBaseManager.joinTables(req.session.token);
+        const joinTables = await DataBaseManager.joinTables(req.cookies.token);
         
         if (!joinTables || joinTables.length === 0) {
             res.statusCode = 500; // Erro interno do servidor

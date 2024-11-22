@@ -1,5 +1,6 @@
 import express from "express";
 import session from 'express-session';
+import cookieParser from "cookie-parser";
 import {Request, Response, Router} from "express";
 
 import { AccountsManager } from "./accounts/accounts";
@@ -20,19 +21,52 @@ export const server = express();
 // o navegador pergunta se o outro site permite isso.
 // Se permitido, o navegador deixa passar; se não, bloqueia o acesso.
 // Isso ajuda a proteger contra ataques de segurança, como o Cross-Site Scripting (XSS).
-server.use(cors())
 
-declare module 'express-session' {
-  interface SessionData {
-      token: string;
-      role: number;
-  }
+const allowedOrigins = ['http://localhost:5501', 'http://192.168.1.2:5501'];
+server.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+
+server.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
+
+
+// Middleware para cookies
+server.use(cookieParser());
+server.use(express.json());
+
+declare global {
+  namespace Express{
+    interface Request {
+      token?: string;
+      role?: number;
+    }
+  }    
 }
 server.use(session({
-  secret: 'key', 
+  secret: 'seuSegredoSeguro',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false },
+  saveUninitialized: false,
+  cookie: {
+      secure: false,
+      httpOnly: true
+  }
 }));
 
 const routes = Router();

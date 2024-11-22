@@ -1,4 +1,5 @@
 import {Request, RequestHandler, Response} from "express";
+import { AccountsManager } from "../accounts/accounts";
 import { DataBaseManager } from "../db/connection";
 import { dbBetsManager } from "./databaseBets";
 import { dbEventsManager } from "../events/databaseEvent";
@@ -17,6 +18,7 @@ export namespace betsManager
     /* Função para validar se todos os dados da aposta estão corretos */
     async function isAllValid(eventId:number, pBet:string, IdUser:number, pBetValue:number, res: Response): Promise<boolean> 
     {
+        // if(!AccountsManager.isLoggedIn(req, res)) return; precisa????
         // Verifica se o evento existe
         const event = await dbEventsManager.getEventById(eventId)
         if(event?.[0] === undefined){
@@ -53,16 +55,11 @@ export namespace betsManager
     async (req: Request, res : Response) => 
     {        
         // Verifica se o usuário está logado
-        if(!req.session.token)
-        {
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req, res)) return;
 
         // Busca as informações do usuário com base no token da sessão
         const resultSearchUser = 
-        await DataBaseManager.getUserByToken(req.session.token);
+        await DataBaseManager.getUserByToken(req.cookies.token);
         
         if(resultSearchUser)
         {

@@ -6,18 +6,18 @@
     justify-content: center;
     padding: 20px;
     position: relative;
-    overflow: hidden; /* Garante que a imagem não ultrapasse o container */
+    overflow: hidden;
 }
 
 .container-xxlarge2 {
     background: linear-gradient(180deg, rgb(68, 216, 136), rgb(47, 158, 123));
     height: 45vh;
-    position: relative; /* Necessário para o posicionamento absoluto dentro dele */
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: flex-start; 
-    padding: 20px; /* Corrigido para dar espaçamento interno */
+    padding: 20px;
 }
 
 .container-xxlarge3 {
@@ -26,19 +26,30 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    overflow: hidden; /* Garante que a imagem não ultrapasse o container */
+    overflow: hidden;
+    position: relative; 
+}
+
+.container-xxlarge4 {
+    background: #151515;
+    height: 5vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    position: relative; 
 }
 
 .header-content {
     display: flex;
     align-items: center;
     position: relative;
-    z-index: 1; /* Garante que o texto fique acima da imagem */
+    z-index: 1; 
 }
 
 .titleHomepage {
     font-family: 'Montserrat', sans-serif;
-    font-size: 2.5rem;
+    font-size: 2.75rem;
     font-weight: bold;
     color: #ffffff;
     text-align: left;
@@ -50,37 +61,88 @@
 }
 
 .titleHomepage2 {
-    font-family: 'Poppins', sans-serif;
-    font-size: 2.2rem;
-    font-weight: 720;
+    font-family: "Kode Mono", monospace;
+    font-size: 2.75rem;
+    font-weight: bold;
     color: #000000;
     text-align: left;
-    letter-spacing: 0.8px;
-    line-height: 1.2;
+    letter-spacing: -3px;
+    line-height: 1.1;
     margin: 0;
     text-transform: uppercase;
-    padding-left: 20px; /* Ajusta o alinhamento */
-    margin-bottom: 0px; /* Um pouco de espaço abaixo */
-    margin-left: 900px;
+    padding-left: 20px; 
+    margin-bottom: 0px; 
+    margin-left: 930px;
     margin-top: 0px;
+}
+
+.titleHomepage3 {
+    font-family: "Kode Mono", monospace;
+    font-size: 2.75rem;
+    font-weight: bold;
+    color: #44d888;
+    text-align: left;
+    letter-spacing: -3px;
+    line-height: 1.1;
+    margin: 0;
+    text-transform: uppercase;
+    margin-bottom: 0px; 
+    margin-left: 280px;
+    margin-top: 8px;
+}
+
+.ganhar-dinheiro {
+    color: rgb(68, 216, 136);
+    background: linear-gradient(to right, #00b36b, #00ff99);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    font-weight: bold;
+}
+
+.descriptionHomepage {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #ffffff;
+    text-align: left;
+    margin-top: 20px;
+    margin-left: 100px;
+    line-height: 1.5;
+    padding-right: 220px;
+}
+
+.everySport {
+    font-family: "Kode Mono", monospace;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
 }
 
 .descriptionHomepage2 {
     font-family: 'Montserrat', sans-serif;
     font-size: 1.1rem;
-    color: #ffffff;
+    font-weight: 500;
+    color: #000000;
     text-align: left;
     line-height: 1.5;
-    padding-left: 20px; /* Ajusta o alinhamento do texto */
-    margin-left: 900px;
-    margin-top: 35px;
+    padding-left: 20px; 
+    margin-left: 930px;
+    margin-top: 30px;
+}
+
+.descriptionFooter{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: white;
+    text-align: center;
+    justify-items: auto;
 }
 
 .logoPucBet {
     width: 220px; 
     height: auto;
     margin-left: 50px; 
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     padding-right: 20px;
 }
 
@@ -90,7 +152,7 @@
     top: 100;
     width: 1050px; 
     height: 1000%;
-    z-index: 0; /* Garante que a imagem fique atrás do conteúdo */
+    z-index: 0; 
     overflow: hidden; 
     object-fit: cover;
 }
@@ -105,7 +167,7 @@
     background: linear-gradient(
         to right, 
         rgba(21, 21, 21, 1),       /* Opacidade total no começo do gradiente */
-        rgba(21, 21, 21, 0.9) 30%, /* 90% opaco, cobrindo bem o lado esquerdo */
+        rgba(21, 21, 21, 0.92) 40%, /* 90% opaco, cobrindo bem o lado esquerdo */
         rgba(21, 21, 21, 0.6) 70%, /* Transição para o centro */
         rgba(21, 21, 21, 0.3) 100% /* Final mais transparente para misturar melhor */
     );
@@ -120,47 +182,70 @@
     z-index: -1;
 }
 
+.header-image-container-esports {
+    position: absolute; 
+    top: 0;  
+    left: 1000px; 
+    width: 50%;  
+    height: 100%; 
+    z-index: 0;
+    overflow: hidden;
+}
+
+.header-image-container-esports::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            to right,
+            rgba(21, 21, 21, 1.2),
+            rgba(21, 21, 21, 0.8) 20%,
+            rgba(21, 21, 21, 0.8) 20%,
+            rgba(21, 21, 21, 0.4) 45%
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(21, 21, 21, 0.5), 
+            rgba(21, 21, 21, 0.25) 0%, 
+            rgba(21, 21, 21, 1) 88% 
+        ),
+        linear-gradient(
+            to left,
+            rgba(0, 255, 153, 0.2) 100%, 
+            rgb(68, 216, 136) 10%
+        );
+    z-index: 5000;
+}
+
 .header-image-esports {
-    position: relative;
-    width: 800px;
-    margin-left: 1100px;
-    z-index: 1; /* Garante que a imagem fique atrás do conteúdo */
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
 }
 
 .soccerPlayer {
     width: 700px;
     height: auto;
-    position: absolute; /* Permite que a imagem entre no container-xxlarge */
-    top: -80px;
+    position: absolute; 
+    top: -95px;
     left: 30%; 
     transform: translateX(-50%); 
-    z-index: 0; /* Garante que a imagem fique atrás do conteúdo, mas à frente do fundo */
+    z-index: 1;
 }
 
-.ganhar-dinheiro {
-    background: linear-gradient(to right, #00b36b, #00ff99);
-    color: transparent;
-    background-clip: text;
-    -webkit-background-clip: text;
-    font-weight: bold;
+.container-xxlarge1 .soccerPlayer {
+    top: -80px; 
+    left: 25%;
 }
 
-.gotyoucovered {
-    font-family: 'Poppins', sans-serif;
-    color: white;
-    font-weight: bold;
-}
-
-.descriptionHomepage {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.1rem;
-    color: #ffffff;
-    text-align: left;
-    margin-top: 10px;
-    margin-left: 100px;
-    line-height: 1.5;
-    padding-right: 220px;
+.container-xxlarge3 .soccerPlayer {
+    top: -80px;
+    left: 30%;
 }
 
 .btn-signup {

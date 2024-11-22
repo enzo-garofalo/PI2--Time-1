@@ -1,9 +1,11 @@
 import {Request, RequestHandler, Response} from "express";
+
 import { dbEventsManager } from "./databaseEvent";
 import { DataBaseManager } from "../db/connection";
-
+import { AccountsManager } from "../accounts/accounts";
 import { emailServiceManager } from "./emailService";
 import OracleDB from "oracledb";
+
 
 
 export namespace EventsManager
@@ -25,11 +27,7 @@ export namespace EventsManager
     export const addNewEventHandler: RequestHandler = async (req: Request, res: Response) => {
 
         // Verifica se o usuário está logado
-        if (req.session.token === undefined) {
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req, res)) return;
     
         // Obtém os parâmetros do cabeçalho da requisição
         const pTitle = req.get('Title');
@@ -38,7 +36,7 @@ export namespace EventsManager
         const pFinishDate = req.get('finishDate');
     
         // Busca o ID do usuário com base no token da sessão
-        const id_user = await DataBaseManager.getUserID(req.session.token);
+        const id_user = await DataBaseManager.getUserID(req.cookies.token);
     
         // Verifica se todos os parâmetros necessários estão presentes
         if (pTitle && pDescription && pCategories && pFinishDate && id_user) {
@@ -80,13 +78,12 @@ export namespace EventsManager
     export const evaluateNewEventHandler: RequestHandler =
     async (req: Request, res: Response) => 
     {
+        console.log('Cookies recebidos:', req.cookies);
+        console.log('Sessão:', req.cookies);
         // Verifica se o usuário está autenticado e é um moderador (role === 1)
-        if(req.session.role !== 1 || !req.session.token){
-            res.statusCode = 401;  // Status de não autorizado
-            res.send('Usuário deve estar logado como moderador');
-            return;
-        }
-    
+        if(!AccountsManager.isModerator(req, res)) return;
+
+        console.log(`Rota de evaluate\nToken: ${req.cookies.token}`);
         // Recupera o ID do evento da requisição
         const pEventID = req.get('eventID');
     
@@ -133,9 +130,14 @@ export namespace EventsManager
                 // Obtém o título do evento rejeitado
                 const eventTitle = event?.[0].TITLE;
                 // Obtém o nome do moderador que avaliou o evento
-                const userModer = await DataBaseManager.getUserByToken(req?.session.token);
-                const userName = userModer?.[0].COMPLETE_NAME;
-    
+                var userName = "teste";
+                if(req.cookies.token){
+                    const userModer = await DataBaseManager.getUserByToken(req.cookies.token);
+                    if(userModer)
+                        userName = userModer?.[0].COMPLETE_NAME;
+                }
+                
+
                 // Envia um e-mail de notificação ao usuário se todas as informações necessárias estiverem presentes
                 if(email && userName && eventTitle){
                     await emailServiceManager.sendMail(userName, pReason, email, eventTitle);
@@ -189,18 +191,10 @@ export namespace EventsManager
     export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
     
         // Verifica se o usuário está logado (sessão válida com token)
-        if (!req.session.token) {
-            res.statusCode = 401; // Código 401: Não autorizado
-            res.send("Usuário não está logado");
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req,res)) return;
     
         // Verifica se o usuário tem permissão de moderador (role !== 0)
-        else if (req.session.role === 0) {
-            res.statusCode = 401; // Código 401: Não autorizado
-            res.send("Rota permitida apenas para moderadores");
-            return;
-        }
+        if(!AccountsManager.isModerator(req, res)) return;
     
         // Obtém o ID do evento e o veredicto de ocorrência do evento a partir do cabeçalho da requisição
         const pIdEvent = Number(req.get('eventId'));
@@ -252,11 +246,7 @@ export namespace EventsManager
     export const searchEventHandler: RequestHandler =
     async (req: Request, res: Response) => {
 
-        if(!req.session.role){
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req, res)) return; //mudou
         
         const pStringBusca = req.get('stringBusca')
 
@@ -286,14 +276,11 @@ export namespace EventsManager
      async (req: Request, res: Response) => {
         
         // Verifica se user está logado
-        if(!req.session.token){
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if(!AccountsManager.isLoggedIn(req, res)) return; //mudou
+        
 
         const pEventID = Number(req.get('id_event'));
-        const userToken = req.session.token;
+        const userToken = req.cookies.token;
         
         // Verifica se o user é dono do evento a ser modificado
         const isOwner: boolean = 
@@ -334,11 +321,7 @@ export namespace EventsManager
     export const getEventHandler: RequestHandler = 
     async (req: Request, res: Response) => {
         
-        if (req.session.role === undefined) {
-            res.statusCode = 401;
-            res.send('Usuário não está logado!');
-            return;
-        }
+        if (!AccountsManager.isLoggedIn(req, res)) return;
 
         const pStatus = req.get('status');
         let consulta = '';

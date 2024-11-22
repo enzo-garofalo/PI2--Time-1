@@ -14,9 +14,6 @@ function hideMessage() {
     const mb = document.getElementById('message-box');
     mb.classList.remove('show');
     mb.classList.add('hide');
-    setTimeout(() => {
-        mb.style.display = 'none';
-    }, 300); // Espera a animação desaparecer antes de esconder
 }
 
 // Validação para login
@@ -43,13 +40,16 @@ async function signIn() {
 
     if (isValid(email, password)) {
         const loginData = new Headers();
+        loginData.append("Content-Type", "application/json");
+        loginData.append("Connection", "Keep-alive");
         loginData.append('email', email);
         loginData.append('password', password);
 
         const res = await fetch(
-            'http://192.168.1.2:3000/login', {
+            'http://127.0.0.1:3000/login', {
                 method: 'POST',
-                headers: loginData
+                headers: loginData,
+                credentials: 'include'
             }
         );
 
@@ -77,14 +77,15 @@ async function signUp() {
         signUpData.append('birthdate', birthdate);
 
         const res = await fetch(
-            'http://192.168.1.2:3000/signUp', {
+            'http://127.0.0.1:3000/signUp', {
                 method: 'PUT',
-                headers: signUpData
+                headers: signUpData,
+                credentials: 'include' // Necessário para enviar cookies entre cliente e servidor
             }
         );
 
         if (res.ok) {
-            window.location.href = './home.html';
+            window.location.href = '../view/home.html';
         } else {
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             showMessage(errorMessage, 'error');

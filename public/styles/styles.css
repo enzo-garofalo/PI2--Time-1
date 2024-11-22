@@ -166,4 +166,13 @@ i{
   height: auto;
   padding-bottom: 20px;
 }
-
+.alert {
+  position: absolute; /* Alerta posicionado em relação ao container */
+  top: 10px; /* Ajuste para posicionar o alerta acima do formulário */
+  left: 50%; /* Centraliza horizontalmente */
+  transform: translateX(-50%); /* Centraliza em relação ao eixo horizontal */
+  z-index: 1000; /* Garante que o alerta fique acima dos outros elementos */
+  width: 50%; /* Define um tamanho automático para o alerta */
+  max-width: 90%; /* Evita que ocupe muito espaço em telas pequenas */
+  text-align: center; /* Centraliza o texto */
+}
