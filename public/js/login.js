@@ -1,5 +1,15 @@
-import { showAlert } from './signup.js'
 
+
+async function showAlert(message, type){
+    const alertContainer = document.getElementById('alert-box');
+
+    alertContainer.className = `alert alert-${type} alert-dismissible fade show w-100`;
+    alertContainer.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="location.reload()"></button>
+        `;
+    alertContainer.classList.remove('d-none');
+}
 
 // Validação para login
 function isValid(email, password) {
@@ -48,7 +58,7 @@ async function signIn() {
         } else {
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             // showMessage(errorMessage, 'error');
-            showAlert(errorMessage,'warning');
+            await showAlert(errorMessage,'danger');
         }
     }
 }
