@@ -27,7 +27,7 @@
         <button type="button" class="btn btn-primary" 
         style="float:right;" data-bs-toggle="modal" 
         data-bs-target="#addNewEventModal">
-        <i class="fas fa-plus"></i>Criar Evento</button>
+        <i class="fas fa-plus"></i> Criar Evento</button>
     </div>
 
 
@@ -58,7 +58,7 @@
               <div class="mb-3">
                 <label for="eventTime" class="form-label">Finish date</label>
                 <input type="date" class="form-control w-auto" id="eventCategory"> <!--"type=date" padrão bootstrap de calendário e "w-auto" organzina automaticamente o tamanho-->
-              </div> <!--VERIFICAR SE O BD ACEITA O MODELO "DD-MM-AAAA" -->
+              </div>
               <div class="mb-3">
                 <label for="eventTime" class="form-label">Time</label>
                 <input type="time" class="form-control w-25" id="eventTime"> <!--"type=time" padrão bootstrap de tempo-->
@@ -77,12 +77,42 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
             crossorigin="anonymous"></script>
-    
     <script>
-        /*  1- Acessar rota
-            2- Pegar os dados do usuário
-        */
-    </script>
+        async function addNewEvent() {
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const finishDate = document.getElementById('finishDate').value;
+            const time = document.getElementById('time').value;
+
+            // objeto com os dados do evento
+            const eventData = {
+                title: title,
+                description: description,
+                finishDate: finishDate,
+                time: time
+            };
+            // Como usar esse objeto?
+
+
+            try {
+                // Realiza a requisição POST para criar o evento
+                const res = await fetch('http://127.0.0.1:3000/addNewEvent', {
+                    method: 'POST',
+                });
+
+
+                // Verifica se a resposta foi bem-sucedida
+                if (res.ok) {
+                    console.log('Evento criado com sucesso');
+                } else {
+                    console.error('Erro ao criar evento');
+                }
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+            }
+        }   
+            </script>
+            
 
   </body>
 </html>
