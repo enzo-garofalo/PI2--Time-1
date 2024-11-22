@@ -5,29 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evaluate Events</title>
     <link rel="stylesheet" href="../styles/bootstrap.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-
-        .container {
-            margin-top: 20px;
-        }
-
-        #events-list {
-            height: 70vh;
-            overflow-y: auto;
-        }
-
-        .event-item {
-            cursor: pointer;
-        }
-
-        .event-item:hover {
-            background-color: #f8f9fa;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
 </head>
 <body>
     <div class="container">
@@ -77,24 +55,31 @@
 
         async function fetchEvents() {
             const res = await fetch('http://127.0.0.1:3000/evaluateNewEvent', { 
-                    method: 'PUT',
+                method: 'PUT',
+                credentials: 'include'
             });
-            const events = await res.json();
-            const eventsList = document.getElementById('events-list');
 
-            eventsList.innerHTML = '';
-            if (Array.isArray(events)) {
-                events.forEach(event => {
-                    const li = document.createElement('li');
-                    li.className = 'list-group-item event-item';
-                    li.textContent = `ID: ${event.ID_EVENT} - ${event.TITLE}`;
-                    li.onclick = () => {
-                        document.getElementById('event-id').value = event.ID;
-                    };
-                    eventsList.appendChild(li);
-                });
-            } else {
-                eventsList.innerHTML = `<li class="list-group-item text-center">${events}</li>`;
+            if(res.ok){
+                const events = await res.json();
+                const eventsList = document.getElementById('events-list');
+    
+                eventsList.innerHTML = '';
+                if (Array.isArray(events)) {
+                    events.forEach(event => {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item event-item';
+                        li.textContent = `ID: ${event.ID_EVENT} - ${event.TITLE}`;
+                        li.onclick = () => {
+                            document.getElementById('event-id').value = event.ID;
+                        };
+                        eventsList.appendChild(li);
+                    });
+                } else {
+                    eventsList.innerHTML = `<li class="list-group-item text-center">${events}</li>`;
+                }
+            }else{
+                const errorMessage = await res.text();
+                alert(message);
             }
         }
 
@@ -116,6 +101,7 @@
             const res = await fetch('http://127.0.0.1:3000/evaluateNewEvent', {
                 method: 'PUT',
                 headers,
+                credentials: 'include'
             });
 
             const message = await res.text();

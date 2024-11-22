@@ -4,8 +4,6 @@ import { DataBaseManager } from "../db/connection";
 import { dbAccountsManager } from "./databaseAccounts";
 
 import { FundsManager } from "../funds/funds";
-import { verify } from "crypto";
-
 /*arquivo .ts relacionado a contas*/
 
 export namespace AccountsManager {
@@ -20,12 +18,33 @@ export namespace AccountsManager {
         ROLE: number;
         TOKEN: string | undefined;
     };
+    // Verifica se o usuário está logado
+    export function isLoggedIn(req: Request, res: Response): boolean {
+        if (req.cookies?.token) {
+            return true;
+        }
+
+        res.status(401).json('Usuário não está logado!');
+        return false;
+    }
+
+    // Verifica se o usuário é moderador
+    export function isModerator(req: Request, res: Response): boolean {
+        console.log('Valor de req.cookies.role:', req.cookies?.role);
+        const role = Number(req.cookies?.role);
+        if (role === 1) {
+            return true;
+        }
+        res.status(401).json('Usuário deve estar logado como moderador!');
+        return false;
+    }
+    
+
 
     /* 
         Recebe requisição e trata os dados e 
         coloca em nova conta e cria uma carteira vazia
     */
-
     export const signUpHandler: RequestHandler = 
     async (req: Request, res: Response) => 
     {
@@ -112,18 +131,23 @@ export namespace AccountsManager {
 
             if(account)
             {
-                req.session.token = account[0].TOKEN;
-                req.session.role = account[0].ROLE;
+                const token = account[0].TOKEN;
+                const role = account[0].ROLE;
+
+                res.cookie('token', token, { 
+                    httpOnly: true, 
+                    secure: true, // Deve ser `true` em produção com HTTPS
+                    sameSite: 'none' 
+                });
+                res.cookie('role', Number(role), { 
+                    httpOnly: true, 
+                    secure: true, 
+                    sameSite: 'none' 
+                });
             }
-            
-            req.session.save((err) => {
-                if (err) {
-                    console.error('Erro ao salvar a sessão:', err);
-                    res.status(500).send('Erro interno. Tente novamente mais tarde.');
-                    return;
-                }
-            });
-            console.log("Rota de login | Token: " +req.session.token)
+            console.log('Cookies recebidos no backend:', req.cookies);
+            console.log('Cabeçalhos de requisição:', req.headers);
+
             res.statusCode = 200;
             res.send(`Acesso Liberado.\nBem Vindo`);
         }else{
