@@ -79,6 +79,7 @@ routes.get('/', (req: Request, res: Response)=>{
 //Rotas de Accounts
 routes.put('/signUp', AccountsManager.signUpHandler);
 routes.post('/login', AccountsManager.loginHandler);
+routes.get('/isModerator', AccountsManager.isModeratorHandler);
 
 //Rotas de Eventos
 routes.put('/addNewEvent', EventsManager.addNewEventHandler);
@@ -93,6 +94,7 @@ routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
 routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
+routes.get('/getBalance', FundsManager.getBalance);
 
 //Rotas de bets
 routes.put('/betOnEvent', betsManager.betOnEventHandler)

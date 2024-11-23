@@ -78,7 +78,7 @@ export namespace EventsManager
     export const evaluateNewEventHandler: RequestHandler =
     async (req: Request, res: Response) => 
     {
-        console.log('Cookies recebidos:', req.cookies);
+        console.log('Cookies recebidos rota de evaluate:', req.cookies);
         console.log('Sessão:', req.cookies);
         // Verifica se o usuário está autenticado e é um moderador (role === 1)
         if(!AccountsManager.isModerator(req, res)) return;
@@ -345,8 +345,7 @@ export namespace EventsManager
                     break;
 
                 case "aprovado":
-                    consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
-                                REGISTER_DATE, FINISH_DATE
+                    consulta = `SELECT *
                                 FROM EVENTS
                                 WHERE STATUS_EVENT = 'Aprovado'`;
                     break;
@@ -367,10 +366,10 @@ export namespace EventsManager
             const result: OracleDB.Result<Event> = await connection.execute(consulta);
             if(result.rows?.length === 0){
                 res.statusCode = 200;
-                res.send(`Não há eventos do status: ${pStatus}`);
-            }else{
+                res.send({ array: [] });  // Envia uma lista vazia com a chave 'array' se não houver eventos
+            } else {
                 res.statusCode = 200;
-                res.send(result.rows);
+                res.send({ array: result.rows });  // Envia os dados dentro de um objeto com a chave 'array'
             }
         } catch (error){
             console.error("Erro ao obter eventos:", error);

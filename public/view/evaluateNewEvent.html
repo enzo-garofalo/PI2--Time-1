@@ -1,115 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluate Events</title>
-    <link rel="stylesheet" href="../styles/bootstrap.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Home</title>
+    <meta name="description" content="A portfolio management dashboard.">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../styles/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <!-- Sidebar com a lista de eventos -->
-            <div class="col-md-4">
-                <h4 class="mb-3">Eventos Pendentes</h4>
-                <ul class="list-group" id="events-list">
-                    <!-- Eventos serão carregados aqui dinamicamente -->
-                </ul>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="app-header-left">
+                <span class="app-icon"><img src="../assets/pucbet-logo.png" class="logoPucBet"></span>
+                <div class="search-wrapper">
+                    <input class="search-input" type="text" placeholder="Search">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-search" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </div>
             </div>
-
-            <!-- Formulário de avaliação -->
-            <div class="col-md-8">
-                <h4 class="mb-3">Avaliar Evento</h4>
-                <form id="evaluation-form" onsubmit="event.preventDefault(); evaluateEvent();">
-                    <div class="mb-3">
-                        <label for="event-id" class="form-label">ID do Evento</label>
-                        <input type="number" class="form-control" id="event-id" placeholder="Selecione um evento ou insira o ID" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="validity" class="form-label">Evento Válido?</label>
-                        <select class="form-select" id="validity" required>
-                            <option value="" selected disabled>Escolha uma opção</option>
-                            <option value="sim">Sim</option>
-                            <option value="não">Não</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3" id="reason-group" style="display: none;">
-                        <label for="reason" class="form-label">Motivo da Reprovação</label>
-                        <textarea class="form-control" id="reason" rows="3" placeholder="Explique o motivo"></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Avaliar</button>
-                </form>
+            <div class="app-header-right"> 
+                <div id="balance-container" class="mt-3 d-none">
+                    <h3>Your Balance: $<span id="balance"></span></h3>
+                </div>
             </div>
+        </header>
+
+        <div class="app-content">
+            <nav class="app-sidebar">
+                <a href="../view/home.html" class="app-sidebar-link">
+                    <i class="fa fa-home"></i>
+                    Home
+                </a>
+                <a href="#" class="app-sidebar-link active">
+                    <i class="fa fa-chart-bar"></i>
+                    Evaluate Event
+                </a>
+                <a href="#" class="app-sidebar-link">
+                    <i class="fa fa-cogs"></i>
+                    Settings
+                </a>
+                <a href="#" class="app-sidebar-link">
+                    <i class="fa fa-sign-out-alt"></i>
+                    Logout
+                </a>
+            </nav>
+
+            <main class="projects-section">
+                <header class="projects-section-header">
+                    <p class="section-title">Eventos Pendentes</p>
+                    <p class="time" id="currentDate"></p>
+                </header>
+                <div class="row align-items-center" >
+                    <div class="col">
+                      <table id="tableProducts" class="table">
+                          <thead>
+                            <tr>
+                              <th scope="col" class="text-end">#</th>
+                              <th scope="col" class="text-left">Title</th>
+                              <th scope="col" class="text-end">Description</th>
+                              <th scope="col" class="text-end">Categorie</th>
+                              <th scope="col" class="text-center">Finish Date</th>
+                              <th scope="col" class="text-center"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          <!-- produtos serão adicionados dinamicamente aqui. 
+                            consultar a função addProductRow
+                          -->
+                          </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- Paginador -->
+                <div class="row">
+                    <div class="col">
+                        <nav aria-label="..." style="float:right;">
+                            <ul id="ulPaginator" class="pagination pagination-sm">
+                            <!-- Elementos do paginador aparecerão aqui -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
+    <script async defer>
+        var ulPaginator = document.getElementById("ulPaginator");
+        var tableProducts = document.getElementById('tableProducts');
+        let numPages = 0; 
+        const pageSize = 10; 
+        var page = 1; 
 
-    <script>
-        document.getElementById('validity').addEventListener('change', function () {
-            const reasonGroup = document.getElementById('reason-group');
-            reasonGroup.style.display = this.value === 'não' ? 'block' : 'none';
-        });
+        async function fetchActiveEvent(){
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("connection", "keep-alive");
+                reqHeaders.append("status", "pendente");
 
-        async function fetchEvents() {
-            const res = await fetch('http://127.0.0.1:3000/evaluateNewEvent', { 
-                method: 'PUT',
-                credentials: 'include'
-            });
-
-            if(res.ok){
-                const events = await res.json();
-                const eventsList = document.getElementById('events-list');
-    
-                eventsList.innerHTML = '';
-                if (Array.isArray(events)) {
-                    events.forEach(event => {
-                        const li = document.createElement('li');
-                        li.className = 'list-group-item event-item';
-                        li.textContent = `ID: ${event.ID_EVENT} - ${event.TITLE}`;
-                        li.onclick = () => {
-                            document.getElementById('event-id').value = event.ID;
-                        };
-                        eventsList.appendChild(li);
-                    });
-                } else {
-                    eventsList.innerHTML = `<li class="list-group-item text-center">${events}</li>`;
+                const res = await fetch('http://127.0.0.1:3000/getEvent', {
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    const eventsData = await res.json();
+                    console.log(eventsData);
+                    fillTable(eventsData);
+                }else{
+                    alert('ocorreu um erro, verficar e tratar ...');
                 }
-            }else{
-                const errorMessage = await res.text();
-                alert(message);
+            }catch(error){
+                console.error(error);
             }
         }
 
-        async function evaluateEvent() {
-            const id = document.getElementById('event-id').value;
-            const validity = document.getElementById('validity').value;
-            const reason = document.getElementById('reason').value;
+        function fillTable(events){
+            cleanTableRows();
 
-            if (validity === 'não' && !reason) {
-                alert('Por favor, forneça um motivo para reprovar o evento.');
-                return;
-            }
+            events.array.forEach(element => {
+                addEventRow(element);
+            });
+        }
 
-            const headers = new Headers();
-            headers.append('eventID', id);
-            headers.append('isValid', validity);
-            if (validity === 'não') headers.append('reason', reason);
+        function cleanTableRows(){
+            tableProducts.getElementsByTagName('tbody')[0].innerHTML = '';
+        }
 
-            const res = await fetch('http://127.0.0.1:3000/evaluateNewEvent', {
-                method: 'PUT',
-                headers,
-                credentials: 'include'
+        function addEventRow(event){
+            const eventRow = 
+                `<tr id="${event.ID_EVENT}">
+                    <td class="event-id">${event.ID_EVENT}</td>
+                    <td class="event-title">${event.TITLE}</td>
+                    <td class="event-description">${event.DESCRIPTION}</td>
+                    <td class="event-categorie">${event.CATEGORIES}</td>
+                    <td class="event-finish-date">${event.FINISH_DATE}</td>
+                    <td class="bet-on-event">
+                        <button>BET</button>
+                    </td>
+                </tr>`;
+            tableProducts.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
+        }
+
+        function setDate(){
+            const currentDate = new Date();
+    
+            // Formata a data no formato "Month, Day" (ex: "December, 12")
+            const month = currentDate.toLocaleString('default', { month: 'long' }); // Mês por extenso
+            const day = currentDate.getDate(); // Dia do mês
+    
+            // Preenche o conteúdo do elemento com a classe "time"
+            // Cria um objeto Date para a data atual
+            document.getElementById('currentDate').textContent = `${month}, ${day}`;
+        }
+
+        async function setBalance() {
+            const res = await fetch('http://127.0.0.1:3000/getBalance', {
+                method: 'GET',
+                credentials: 'include' // Necessário para enviar o cookie com a requisição
             });
 
-            const message = await res.text();
-            alert(message);
-            fetchEvents(); // Atualiza a lista de eventos
+            if (res.ok) {
+                let data = await res.json();
+                let balance = data.balance;  // Assumindo que a resposta do backend seja um objeto com o campo "balance"
+                
+                // Se necessário, formate o saldo com 2 casas decimais
+                balance = parseFloat(balance).toFixed(2);
+
+                // Exibe o saldo na página
+                document.getElementById('balance').textContent = `${balance}`;
+            } else {
+                alert('Não foi possível acessar os dados');
+            }
         }
 
-        window.onload = fetchEvents;
+
+        (async function() {
+            await fetchActiveEvent();
+            setBalance();
+            setDate();
+        })();
     </script>
 </body>
 </html>

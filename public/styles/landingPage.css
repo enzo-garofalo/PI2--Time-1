@@ -1,0 +1,273 @@
+.container-xxlarge {
+    background: #151515;
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.container-xxlarge2 {
+    background: linear-gradient(180deg, rgb(68, 216, 136), rgb(47, 158, 123));
+    height: 45vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; 
+    padding: 20px;
+}
+
+.container-xxlarge3 {
+    background: rgb(21, 21, 21);
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    position: relative; 
+}
+
+.container-xxlarge4 {
+    background: #151515;
+    height: 5vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    position: relative; 
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 1; 
+}
+
+.titleHomepage {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.75rem;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: left;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    margin: 0;
+    margin-left: 100px;
+    padding-right: 20px;
+}
+
+.titleHomepage2 {
+    font-family: "Kode Mono", monospace;
+    font-size: 2.75rem;
+    font-weight: bold;
+    color: #000000;
+    text-align: left;
+    letter-spacing: -3px;
+    line-height: 1.1;
+    margin: 0;
+    text-transform: uppercase;
+    padding-left: 20px; 
+    margin-bottom: 0px; 
+    margin-left: 930px;
+    margin-top: 0px;
+}
+
+.titleHomepage3 {
+    font-family: "Kode Mono", monospace;
+    font-size: 2.75rem;
+    font-weight: bold;
+    color: #44d888;
+    text-align: left;
+    letter-spacing: -3px;
+    line-height: 1.1;
+    margin: 0;
+    text-transform: uppercase;
+    margin-bottom: 0px; 
+    margin-left: 280px;
+    margin-top: 8px;
+}
+
+.ganhar-dinheiro {
+    color: rgb(68, 216, 136);
+    background: linear-gradient(to right, #00b36b, #00ff99);
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    font-weight: bold;
+}
+
+.descriptionHomepage {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #ffffff;
+    text-align: left;
+    margin-top: 20px;
+    margin-left: 100px;
+    line-height: 1.5;
+    padding-right: 220px;
+}
+
+.everySport {
+    font-family: "Kode Mono", monospace;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+}
+
+.descriptionHomepage2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #000000;
+    text-align: left;
+    line-height: 1.5;
+    padding-left: 20px; 
+    margin-left: 930px;
+    margin-top: 30px;
+}
+
+.descriptionFooter{
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: white;
+    text-align: center;
+    justify-items: auto;
+}
+
+.logoPucBet {
+    width: 220px; 
+    height: auto;
+    margin-left: 50px; 
+    margin-bottom: 10px;
+    padding-right: 20px;
+}
+
+.header-image-container {
+    position: absolute;
+    right: -20px;
+    top: 100;
+    width: 1050px; 
+    height: 1000%;
+    z-index: 0; 
+    overflow: hidden; 
+    object-fit: cover;
+}
+
+.header-image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to right, 
+        rgba(21, 21, 21, 1),       /* Opacidade total no começo do gradiente */
+        rgba(21, 21, 21, 0.92) 40%, /* 90% opaco, cobrindo bem o lado esquerdo */
+        rgba(21, 21, 21, 0.6) 70%, /* Transição para o centro */
+        rgba(21, 21, 21, 0.3) 100% /* Final mais transparente para misturar melhor */
+    );
+    z-index: 5000;
+}
+
+.header-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    position: relative;
+    z-index: -1;
+}
+
+.header-image-container-esports {
+    position: absolute; 
+    top: 0;  
+    left: 1000px; 
+    width: 50%;  
+    height: 100%; 
+    z-index: 0;
+    overflow: hidden;
+}
+
+.header-image-container-esports::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(
+            to right,
+            rgba(21, 21, 21, 1.2),
+            rgba(21, 21, 21, 0.8) 20%,
+            rgba(21, 21, 21, 0.8) 20%,
+            rgba(21, 21, 21, 0.4) 45%
+        ),
+        linear-gradient(
+            to bottom,
+            rgba(21, 21, 21, 0.5), 
+            rgba(21, 21, 21, 0.25) 0%, 
+            rgba(21, 21, 21, 1) 88% 
+        ),
+        linear-gradient(
+            to left,
+            rgba(0, 255, 153, 0.2) 100%, 
+            rgb(68, 216, 136) 10%
+        );
+    z-index: 5000;
+}
+
+.header-image-esports {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; 
+}
+
+.soccerPlayer {
+    width: 700px;
+    height: auto;
+    position: absolute; 
+    top: -95px;
+    left: 30%; 
+    transform: translateX(-50%); 
+    z-index: 1;
+}
+
+.container-xxlarge1 .soccerPlayer {
+    top: -80px; 
+    left: 25%;
+}
+
+.container-xxlarge3 .soccerPlayer {
+    top: -80px;
+    left: 30%;
+}
+
+.btn-signup {
+    font-family: 'Montserrat', sans-serif;
+    background: linear-gradient(to right, #00b36b, #00ff99);
+    color: #000000;
+    padding: 10px 50px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    text-transform: uppercase;
+    margin-top: 20px;
+    margin-left: 100px;
+    align-self: flex-start;
+    box-shadow: 0px 4px 10px rgba(0, 255, 153, 0.4);
+}
+
+.btn-signup:hover {
+    transform: scale(1.05);
+    background: linear-gradient(to right, #00ff99, #00e676);
+    box-shadow: 0px 6px 12px rgba(0, 255, 153, 0.6);
+}

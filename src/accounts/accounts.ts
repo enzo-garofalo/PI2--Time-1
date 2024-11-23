@@ -104,7 +104,13 @@ export namespace AccountsManager {
     }
     
     
-
+    export const isModeratorHandler: RequestHandler =
+    async (req: Request, res: Response) => 
+    {
+        if(!isModerator(req, res)) return;
+        res.status(200).send('Acesso Liberado');
+        return;
+    } 
 
     /*
         Recebe email e senha e faz o login

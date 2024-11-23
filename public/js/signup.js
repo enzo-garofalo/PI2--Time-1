@@ -22,7 +22,7 @@ function isValidEmail(email) {
 async function showAlert(message, type){
     const alertContainer = document.getElementById('alert-box');
 
-    alertContainer.className = `alert alert-${type} alert-dismissible fade show`;
+    alertContainer.className = `alert alert-${type} alert-dismissible fade show w-100`;
     alertContainer.innerHTML = `
         ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="location.reload()"></button>
