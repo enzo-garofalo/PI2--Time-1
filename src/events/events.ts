@@ -381,4 +381,31 @@ export namespace EventsManager
             return;
         }
     }
+
+    export const getEventQttyHandler: RequestHandler =
+    async (req: Request, res: Response) => {
+        const pStatus = req.get('status');
+        if(pStatus){
+            const eventQtty = await dbEventsManager.getEventQtty(pStatus);
+            res.status(200).send(eventQtty.rows);
+            return;
+        } 
+
+        res.status(400).send('Requisição Inválida');
+        return;
+    }
+
+    export const getEventByPageHandler: RequestHandler =
+    async (req: Request, res: Response) =>{
+        const pPage = req.get('page');
+        const pPageSize = req.get('pageSize');
+        const pStatus = req.get('status');
+        if(pPage && pPageSize && pStatus){
+            const events = await dbEventsManager.getEventsByPage(parseInt(pPage), parseInt(pPageSize), pStatus);
+            console.log('Events', events);
+            res.status(200).json(events.rows);
+        }else{
+            res.status(400).send('Requisição inválida - Parâmetros Faltantes');
+        }
+    }
 }

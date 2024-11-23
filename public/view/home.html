@@ -68,23 +68,23 @@
                             </tr>
                           </thead>
                           <tbody>
-                          <!-- produtos serão adicionados dinamicamente aqui. 
-                            consultar a função addProductRow
+                          <!-- eventos serão adicionados dinamicamente aqui. 
+                            consultar a função addEventRow
                           -->
                           </tbody>
                         </table>
                     </div>
-                </div>
-                <!-- Paginador -->
-                <div class="row">
-                    <div class="col">
-                        <nav aria-label="..." style="float:right;">
-                            <ul id="ulPaginator" class="pagination pagination-sm">
-                            <!-- Elementos do paginador aparecerão aqui -->
-                            </ul>
-                        </nav>
+                    <div class="row justify-content-center">
+                        <div class="col-auto">
+                            <nav aria-label="Page navigation">
+                                <ul id="ulPaginator" class="pagination pagination-sm">
+                                    <!-- Elementos do paginador aparecerão aqui -->
+                                </ul>
+                            </nav>
+                        </div>
                     </div>
                 </div>
+                <!-- Paginador -->
             </main>
         </div>
     </div>
@@ -92,7 +92,7 @@
         var ulPaginator = document.getElementById("ulPaginator");
         var tableProducts = document.getElementById('tableProducts');
         let numPages = 0; 
-        const pageSize = 10; 
+        const pageSize = 11; 
         var page = 1; 
 
         async function checkIsModerator(){
@@ -116,6 +116,83 @@
             }
         }
 
+        async function requestNumberOfEvent() {
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("status", "Aprovado");
+
+                const res = await fetch("http://127.0.0.1:3000/getEventQtty", {
+                    method: "GET",
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    const qttyJson = await res.json();
+                    const qtty = qttyJson[0].EVENTQTTY
+                    if (qtty && qtty > 0) {
+                        numPages = Math.ceil(qtty / pageSize);
+                        refreshPaginator(); // Adicionei para chamar a função que cria o paginador
+                    } else {
+                        console.log("Número de páginas inválido.");
+                    }
+                }else{
+                    alert('Ocorreu um erro, não foi possível estimar a quatidade de eventos');
+                    window.location.href = '../view/login.html';
+                }
+            }catch(error){
+                console.error(error);
+            }
+        }
+
+        async function requestEvents(pageNumber) {
+            try{
+                page = pageNumber;
+
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("page", pageNumber);
+                reqHeaders.append("pageSize", pageSize);
+                reqHeaders.append("status", "Aprovado");
+
+                
+                const resEvents = await fetch("http://127.0.0.1:3000/getEventsByPage", {
+                    method: "POST",
+                    headers: reqHeaders,
+                    credentials: 'include'
+                 });
+
+                 if(resEvents.ok){
+                    const eventsData = await resEvents.json();
+                    console.log(eventsData);  // Verifique a estrutura dos dados
+                    fillTable(eventsData);
+                 }
+            }catch(error){
+
+                console.error(error);
+            }
+            
+        }
+                 
+        function resetUlPageNumbers(){
+          while(ulPaginator.firstChild) 
+            ulPaginator.removeChild(ulPaginator.firstChild);
+        }
+
+        function refreshPaginator(){
+            // limpar os elementos e adicioná-los. 
+            resetUlPageNumbers();
+            // adicionar as páginas. 
+            let status = "";
+            let strLi = "";
+
+            for (let i = 1; i <= numPages; i++) {
+                (i === page) ? status = "page-item active" : status = "page-item";
+                strLi = `<li class="${status}"><a class="page-link" href="javascript:requestEvents(${i});">${i}</a></li>`;
+                ulPaginator.innerHTML += strLi;
+            }
+        }
+        
         async function fetchActiveEvent(){
             try{
                 const reqHeaders = new Headers();
@@ -142,16 +219,18 @@
         function fillTable(events){
             cleanTableRows();
 
-            events.array.forEach(element => {
+            events.forEach(element => {
                 addEventRow(element);
             });
         }
 
-        function cleanTableRows(){
+        // Função para limpar as linhas da tabela
+        function cleanTableRows() {
             tableProducts.getElementsByTagName('tbody')[0].innerHTML = '';
         }
 
-        function addEventRow(event){
+        // Função para adicionar uma linha na tabela
+        function addEventRow(event) {
             const eventRow = 
                 `<tr id="${event.ID_EVENT}">
                     <td class="event-id">${event.ID_EVENT}</td>
@@ -199,12 +278,16 @@
         }
 
 
-        (async function() {
-            await fetchActiveEvent();
-            await checkIsModerator();
-            setBalance();
-            setDate();
-        })();
+        document.addEventListener('readystatechange', async event => {
+            if(event.target.readyState === 'complete'){
+                await checkIsModerator();
+                setBalance();
+                setDate();
+
+                requestNumberOfEvent();
+                requestEvents(page);
+            }
+        });
     </script>
 </body>
 </html>

@@ -343,3 +343,67 @@ body {
         font-size: 12px;
     }
 }
+/* Estilo para a barra de navegação do paginador */
+.pagination {
+    display: inline-flex;
+    list-style-type: none;
+    padding-left: 0;
+    border-radius: 0.375rem;
+}
+
+.page-item {
+    margin: 0 5px;
+}
+
+.page-item a {
+    color: #007bff;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+.page-item.active a {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.page-item.disabled a {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.page-item:hover a {
+    background-color: #f1f1f1;
+    border-color: #ced4da;
+}
+
+#ulPaginator {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    margin-top: 20px; /* Para garantir que não fique grudado no conteúdo acima */
+}
+
+.page-item {
+    margin: 0 5px;
+}
+
+.page-link {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.page-item.active .page-link {
+    font-weight: bold;
+    color: var(--highlight);
+}
+
+.page-item .page-link:hover {
+    color: var(--accent-color);
+}
