@@ -59,20 +59,22 @@ async function signIn() {
 
     if (isValid(email, password)) {
         const loginData = new Headers();
-        loginData.append('Connection', 'Keep-alive');
+        loginData.append("Content-Type", "application/json");
+        loginData.append("Connection", "Keep-alive");
         loginData.append('email', email);
         loginData.append('password', password);
 
         const res = await fetch(
             'http://127.0.0.1:3000/login', {
                 method: 'POST',
-                headers: loginData
+                headers: loginData,
+                credentials: 'include'
             }
         );
 
         if (res.ok) {
             // Aqui redireciona se o login estiver correto
-            window.location.href = '../view/evaluateNewEvent.html';
+            window.location.href = '../view/home.html';
         } else {
             const errorMessage = await res.text(); // Lê o erro retornado do servidor
             showMessage(errorMessage, 'error');
@@ -96,7 +98,8 @@ async function signUp() {
         const res = await fetch(
             'http://127.0.0.1:3000/signUp', {
                 method: 'PUT',
-                headers: signUpData
+                headers: signUpData,
+                credentials: 'include' // Necessário para enviar cookies entre cliente e servidor
             }
         );
 
