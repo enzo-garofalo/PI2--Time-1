@@ -184,7 +184,6 @@ export namespace FundsManager{
         if (!AccountsManager.isLoggedIn(req, res)) return;
     
         const joinTables = await DataBaseManager.joinTables(req.cookies.token);
-    
         if (!joinTables || joinTables.length === 0) {
             res.statusCode = 500; // Erro interno do servidor
             res.send("Erro: Não foi possível acessar os dados da conta.");

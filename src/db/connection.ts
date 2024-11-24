@@ -93,7 +93,7 @@ export namespace DataBaseManager
     export async function joinTables(token:string) {
 
         const connection = await DataBaseManager.get_connection()
-        
+        // console.log("Token em join tables: " + token);
         const userID : OracleDB.Result<{IDUSER: number, IDWALLET: number, BALANCE: number}> = 
             await connection.execute(
                 `SELECT AC.ID AS IDUSER, WL.ID_WALLET AS IDWALLET, WL.BALANCE AS BALANCE
@@ -102,7 +102,6 @@ export namespace DataBaseManager
                 WHERE AC.TOKEN = :token`,
                 {token}
         );
-
         return userID.rows;
     }
 }

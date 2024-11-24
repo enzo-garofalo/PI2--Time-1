@@ -15,20 +15,20 @@
         <header class="app-header">
             <div class="app-header-left">
                 <span class="app-icon"><img src="../assets/pucbet-logo.png" class="logoPucBet"></span>
-                <div class="search-wrapper">
-                    <input class="search-input" type="text" placeholder="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-search" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                </div>
+            </div>
+            <!-- Barra de Pesquisa Centralizada -->
+            <div class="app-header-center">
+                <input type="text" class="search-input" id="searchBar" placeholder="Pesquisar eventos..." oninput="searchEvents()">
+                <button class="search-btn"><i class="fa fa-search"></i></button>
             </div>
             <div class="app-header-right"> 
                 <div id="balance-container" class="mt-3 d-none">
                     <h3>Your Balance: $<span id="balance"></span></h3>
                 </div>
             </div>
+            
         </header>
+        
 
         <div class="app-content">
             <nav class="app-sidebar">
@@ -36,13 +36,21 @@
                     <i class="fa fa-home"></i>
                     Home
                 </a>
-                <a href="#" class="app-sidebar-link active">
+                <a href="../view/evaluateNewEvent.html" class="app-sidebar-link only-moderator active" style="display: none;">
                     <i class="fa fa-chart-bar"></i>
                     Evaluate Event
                 </a>
                 <a href="#" class="app-sidebar-link">
+                    <i class="fa fa-chart-bar"></i>
+                    Finish Event
+                </a>
+                <a href="#" class="app-sidebar-link">
                     <i class="fa fa-cogs"></i>
-                    Settings
+                    My Events
+                </a>
+                <a href="#" class="app-sidebar-link">
+                    <i class="fa fa-cogs"></i>
+                    My Wallet
                 </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-sign-out-alt"></i>
@@ -55,84 +63,322 @@
                     <p class="section-title">Eventos Pendentes</p>
                     <p class="time" id="currentDate"></p>
                 </header>
-                <div class="row align-items-center" >
+                <div class="row align-items-center">
                     <div class="col">
-                      <table id="tableProducts" class="table">
-                          <thead>
-                            <tr>
-                              <th scope="col" class="text-end">#</th>
-                              <th scope="col" class="text-left">Title</th>
-                              <th scope="col" class="text-end">Description</th>
-                              <th scope="col" class="text-end">Categorie</th>
-                              <th scope="col" class="text-center">Finish Date</th>
-                              <th scope="col" class="text-center"></th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          <!-- produtos serão adicionados dinamicamente aqui. 
-                            consultar a função addProductRow
-                          -->
-                          </tbody>
+                        <table id="tableEvents" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-end">#</th>
+                                    <th scope="col" class="text-left">Title</th>
+                                    <th scope="col" class="text-end">Description</th>
+                                    <th scope="col" class="text-end">Category</th>
+                                    <th scope="col" class="text-center">Finish Date</th>
+                                    <th scope="col" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic rows inserted here -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
                 <!-- Paginador -->
-                <div class="row">
-                    <div class="col">
-                        <nav aria-label="..." style="float:right;">
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+                        <nav aria-label="Page navigation">
                             <ul id="ulPaginator" class="pagination pagination-sm">
-                            <!-- Elementos do paginador aparecerão aqui -->
+                                <!-- Elementos do paginador -->
                             </ul>
                         </nav>
                     </div>
                 </div>
             </main>
         </div>
+        <div class="modal" id="modalId">
+            <form class="modal-content">
+                <div class="container">
+                    <div class="modal-header">
+                        <h1>Evaluate Event</h1>
+                    </div>
+                    
+                    <div class="event-form">
+                        <label for="fTitle">Ttile</label>
+                        <input type="text" id="fTitle" disabled>
+                        
+                        <label for="fTitle">Description</label>
+                        <input type="text" id="fDescription" disabled>
+                        
+                        <label for="fCategory">Category</label>
+                        <input type="text" id="fCategory" disabled>
+                        
+                        <div class="date-container">
+                            <div class="date-field">
+                                <label for="fRegisterDate">Register Date</label>
+                                <input type="date" id="fRegisterDate" disabled>
+                            </div>
+                            <div class="date-field">
+                                <label for="fFinishDate">Finish Date</label>
+                                <input type="date" id="fFinishDate" disabled>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="moderator-evaluation">
+                        <label for="fVerdict">Is this event approved?</label>
+                            <div class="radio-group">
+                                <label>
+                                    <input type="radio" name="fVerdict" value="sim" onclick="toggleReason()"> Yes
+                                </label>
+                                <label>
+                                    <input type="radio" name="fVerdict" value="não" onclick="toggleReason()"> No
+                                </label>
+                        </div> 
+            
+                        
+                        <label for="fReason">Reason</label>
+                        <select name="fReason" id="fReason" disabled onchange="handleOtherReason()">
+                            <option value="placeholder" hidden>Select a reason...</option>
+                            <option value="textoConfuso">Texto Confuso</option>
+                            <option value="textoInapropriado">Texto Inapropriado</option>
+                            <option value="disrespeitoTermos">Não respeita a política de privacidade e/ou termos de uso da plataforma</option>
+                            <option value="other">Other</option>
+                        </select>
+
+                        <!-- Campo de texto que será exibido ao selecionar "Outros" -->
+                        <div id="otherReasonContainer" style="display: none; margin-top: 10px;">
+                            <label for="otherReasonText">Specify your reason:</label>
+                            <input type="text" id="otherReasonText" placeholder="Describe your reason here..." />
+                        </div>
+                    </div>
+        
+                    <div class="modal-footer">
+                        <button type="button" onclick="hideModal()" class="cancelBtn">
+                                Cancel
+                        </button>
+                        <button type="button" onclick="hideModal(); evaluateEvent()" class="evaluateBtn">
+                                Evaluate
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
+    <script>
+        var modal = document.getElementById('modalId');
+
+        function toggleReason() {
+            const reasonField = document.getElementById('fReason');
+            const placeholderOption = reasonField.options[0]; // Pega o placeholder
+            const radioNo = document.querySelector('input[name="fVerdict"][value="não"]');
+            const radioYes = document.querySelector('input[name="fVerdict"][value="sim"]');
+            const otherReasonContainer = document.getElementById('otherReasonContainer');
+
+            if (radioNo.checked) {
+                // Habilita o campo e ajusta o placeholder para "Select a reason..."
+                reasonField.disabled = false;
+                reasonField.style.borderColor = '#66e0a3';
+                placeholderOption.text = "Select a reason...";
+                reasonField.selectedIndex = 0; // Define o placeholder como selecionado
+            } else if (radioYes.checked) {
+                // Desabilita o campo e ajusta o placeholder para "Reason isn't needed..."
+                reasonField.disabled = true;
+                reasonField.style.borderColor = '#3d3d3d';
+                placeholderOption.text = "Reason isn't needed...";
+                reasonField.selectedIndex = 0; // Define o placeholder como selecionado
+                otherReasonContainer.style.display = "none"; // Oculta o campo "Outros"
+            }
+        }
+
+        function handleOtherReason() {
+            const reasonField = document.getElementById('fReason');
+            const otherReasonContainer = document.getElementById('otherReasonContainer');
+            const selectedValue = reasonField.value;
+
+            if (selectedValue === "other") {
+                otherReasonContainer.style.display = "block"; // Exibe o campo "Outros"
+            } else {
+                otherReasonContainer.style.display = "none"; // Oculta o campo "Outros"
+            }
+        }
+
+        function evaluateEvent(){
+
+        }
+
+        function showModal(){
+            modal.style.display = 'block';
+        }
+        
+        function hideModal(){
+            modal.style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }   
+    </script>
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
-        var tableProducts = document.getElementById('tableProducts');
+        var tableEvents = document.getElementById('tableEvents');
         let numPages = 0; 
         const pageSize = 10; 
         var page = 1; 
 
-        async function fetchActiveEvent(){
+        async function checkIsModerator(){
             try{
                 const reqHeaders = new Headers();
                 reqHeaders.append("Content-Type", "application/json");
                 reqHeaders.append("connection", "keep-alive");
-                reqHeaders.append("status", "pendente");
 
-                const res = await fetch('http://127.0.0.1:3000/getEvent', {
+                const res = await fetch('http://127.0.0.1:3000/isModerator', {
                     method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                })
+                if(res.ok){
+                    const elements = document.querySelectorAll('.only-moderator');
+                    elements.forEach(element => {
+                        element.style.display = 'block';
+                    });
+                }
+            }catch(error){
+                alert("Não foi possível carregar dados, tente novamente mais tarde!");
+                window.location.href = "../view/login.html";
+            }
+        }
+
+        async function requestNumberOfEvent() {
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("status", "Pendente");
+
+                const res = await fetch("http://127.0.0.1:3000/getEventQtty", {
+                    method: "GET",
                     headers: reqHeaders,
                     credentials: 'include'
                 });
                 if(res.ok){
-                    const eventsData = await res.json();
-                    console.log(eventsData);
-                    fillTable(eventsData);
+                    const qttyJson = await res.json();
+                    const qtty = qttyJson[0].EVENTQTTY
+                    if (qtty && qtty > 0) {
+                        numPages = Math.ceil(qtty / pageSize);
+                        refreshPaginator(); // Adicionei para chamar a função que cria o paginador
+                    } else {
+                        console.log("Número de páginas inválido.");
+                    }
                 }else{
-                    alert('ocorreu um erro, verficar e tratar ...');
+                    alert('Ocorreu um erro, não foi possível estimar a quatidade de eventos');
+                    window.location.href = '../view/login.html';
                 }
             }catch(error){
                 console.error(error);
             }
         }
 
+        async function requestEvents(pageNumber) {
+            try{
+                page = pageNumber;
+
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("page", pageNumber);
+                reqHeaders.append("pageSize", pageSize);
+                reqHeaders.append("status", "Pendente");
+
+                
+                const resEvents = await fetch("http://127.0.0.1:3000/getEventsByPage", {
+                    method: "POST",
+                    headers: reqHeaders,
+                    credentials: 'include'
+                 });
+
+                 if(resEvents.ok){
+                    const eventsData = await resEvents.json();
+                    console.log(eventsData);  // Verifique a estrutura dos dados
+                    fillTable(eventsData);
+                 }
+                 refreshPaginator();
+            }catch(error){
+
+                console.error(error);
+            }
+            
+        }
+                 
+        function resetUlPageNumbers(){
+          while(ulPaginator.firstChild) 
+            ulPaginator.removeChild(ulPaginator.firstChild);
+        }
+
+        function refreshPaginator() {
+            resetUlPageNumbers();
+
+            // Botão "Anterior"
+            const prevLi = document.createElement("li");
+            if(page === 1){
+                prevLi.className = `page-item ${page === 1 ? "disabled" : ""}`;
+            }else{
+                prevLi.className = `page-item`;
+
+            }
+            const prevA = document.createElement("a");
+            prevA.className = "page-link";
+            prevA.style.textDecoration = 'none';
+            prevA.href = "javascript:void(0);";
+            prevA.textContent = "«";
+            prevA.addEventListener("click", () => {
+                if (page > 1) requestEvents(page - 1);
+            });
+            prevLi.appendChild(prevA);
+            ulPaginator.appendChild(prevLi);
+
+            // Números das páginas
+            for (let i = 1; i <= numPages; i++) {
+                const li = document.createElement("li");
+                li.className = `page-item ${i === page ? "active" : ""}`;
+                const a = document.createElement("a");
+                a.className = "page-link";
+                a.style.textDecoration = 'none';
+                a.href = "javascript:void(0);";
+                a.textContent = i;
+                a.addEventListener("click", () => {
+                    if (i !== page) requestEvents(i);
+                });
+                li.appendChild(a);
+                ulPaginator.appendChild(li);
+            }
+
+            // Botão "Próximo"
+            const nextLi = document.createElement("li");
+            nextLi.className = `page-item ${page === numPages ? "disabled" : ""}`;
+            const nextA = document.createElement("a");
+            nextA.className = "page-link";
+            nextA.style.textDecoration = 'none';
+            nextA.href = "javascript:void(0);";
+            nextA.textContent = "»";
+            nextA.addEventListener("click", () => {
+                if (page < numPages) requestEvents(page + 1);
+            });
+            nextLi.appendChild(nextA);
+            ulPaginator.appendChild(nextLi);
+        }
+
         function fillTable(events){
             cleanTableRows();
 
-            events.array.forEach(element => {
+            events.forEach(element => {
                 addEventRow(element);
             });
         }
 
-        function cleanTableRows(){
-            tableProducts.getElementsByTagName('tbody')[0].innerHTML = '';
+        // Função para limpar as linhas da tabela
+        function cleanTableRows() {
+            tableEvents.getElementsByTagName('tbody')[0].innerHTML = '';
         }
 
-        function addEventRow(event){
+        // Função para adicionar uma linha na tabela
+        function addEventRow(event) {
             const eventRow = 
                 `<tr id="${event.ID_EVENT}">
                     <td class="event-id">${event.ID_EVENT}</td>
@@ -140,11 +386,11 @@
                     <td class="event-description">${event.DESCRIPTION}</td>
                     <td class="event-categorie">${event.CATEGORIES}</td>
                     <td class="event-finish-date">${event.FINISH_DATE}</td>
-                    <td class="bet-on-event">
-                        <button>BET</button>
+                    <td class="evaluateEvent">
+                        <button onclick="showModal()">Evaluate</button>
                     </td>
                 </tr>`;
-            tableProducts.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
+            tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
         }
 
         function setDate(){
@@ -167,24 +413,38 @@
 
             if (res.ok) {
                 let data = await res.json();
-                let balance = data.balance;  // Assumindo que a resposta do backend seja um objeto com o campo "balance"
-                
+                let balance = data.balance;
                 // Se necessário, formate o saldo com 2 casas decimais
                 balance = parseFloat(balance).toFixed(2);
-
+                
                 // Exibe o saldo na página
                 document.getElementById('balance').textContent = `${balance}`;
             } else {
-                alert('Não foi possível acessar os dados');
+                alert('Não foi possível acessar os dados da sua carteira');
+               
             }
         }
+        
+        // Adiciona destaque na linha clicada
+        tableEvents.addEventListener('click', (event) => {
+            const row = event.target.closest('tr'); // Identifica a linha clicada
+            if (row) {
+                tableEvents.querySelectorAll('tr').forEach(tr => tr.classList.remove('active-row'));
+                row.classList.add('active-row');
+            }
+        });
 
 
-        (async function() {
-            await fetchActiveEvent();
-            setBalance();
-            setDate();
-        })();
+        document.addEventListener('readystatechange', async event => {
+            if(event.target.readyState === 'complete'){
+                await checkIsModerator();
+                await setBalance();
+                setDate();
+
+                requestNumberOfEvent();
+                requestEvents(page);
+            }
+        });
     </script>
 </body>
 </html>

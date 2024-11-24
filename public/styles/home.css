@@ -295,6 +295,7 @@ body {
 .table .bet-on-event button {
     background: var(--accent-color);
     color: #fff;
+    font-size: 15px;
     border: none;
     padding: 8px 12px;
     border-radius: 4px;
@@ -303,7 +304,19 @@ body {
     transition: background 0.3s ease;
 }
 
-.table .bet-on-event button:hover {
+.table .evaluateEvent button {
+    background: #3074e2;
+    color: #fff;
+    font-size: 15px;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.table  button:hover {
     background: var(--button-hover);
 }
 
@@ -369,3 +382,238 @@ body {
     opacity: 0.5;
     pointer-events: none;
 }
+.modal {
+    display: none; /* Modal inicialmente escondido */
+    position: fixed;
+    z-index: 1001; /* Certifica-se que aparece sobre outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden; /* Desabilita o scroll */
+    background-color: rgba(0, 0, 0, 0.7); /* Fundo semitransparente */
+}
+
+.modal-content {
+    background-color: var(--background-light);
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centraliza o modal */
+    padding: 25px;
+    border-radius: 10px;
+    border: 1px solid var(--input-border);
+    width: 40%;
+    max-width: 600px; /* Para limitar o tamanho em telas maiores */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+    color: var(--text-color);
+    animation: fadeIn 0.3s ease-out;
+    box-shadow:  15px var(--accent-color);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--input-border);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.modal-header h1 {
+    font-size: 26px;
+    font-weight: bold;
+    margin: 0;
+    text-align: left;
+    color: var(--accent-color);
+    flex-grow: 1; /* Mantém o título alinhado mesmo com botão ao lado */
+}
+
+.modal-header .close {
+    cursor: pointer;
+    font-size: 22px;
+    color: var(--text-color);
+    padding: 8px;
+    border-radius: 50%;
+    background-color: transparent;
+    border: 2px solid var(--input-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    transition: all 0.3s ease;
+}
+
+.modal-header .close:hover {
+    background-color: var(--button-hover);
+    color: var(--highlight);
+    transform: scale(1.1); /* Pequena animação ao hover */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.event-form{
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--input-border);
+}
+
+.event-form label,
+.moderator-evaluation label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--label-color);
+    padding-top: 5px;
+}
+
+.event-form input[type="text"],
+.event-form input[type="date"],
+.moderator-evaluation select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.event-form input[type="text"]:focus,
+.event-form input[type="date"]:focus,
+.moderator-evaluation select:focus {
+    border-color: var(--accent-color);
+    outline: none;
+}
+input[type="radio"]{
+    width: 20px;
+    height: 20px;
+}
+.moderator-evaluation input[type="radio"] {
+    margin-right: 5px;
+    accent-color: var(--accent-color);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid var(--input-border);
+    padding-top: 10px;
+    margin-top: 10px;
+}
+
+.cancelBtn,
+.evaluateBtn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.cancelBtn {
+    background-color: #e63946;
+    color: #fff;
+}
+
+.cancelBtn:hover {
+    background-color: #ff4e5c;
+    transform: translateY(-2px);
+}
+
+.evaluateBtn {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.evaluateBtn:hover {
+    background-color: var(--highlight);
+    transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.date-container {
+    display: flex;
+    gap: 15px; /* Espaço entre os campos */
+    justify-content: space-between;
+    padding-top: 10px;
+}
+
+.date-field {
+    flex: 1; /* Faz os campos se adaptarem ao tamanho disponível */
+    display: flex;
+    flex-direction: column;
+}
+
+.date-field label {
+    margin-bottom: 5px; /* Espaço entre o rótulo e o campo */
+    font-weight: bold;
+    color: var(--label-color);
+}
+
+.date-field input[type="date"] {
+    width: 100%; /* Campo ocupa todo o espaço disponível */
+    padding: 10px;
+    border: 1px solid var(--input-border);
+    border-radius: 6px;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+.radio-group {
+    display: flex;
+    gap: 15px; /* Espaço entre os botões */
+    align-items: center;
+}
+
+.radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espaço entre o botão e o texto */
+    font-weight: normal;
+    color: var(--text-color);
+}
+/* Estilo para o campo de texto que aparece quando "Outros" é selecionado */
+
+
+#otherReasonContainer input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 18px;
+    border: 1px solid var(--input-border);
+    border-radius: 5px;
+    margin-top: 5px;
+    margin-bottom: -100px;
+    box-sizing: border-box; /* Para garantir que o padding não afete o tamanho */
+    background-color: var(--input-background);
+    color: #FFFF;
+}
+
+#otherReasonContainer input[type="text"]:focus {
+    outline: none;
+    border-color: #66e0a3; /* Cor do foco */
+}
+
+#otherReasonContainer input[type="text"]::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+
