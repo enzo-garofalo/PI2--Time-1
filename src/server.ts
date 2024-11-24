@@ -22,7 +22,7 @@ export const server = express();
 // Se permitido, o navegador deixa passar; se não, bloqueia o acesso.
 // Isso ajuda a proteger contra ataques de segurança, como o Cross-Site Scripting (XSS).
 
-const allowedOrigins = ['http://localhost:5501', 'http://192.168.1.2:5501'];
+const allowedOrigins = ['http://localhost:5501', 'http://192.168.1.2:5501', 'http://192.168.1.5:5501'];
 server.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {

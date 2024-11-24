@@ -7,6 +7,7 @@
     <meta name="description" content="A portfolio management dashboard.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../styles/home.css">
+    <link rel="icon" href="../assets/favicon.png" sizes="32x32">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 </head>
 <body>
@@ -14,20 +15,20 @@
         <header class="app-header">
             <div class="app-header-left">
                 <span class="app-icon"><img src="../assets/pucbet-logo.png" class="logoPucBet"></span>
-                <div class="search-wrapper">
-                    <input class="search-input" type="text" placeholder="Search">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="feather feather-search" viewBox="0 0 24 24">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                </div>
+            </div>
+            <!-- Barra de Pesquisa Centralizada -->
+            <div class="app-header-center">
+                <input type="text" class="search-input" id="searchBar" placeholder="Pesquisar eventos..." oninput="searchEvents()">
+                <button class="search-btn"><i class="fa fa-search"></i></button>
             </div>
             <div class="app-header-right"> 
                 <div id="balance-container" class="mt-3 d-none">
                     <h3>Your Balance: $<span id="balance"></span></h3>
                 </div>
             </div>
+            
         </header>
+        
 
         <div class="app-content">
             <nav class="app-sidebar">
@@ -54,45 +55,43 @@
                     <p class="section-title">Eventos Ativos</p>
                     <p class="time" id="currentDate"></p>
                 </header>
-                <div class="row align-items-center" >
+                <div class="row align-items-center">
                     <div class="col">
-                      <table id="tableProducts" class="table">
-                          <thead>
-                            <tr>
-                              <th scope="col" class="text-end">#</th>
-                              <th scope="col" class="text-left">Title</th>
-                              <th scope="col" class="text-end">Description</th>
-                              <th scope="col" class="text-end">Categorie</th>
-                              <th scope="col" class="text-center">Finish Date</th>
-                              <th scope="col" class="text-center"></th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          <!-- eventos serão adicionados dinamicamente aqui. 
-                            consultar a função addEventRow
-                          -->
-                          </tbody>
+                        <table id="tableEvents" class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-end">#</th>
+                                    <th scope="col" class="text-left">Title</th>
+                                    <th scope="col" class="text-end">Description</th>
+                                    <th scope="col" class="text-end">Category</th>
+                                    <th scope="col" class="text-center">Finish Date</th>
+                                    <th scope="col" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic rows inserted here -->
+                            </tbody>
                         </table>
-                    </div>
-                    <div class="row justify-content-center">
-                        <div class="col-auto">
-                            <nav aria-label="Page navigation">
-                                <ul id="ulPaginator" class="pagination pagination-sm">
-                                    <!-- Elementos do paginador aparecerão aqui -->
-                                </ul>
-                            </nav>
-                        </div>
                     </div>
                 </div>
                 <!-- Paginador -->
+                <div class="row justify-content-center">
+                    <div class="col-auto">
+                        <nav aria-label="Page navigation">
+                            <ul id="ulPaginator" class="pagination pagination-sm">
+                                <!-- Elementos do paginador -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
-        var tableProducts = document.getElementById('tableProducts');
+        var tableEvents = document.getElementById('tableEvents');
         let numPages = 0; 
-        const pageSize = 11; 
+        const pageSize = 10; 
         var page = 1; 
 
         async function checkIsModerator(){
@@ -167,6 +166,7 @@
                     console.log(eventsData);  // Verifique a estrutura dos dados
                     fillTable(eventsData);
                  }
+                 refreshPaginator();
             }catch(error){
 
                 console.error(error);
@@ -178,19 +178,57 @@
           while(ulPaginator.firstChild) 
             ulPaginator.removeChild(ulPaginator.firstChild);
         }
-
-        function refreshPaginator(){
-            // limpar os elementos e adicioná-los. 
+        function refreshPaginator() {
             resetUlPageNumbers();
-            // adicionar as páginas. 
-            let status = "";
-            let strLi = "";
 
-            for (let i = 1; i <= numPages; i++) {
-                (i === page) ? status = "page-item active" : status = "page-item";
-                strLi = `<li class="${status}"><a class="page-link" href="javascript:requestEvents(${i});">${i}</a></li>`;
-                ulPaginator.innerHTML += strLi;
+            // Botão "Anterior"
+            const prevLi = document.createElement("li");
+            if(page === 1){
+                prevLi.className = `page-item ${page === 1 ? "disabled" : ""}`;
+            }else{
+                prevLi.className = `page-item`;
+
             }
+            const prevA = document.createElement("a");
+            prevA.className = "page-link";
+            prevA.style.textDecoration = 'none';
+            prevA.href = "javascript:void(0);";
+            prevA.textContent = "«";
+            prevA.addEventListener("click", () => {
+                if (page > 1) requestEvents(page - 1);
+            });
+            prevLi.appendChild(prevA);
+            ulPaginator.appendChild(prevLi);
+
+            // Números das páginas
+            for (let i = 1; i <= numPages; i++) {
+                const li = document.createElement("li");
+                li.className = `page-item ${i === page ? "active" : ""}`;
+                const a = document.createElement("a");
+                a.className = "page-link";
+                a.style.textDecoration = 'none';
+                a.href = "javascript:void(0);";
+                a.textContent = i;
+                a.addEventListener("click", () => {
+                    if (i !== page) requestEvents(i);
+                });
+                li.appendChild(a);
+                ulPaginator.appendChild(li);
+            }
+
+            // Botão "Próximo"
+            const nextLi = document.createElement("li");
+            nextLi.className = `page-item ${page === numPages ? "disabled" : ""}`;
+            const nextA = document.createElement("a");
+            nextA.className = "page-link";
+            nextA.style.textDecoration = 'none';
+            nextA.href = "javascript:void(0);";
+            nextA.textContent = "»";
+            nextA.addEventListener("click", () => {
+                if (page < numPages) requestEvents(page + 1);
+            });
+            nextLi.appendChild(nextA);
+            ulPaginator.appendChild(nextLi);
         }
         
         async function fetchActiveEvent(){
@@ -226,7 +264,7 @@
 
         // Função para limpar as linhas da tabela
         function cleanTableRows() {
-            tableProducts.getElementsByTagName('tbody')[0].innerHTML = '';
+            tableEvents.getElementsByTagName('tbody')[0].innerHTML = '';
         }
 
         // Função para adicionar uma linha na tabela
@@ -242,7 +280,7 @@
                         <button>BET</button>
                     </td>
                 </tr>`;
-            tableProducts.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
+            tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
         }
 
         function setDate(){
@@ -276,7 +314,22 @@
                 alert('Não foi possível acessar os dados');
             }
         }
+        
+        // Adiciona destaque na linha clicada
+        tableEvents.addEventListener('click', (event) => {
+            const row = event.target.closest('tr'); // Identifica a linha clicada
+            if (row) {
+                tableEvents.querySelectorAll('tr').forEach(tr => tr.classList.remove('active-row'));
+                row.classList.add('active-row');
+            }
+        });
+        document.querySelector('.search-input').addEventListener('focus', function() {
+            this.style.boxShadow = '0 0 5px rgba(0, 123, 255, 0.5)';
+        });
 
+        document.querySelector('.search-input').addEventListener('blur', function() {
+            this.style.boxShadow = 'none';
+        });
 
         document.addEventListener('readystatechange', async event => {
             if(event.target.readyState === 'complete'){
