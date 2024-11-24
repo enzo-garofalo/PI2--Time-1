@@ -5,6 +5,7 @@ import { DataBaseManager } from "../db/connection";
 import { AccountsManager } from "../accounts/accounts";
 import { emailServiceManager } from "./emailService";
 import OracleDB from "oracledb";
+import { pid } from "process";
 
 
 
@@ -324,44 +325,14 @@ export namespace EventsManager
         if (!AccountsManager.isLoggedIn(req, res)) return;
 
         const pStatus = req.get('status');
+        const pId = Number(req.get('id'));
         let consulta = '';
 
         const connection: OracleDB.Connection = await DataBaseManager.get_connection();
 
         try {
-            switch (pStatus) {
-                case "pendente":
-                    consulta = `SELECT ID_EVENT, TITLE, DESCRIPTION, CATEGORIES,
-                                REGISTER_DATE, FINISH_DATE
-                                FROM EVENTS
-                                WHERE STATUS_EVENT = 'Pendente'`;
-                    break;
-
-                case "finalizado":
-                    consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
-                                REGISTER_DATE, FINISH_DATE
-                                FROM EVENTS
-                                WHERE STATUS_EVENT = 'Finalizado'`;
-                    break;
-
-                case "aprovado":
-                    consulta = `SELECT *
-                                FROM EVENTS
-                                WHERE STATUS_EVENT = 'Aprovado'`;
-                    break;
-
-                case "deletado":
-                    consulta = `SELECT ID_EVENT, DESCRIPTION, CATEGORIES,
-                                REGISTER_DATE, FINISH_DATE
-                                FROM EVENTS
-                                WHERE STATUS_EVENT = 'Deletado'`;
-                    break;
-
-                default:
-                    res.statusCode = 400;
-                    res.send("Status inválido. Tente usar 'pendente', 'finalizado', 'aprovado' ou 'deletado'.");
-                    return;
-            }
+            consulta = ` SELECT * FROM EVENTS WHERE STATUS_EVENT = '${pStatus}'`;
+            if(pId) consulta += ` AND ID_EVENT = ${pId}`;
 
             const result: OracleDB.Result<Event> = await connection.execute(consulta);
             if(result.rows?.length === 0){
