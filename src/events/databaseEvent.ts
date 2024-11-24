@@ -325,6 +325,35 @@ export namespace dbEventsManager
 
         return false;
     }
+
+    export async function getEventQtty(status_event:string) {
+        let connection = await DataBaseManager.get_connection();
+        let eventQtty = await connection.execute(
+            'SELECT count(ID_EVENT) as EVENTQTTY FROM EVENTS WHERE STATUS_EVENT = :status',
+            [status_event]
+        );
+        await connection.close();
+        console.log(eventQtty.rows);
+        return eventQtty;
+    }
+
+    export async function getEventsByPage(page:number, pageSize: number, status_event: string) : Promise<OracleDB.Result<unknown>> {
+        const startRecord = ((page-1)*pageSize) + 1;
+        let connection = await DataBaseManager.get_connection();
+        let eventQtty = await connection.execute(
+            `
+            SELECT * 
+            FROM EVENTS 
+            WHERE STATUS_EVENT = :status_event 
+            ORDER BY ID_EVENT 
+            OFFSET :startRecord ROWS FETCH NEXT :pagesize ROWS ONLY
+            `,
+            [status_event, startRecord, pageSize]
+        );
+        await connection.close();
+        console.log(eventQtty.rows);
+        return eventQtty;
+    }
 }
 
 

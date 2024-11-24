@@ -6,24 +6,15 @@
     <title>Sign Up</title>
     <link rel="stylesheet" href="../styles/styles.css">
     <link rel="stylesheet" href="../styles/bootstrap.css">
+    <link rel="icon" href="../assets/favicon.png" sizes="32x32">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
   </head>
   <body>
-    
-    <div class="container">
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <strong>Error!</strong> <span id="alert-message">opa</span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    
-    
-    
-    <!-- Div para form -->
     <div class="container" id="login-container">
-
-      <form class="text-center">
-        <img src="../assets/logoPucBet.png" alt="logoPucBet" class="logoPucBet">
+      <form class="text-center" onsubmit="event.preventDefault(); newUserRequest();">
+        <img src="../assets/pucbet-logo.png" alt="logoPucBet" class="logoPucBet">
         <!-- Alert for errors -->
+        <div id="alert-box" class="alert d-none" role="alert"></div>
 
         <!-- Input para Name -->
         <div class="form-group mb-3 position-relative">
@@ -32,7 +23,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-user"></i>
                 </span>
-                <input type="text" id="fName" class="form-control" placeholder="Enter your Name" onfocus="hideMessage()" required>
+                <input type="text" id="fName" class="form-control" placeholder="Enter your Name" required>
             </div>
         </div>
 
@@ -43,7 +34,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-envelope"></i>
                 </span>
-                <input type="email" id="fEmail" class="form-control" placeholder="Enter your Email" onfocus="hideMessage()" required>
+                <input type="email" id="fEmail" class="form-control" placeholder="Enter your Email" required>
             </div>
         </div>
 
@@ -54,7 +45,7 @@
                 <span class="input-group-text">
                     <i class="fas fa-lock"></i>
                 </span>
-                <input type="password" id="fPassword" class="form-control" placeholder="Enter your Password" onfocus="hideMessage()" required>
+                <input type="password" id="fPassword" class="form-control" placeholder="Enter your Password" required>
             </div>
         </div>
 
@@ -65,18 +56,17 @@
                 <span class="input-group-text">
                     <i class="fas fa-calendar-days"></i>
                 </span>
-                <input type="date" id="fBirthdate" class="form-control" placeholder="Enter your Birthdate" onfocus="hideMessage()" required>
+                <input type="date" id="fBirthdate" class="form-control" required>
             </div>
         </div>
 
-        <button type="submit" class="btn btn-block w-100" id="button-submit" onclick="signUp()">Sign Up</button>
+        <button type="submit" class="btn btn-block w-100" id="button-submit" onclick="newUserRequest()">Sign Up</button>
 
         <p id="p" class="mt-4">Already have an account? 
             <a href="../view/login.html" class="text-decoration-none" id="span">Log In</a>
         </p>
       </form>
     </div>
-    <script src="../js/bootstrap.js" async defer></script>
-    <script src="../js/login.js" async defer></script>
+    <script src="../js/signup.js" async defer></script>
   </body>
 </html>

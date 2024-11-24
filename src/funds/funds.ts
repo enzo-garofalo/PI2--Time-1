@@ -178,6 +178,24 @@ export namespace FundsManager{
                 Valor disponível R$${joinTables[0].BALANCE}`);
             return;
         }
-    }          
+    }
+    
+    export const getBalance: RequestHandler = async (req: Request, res: Response) => {
+        if (!AccountsManager.isLoggedIn(req, res)) return;
+    
+        const joinTables = await DataBaseManager.joinTables(req.cookies.token);
+        if (!joinTables || joinTables.length === 0) {
+            res.statusCode = 500; // Erro interno do servidor
+            res.send("Erro: Não foi possível acessar os dados da conta.");
+            return;
+        }
+    
+        const balance = joinTables[0].BALANCE;
+        
+        // Enviar o saldo como número
+        res.statusCode = 200;
+        res.json({ balance });  // Retorna um objeto com o saldo
+    };
+    
 }
     

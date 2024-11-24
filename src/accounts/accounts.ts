@@ -62,9 +62,9 @@ export namespace AccountsManager {
                 res.statusCode = 400;
                 res.send('Email já utilizado!');
                 return
-            }
+            }else
 
-            // Se o user é menor de 18 anos
+                // Se o user é menor de 18 anos
             if(dbAccountsManager.isUnderage(pBirthdate)){
                 res.statusCode = 400;
                 res.send('PUC BET é permitido apenas para maiores de 18 anos');
@@ -89,20 +89,28 @@ export namespace AccountsManager {
                 FK_ID_USER: undefined
             }
 
-            if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
-            {
-                res.statusCode = 200;
-                res.send("Nova conta adicionada.");
-            }else{
-                res.statusCode = 409;
-                res.send("Erro inesperado ao criar nova conta.")
-            }
+                    if( await dbAccountsManager.saveNewAccount(newAccount, newAccountFunds))
+                    {
+                        res.statusCode = 200;
+                        res.send("Nova conta adicionada.");
+                    }else{
+                        res.statusCode = 409;
+                        res.send("Erro inesperado ao criar nova conta.")
+                    }
         }else{
             res.statusCode = 400;
             res.send("Parâmetros inválidos ou faltantes");
         }
     }
-
+    
+    
+    export const isModeratorHandler: RequestHandler =
+    async (req: Request, res: Response) => 
+    {
+        if(!isModerator(req, res)) return;
+        res.status(200).send('Acesso Liberado');
+        return;
+    } 
 
     /*
         Recebe email e senha e faz o login
