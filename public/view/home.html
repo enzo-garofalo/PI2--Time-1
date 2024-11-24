@@ -21,12 +21,17 @@
                 <input type="text" class="search-input" id="searchBar" placeholder="Pesquisar eventos..." oninput="searchEvents()">
                 <button class="search-btn"><i class="fa fa-search"></i></button>
             </div>
+            <div style="display: flex; justify-content: flex-end; padding: 20px;">
+                <!-- Botão "Create Event" alinhado à direita -->
+                <button type="button" class="btn-primary" data-bs-toggle="modal" data-bs-target="#addNewEventModal">
+                    <i class="fas fa-plus" style="margin-right: 8px;"></i>Create Event
+                </button>
+            </div>
             <div class="app-header-right"> 
                 <div id="balance-container" class="mt-3 d-none">
                     <h3>Your Balance: $<span id="balance"></span></h3>
                 </div>
             </div>
-            
         </header>
         
 
@@ -95,6 +100,48 @@
             </main>
         </div>
     </div>
+
+    <!-- Modal de criação de evento -->
+    <div class="modal" id="addNewEventModal">
+        <form class="modal-content">
+            <div class="container">
+                <div class="modal-header">
+                    <h1>Create new event</h1>
+                    <span class="close" onclick="closeModal()">&times;</span> <!-- Fechar modal -->
+                </div>
+                <div class="event-form">
+                    <label for="fTitle">Title</label>
+                    <input type="text" id="fTitle">
+                    
+                    <label for="fDescription">Description</label>
+                    <input type="text" id="fDescription">
+                    
+                    <label for="fCategory">Category</label>
+                    <input type="text" id="fCategory">
+                    
+                    <div class="date-container">
+                        <div class="date-field">
+                            <label for="fRegisterDate">Finish Date</label>
+                            <input type="date" id="fFinishDate">
+                        </div>
+                        <div class="date-field">
+                            <label for="fFinishDate">Time</label>
+                            <input type="time" id="fTime">
+                        </div>
+                    </div> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="closeModal()" class="cancelBtn btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="createEvent()" class="evaluateBtn btn btn-primary">
+                        Create Event
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
         var tableEvents = document.getElementById('tableEvents');
@@ -346,6 +393,47 @@
                 requestEvents(page);
             }
         });
+      
+        // Código botão CREATE EVENT (add new event)
+        // Função para abrir o modal
+        function openModal() {
+            document.getElementById('addNewEventModal').style.display = 'block';
+        }
+
+        // Função para fechar o modal
+        function closeModal() {
+            document.getElementById('addNewEventModal').style.display = 'none';
+        }
+
+        // Função para processar as informações do evento e criar o evento
+        function createEvent() {
+            const title = document.getElementById('fTitle').value;
+            const description = document.getElementById('fDescription').value;
+            const category = document.getElementById('fCategory').value;
+            const finishDate = document.getElementById('fFinishDate').value;
+            const time = document.getElementById('fTime').value;
+
+            if (!title || !description || !category || !finishDate || !time) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            const eventData = {
+                title: title,
+                description: description,
+                finishDate: finishDate,
+                time: time
+            };
+
+            // Fechar o modal após criar o evento
+            closeModal();
+            alert("Evento criado com sucesso!");
+        }
+
+        // Mostra o modal ao carregar a página
+        window.onload = function() {
+            document.querySelector('button[data-bs-toggle="modal"]').addEventListener('click', openModal);
+        }
     </script>
 </body>
 </html>
