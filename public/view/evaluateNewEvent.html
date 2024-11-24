@@ -203,8 +203,84 @@
         function evaluateEvent(){
 
         }
+        function cleanModal() {
+            // Campos de texto e número
+            document.getElementById('fTitle').value = '';
+            document.getElementById('fDescription').value = '';
+            document.getElementById('fCategory').value = '';
+            document.getElementById('fRegisterDate').value = '';
+            document.getElementById('fFinishDate').value = '';
 
-        function showModal(){
+            // Campos de radio buttons
+            const radioButtons = document.querySelectorAll('input[name="fVerdict"]');
+            radioButtons.forEach(radio => radio.checked = false);
+
+            // Select
+            const reasonSelect = document.getElementById('fReason');
+            reasonSelect.selectedIndex = 0;
+            reasonSelect.disabled = true; // Desabilita novamente
+            reasonSelect.style.borderColor = '#3d3d3d';
+
+            // Campo "Other Reason"
+            const otherReasonContainer = document.getElementById('otherReasonContainer');
+            otherReasonContainer.style.display = 'none';
+            document.getElementById('otherReasonText').value = '';
+        }
+
+        async function getEventById(id_event){
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append('connection', 'keep-alive');
+                reqHeaders.append('status', 'Pendente');
+                reqHeaders.append('id', id_event);
+
+                const res = await fetch('http://127.0.0.1:3000/getEvent', {
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    const eventData = await res.json();
+                    return eventData;
+                }else{
+                    // Caso dê algum erro, recarrega página
+                    alert('Não foi possível encontrar o evento');
+                    window.location.reload();
+                }
+            }catch(error){
+                console.error(error);
+            }
+        }
+
+
+        async function fillModal(id_event) {
+            var title = document.getElementById('fTitle');
+            var description = document.getElementById('fDescription');
+            var category = document.getElementById('fCategory');
+            var registerDate = document.getElementById('fRegisterDate');
+            var finishDate = document.getElementById('fFinishDate');
+
+            // Obtém os dados do evento
+            const event = await getEventById(id_event);
+
+            if (event && event.array.length > 0) {
+                const eventData = event.array[0]; // Acessa o primeiro elemento do array
+
+                // Preenche os campos do modal
+                title.value = eventData.TITLE;
+                description.value = eventData.DESCRIPTION;
+                category.value = eventData.CATEGORIES;
+                registerDate.value = eventData.REGISTER_DATE.split("T")[0]; // Ajusta o formato da data
+                finishDate.value = eventData.FINISH_DATE;
+            } else {
+                alert("Evento não encontrado ou dados inválidos.");
+            }
+        }
+
+        async function showModal(id_event){
+            cleanModal();
+            await fillModal(id_event);
             modal.style.display = 'block';
         }
         
@@ -223,7 +299,7 @@
         let numPages = 0; 
         const pageSize = 10; 
         var page = 1; 
-
+        // Consertar 
         async function checkIsModerator(){
             try{
                 const reqHeaders = new Headers();
@@ -381,13 +457,13 @@
         function addEventRow(event) {
             const eventRow = 
                 `<tr id="${event.ID_EVENT}">
-                    <td class="event-id">${event.ID_EVENT}</td>
+                    <td class="event-id" id="${event.ID_EVENT}">${event.ID_EVENT}</td>
                     <td class="event-title">${event.TITLE}</td>
                     <td class="event-description">${event.DESCRIPTION}</td>
                     <td class="event-categorie">${event.CATEGORIES}</td>
                     <td class="event-finish-date">${event.FINISH_DATE}</td>
                     <td class="evaluateEvent">
-                        <button onclick="showModal()">Evaluate</button>
+                        <button onclick="showModal(${event.ID_EVENT})">Evaluate</button>
                     </td>
                 </tr>`;
             tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
