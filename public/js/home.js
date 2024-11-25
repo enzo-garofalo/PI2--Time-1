@@ -7,20 +7,20 @@ async function hideShow(balance) {
 }
 
 
-document.getElementById("icon-button").addEventListener("click", () => {
-    const iconElement = document.getElementById("icon");
-    const buttonElement = document.getElementById("icon-button");
+document.getElementById("showHideBalance").addEventListener("click", () => {
+    const iconElement = document.getElementById("showHideBalance");
+    const buttonElement = document.getElementById("showHideBalance");
 
     // Verifica o estado atual do ícone
     if (iconElement.classList.contains("fa-eye")) {
         // Altera para "olho fechado"
         iconElement.className = "fas fa-eye-slash";
-        buttonElement.textContent = " Hide Balance";
+        //buttonElement.textContent = " Hide Balance";
         buttonElement.prepend(iconElement); // Reinsere o ícone no botão
     } else {
         // Altera para "olho aberto"
         iconElement.className = "fas fa-eye";
-        buttonElement.textContent = " Show Balance";
+        //buttonElement.textContent = " Show Balance";
         buttonElement.prepend(iconElement); // Reinsere o ícone no botão
     }
 });

@@ -23,7 +23,8 @@
             </div>
             <div class="app-header-right"> 
                 <div id="balance-container" class="mt-3 d-none">
-                    <h3>Your Balance: $<span id="balance"></span></h3>
+                    <h3><button type="button" class="fas fa-eye" id="showHideBalance"></button>
+                    Your Balance: $<span id="balance"></span></h3>
                 </div>
             </div>
             
@@ -41,16 +42,16 @@
                     Evaluate Event
                 </a>
                 <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-chart-bar"></i>
-                    Finish Event
-                </a>
-                <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-cogs"></i>
+                    <i class="fa fa-calendar-days"></i>
                     My Events
                 </a>
                 <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-cogs"></i>
+                    <i class="fa fa-wallet"></i>
                     My Wallet
+                </a>
+                <a href="#" class="app-sidebar-link">
+                    <i class="fa fa-chart-bar"></i>
+                    Finish Event
                 </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-sign-out-alt"></i>
@@ -345,6 +346,24 @@
                 requestNumberOfEvent();
                 requestEvents(page);
             }
+        });
+
+        document.getElementById("showHideBalance").addEventListener("click", async event => {
+        const iconElement = document.getElementById("showHideBalance");
+        const buttonElement = document.getElementById("showHideBalance");
+
+        // Verifica o estado atual do ícone
+        if (iconElement.classList.contains("fa-eye")) {
+            // Altera para "olho fechado"
+            iconElement.className = "fas fa-eye-slash";
+            document.getElementById('balance').textContent = `-----`;;
+            buttonElement.prepend(iconElement); // Reinsere o ícone no botão
+        } else {
+            // Altera para "olho aberto"
+            iconElement.className = "fas fa-eye";
+            await setBalance();
+            buttonElement.prepend(iconElement); // Reinsere o ícone no botão
+        }
         });
     </script>
 </body>
