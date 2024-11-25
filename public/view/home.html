@@ -124,17 +124,13 @@
                             <label for="fRegisterDate">Finish Date</label>
                             <input type="date" id="fFinishDate">
                         </div>
-                        <div class="date-field">
-                            <label for="fFinishDate">Time</label>
-                            <input type="time" id="fTime">
-                        </div>
                     </div> 
                 </div>
                 <div class="modal-footer">
                     <button type="button" onclick="closeModal()" class="cancelBtn btn btn-secondary">
                         Cancel
                     </button>
-                    <button type="button" onclick="createEvent()" class="evaluateBtn btn btn-primary">
+                    <button type="button" onclick="createNewEvent()" class="evaluateBtn btn btn-primary"> <!--erro ao chamar createNewEvent -->
                         Create Event
                     </button>
                 </div>
@@ -396,6 +392,7 @@
       
         // Código botão CREATE EVENT (add new event)
         // Função para abrir o modal
+       // Função para abrir o modal
         function openModal() {
             document.getElementById('addNewEventModal').style.display = 'block';
         }
@@ -406,34 +403,60 @@
         }
 
         // Função para processar as informações do evento e criar o evento
-        function createEvent() {
+        async function createNewEvent() {
             const title = document.getElementById('fTitle').value;
             const description = document.getElementById('fDescription').value;
             const category = document.getElementById('fCategory').value;
             const finishDate = document.getElementById('fFinishDate').value;
-            const time = document.getElementById('fTime').value;
-
-            if (!title || !description || !category || !finishDate || !time) {
+        
+            // Verificar se todos os campos obrigatórios foram preenchidos
+            if (!title || !description || !category || !finishDate) {
                 alert("Por favor, preencha todos os campos.");
                 return;
             }
-
+        
             const eventData = {
                 title: title,
                 description: description,
+                category: category,
                 finishDate: finishDate,
-                time: time
             };
-
-            // Fechar o modal após criar o evento
-            closeModal();
-            alert("Evento criado com sucesso!");
+        
+            try {
+                // Enviar os dados para o backend
+                const response = await fetch('http://127.0.0.1:3000/addNewEvent', {
+                    method: 'POST',
+                    headers: {
+                        'Title': title,
+                        'Description': description,
+                        'Categories': category,
+                        'FinishDate': finishDate,
+                },
+                body: JSON.stringify(eventData), // Enviar os dados como JSON ao ínves de cabeçalhos   VERIFICAR !!!
+                credentials: 'include' // Necessário para enviar o cookie com a requisição
+            });
+            
+                if (response.ok) {
+                    alert("Evento criado com sucesso!");
+                    closeModal();
+                
+                    // Atualizar a lista de eventos após a criação
+                    fetchActiveEvent();
+                } else {
+                    const errorData = await response.json();
+                    alert(`Erro ao criar evento: ${errorData.message || "Tente novamente mais tarde."}`);
+                }
+            } catch (error) {
+                alert("Erro de comunicação com o servidor. Tente novamente.");
+                console.error(error);
+            }
         }
 
-        // Mostra o modal ao carregar a página
+        // Mostra o modal ao clicar no botão
         window.onload = function() {
             document.querySelector('button[data-bs-toggle="modal"]').addEventListener('click', openModal);
         }
+
     </script>
 </body>
 </html>
