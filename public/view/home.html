@@ -18,8 +18,8 @@
             </div>
             <!-- Barra de Pesquisa Centralizada -->
             <div class="app-header-center">
-                <input type="text" class="search-input" id="searchBar" placeholder="Pesquisar eventos..." oninput="searchEvents()">
-                <button class="search-btn"><i class="fa fa-search"></i></button>
+                <input type="text" class="search-input" id="searchBarInput" placeholder="Pesquisar eventos...">
+                <button class="search-btn" onclick="searchEvents()"><i class="fa fa-search"></i></button>
             </div>
             <div style="display: flex; justify-content: flex-end; padding: 20px;">
                 <!-- Botão "Create Event" alinhado à direita -->
@@ -37,7 +37,7 @@
 
         <div class="app-content">
             <nav class="app-sidebar">
-                <a href="#" class="app-sidebar-link active">
+                <a href="../view/home.html" class="app-sidebar-link active">
                     <i class="fa fa-home"></i>
                     Home
                 </a>
@@ -65,7 +65,7 @@
 
             <main class="projects-section">
                 <header class="projects-section-header">
-                    <p class="section-title">Eventos Ativos</p>
+                    <p class="section-title"><span id="titlePage">Eventos Ativos</span></p>
                     <p class="time" id="currentDate"></p>
                 </header>
                 <div class="row align-items-center">
@@ -77,6 +77,7 @@
                                     <th scope="col" class="text-left">Title</th>
                                     <th scope="col" class="text-end">Description</th>
                                     <th scope="col" class="text-end">Category</th>
+                                    <th scope="col" class="text-end">Status</th>
                                     <th scope="col" class="text-center">Finish Date</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
@@ -88,7 +89,7 @@
                     </div>
                 </div>
                 <!-- Paginador -->
-                <div class="row justify-content-center">
+                <div class="row justify-content-center" id="paginador">
                     <div class="col-auto">
                         <nav aria-label="Page navigation">
                             <ul id="ulPaginator" class="pagination pagination-sm">
@@ -329,6 +330,7 @@
                     <td class="event-title">${event.TITLE}</td>
                     <td class="event-description">${event.DESCRIPTION}</td>
                     <td class="event-categorie">${event.CATEGORIES}</td>
+                    <td class="event-status">${event.STATUS_EVENT}</td>
                     <td class="event-finish-date">${event.FINISH_DATE}</td>
                     <td class="bet-on-event">
                         <button>BET</button>
@@ -404,10 +406,10 @@
 
         // Função para processar as informações do evento e criar o evento
         async function createNewEvent() {
-            const title = document.getElementById('fTitle').value;
-            const description = document.getElementById('fDescription').value;
-            const category = document.getElementById('fCategory').value;
-            const finishDate = document.getElementById('fFinishDate').value;
+            var title = document.getElementById('fTitle').value;
+            var description = document.getElementById('fDescription').value;
+            var category = document.getElementById('fCategory').value;
+            var finishDate = document.getElementById('fFinishDate');
         
             // Verificar se todos os campos obrigatórios foram preenchidos
             if (!title || !description || !category || !finishDate) {
@@ -415,36 +417,32 @@
                 return;
             }
         
-            const eventData = {
-                title: title,
-                description: description,
-                category: category,
-                finishDate: finishDate,
-            };
+            const reqHeaders = new Headers();
+            reqHeaders.append("Content-Type", "application/json");
+            reqHeaders.append("connection", "keep-alive");
+            reqHeaders.append('Title', title);
+            reqHeaders.append('Description', description);
+            reqHeaders.append('Categories', category);
+            reqHeaders.append('finishDate', finishDate);
+
         
             try {
                 // Enviar os dados para o backend
                 const response = await fetch('http://127.0.0.1:3000/addNewEvent', {
-                    method: 'POST',
-                    headers: {
-                        'Title': title,
-                        'Description': description,
-                        'Categories': category,
-                        'FinishDate': finishDate,
-                },
-                body: JSON.stringify(eventData), // Enviar os dados como JSON ao ínves de cabeçalhos   VERIFICAR !!!
-                credentials: 'include' // Necessário para enviar o cookie com a requisição
-            });
+                    method: 'PUT',
+                    headers: reqHeaders,
+                    credentials: 'include' // Necessário para enviar o cookie com a requisição
+                });
             
                 if (response.ok) {
                     alert("Evento criado com sucesso!");
                     closeModal();
                 
                     // Atualizar a lista de eventos após a criação
-                    fetchActiveEvent();
+                    requestNumberOfEvent();
+                    requestEvents(page);
                 } else {
-                    const errorData = await response.json();
-                    alert(`Erro ao criar evento: ${errorData.message || "Tente novamente mais tarde."}`);
+                    alert(`Erro ao criar evento`);
                 }
             } catch (error) {
                 alert("Erro de comunicação com o servidor. Tente novamente.");
@@ -456,6 +454,48 @@
         window.onload = function() {
             document.querySelector('button[data-bs-toggle="modal"]').addEventListener('click', openModal);
         }
+
+
+        async function searchEvents() {
+            const busca = document.getElementById('searchBarInput').value;
+
+            const reqHeaders = new Headers();
+            reqHeaders.append("Content-Type", "application/json");
+            reqHeaders.append("connection", "keep-alive");
+            reqHeaders.append("stringBusca", busca);
+            
+
+
+            try{
+                const response = await fetch('http://127.0.0.1:3000/searchEvent',{
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+
+                if(response.ok){
+                    // Deipois tratar se não encontrar nada
+                    const eventsList = await response.json()
+
+                    const titlePage = document.getElementById('titlePage');
+                    titlePage.innerHTML = 'Eventos Encontrados:'
+
+                    const paginador = document.getElementById('paginador');
+                    paginador.style.display = "none";
+
+                    const paginaAtiva = document.getElementsByClassName('active')[0]; // Seleciona o primeiro elemento com a classe 'active'
+                    paginaAtiva.classList.remove('active'); // Remove a classe 'active'
+
+                    fillTable(eventsList);
+                }else{
+                    alert('Evento não encontrado!');
+                }
+            }catch(error){
+                alert('Erro ao buscar evento')
+                console.error(error);
+            }
+        }
+
 
     </script>
 </body>

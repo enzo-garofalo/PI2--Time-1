@@ -258,6 +258,7 @@ export namespace EventsManager
 
                 if(events && events.length > 0){
                     res.statusCode = 200;
+                    console.log(events);
                     res.send(events);
                 }else{
                     res.statusCode = 404;
