@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Home</title>
+    <title>Evaluate New Event</title>
     <meta name="description" content="A portfolio management dashboard.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../styles/home.css">
@@ -21,9 +21,11 @@
                 <input type="text" class="search-input" id="searchBar" placeholder="Pesquisar eventos..." oninput="searchEvents()">
                 <button class="search-btn"><i class="fa fa-search"></i></button>
             </div>
+            <!-- Balance do user -->
             <div class="app-header-right"> 
-                <div id="balance-container" class="mt-3 d-none">
-                    <h3>Your Balance: $<span id="balance"></span></h3>
+                <button type="button" class="fas fa-eye" id="showHideBalance"></button>
+                <div id="balance-container" class="showBalance">
+                        Your Balance: <span id="cifra">$</span><span id="balance"></span>  
                 </div>
             </div>
             
@@ -48,7 +50,7 @@
                     <i class="fa fa-cogs"></i>
                     My Events
                 </a>
-                <a href="#" class="app-sidebar-link">
+                <a href="../view/myWallet.html" class="app-sidebar-link">
                     <i class="fa fa-cogs"></i>
                     My Wallet
                 </a>
@@ -64,7 +66,7 @@
                     <p class="time" id="currentDate"></p>
                 </header>
                 <div class="row align-items-center">
-                    <div class="col">
+                    <div class="col" id="divTabela">
                         <table id="tableEvents" class="table">
                             <thead>
                                 <tr>
@@ -82,16 +84,24 @@
                         </table>
                     </div>
                 </div>
+
+                <div id="noEventsAvaliable" style="display: none;">
+                    <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
+                    <span class="emptyMessage">Não Há Eventos Pendentes</span>
+                </div>
+                
+
                 <!-- Paginador -->
                 <div class="row justify-content-center">
                     <div class="col-auto">
-                        <nav aria-label="Page navigation">
+                        <nav aria-label="Page navigation" id="paginador">
                             <ul id="ulPaginator" class="pagination pagination-sm">
                                 <!-- Elementos do paginador -->
                             </ul>
                         </nav>
                     </div>
                 </div>
+
             </main>
         </div>
         <div class="modal" id="modalId">
@@ -467,9 +477,19 @@
                  if(resEvents.ok){
                     const eventsData = await resEvents.json();
                     console.log(eventsData);  // Verifique a estrutura dos dados
-                    fillTable(eventsData);
+                    if(eventsData.length === 0){
+                        const noEventsAvaliable = document.getElementById('noEventsAvaliable');
+                        noEventsAvaliable.style.display = "flex"
+                        const table = document.getElementById("divTabela");
+                        table.style.display = "none";
+                        const paginator = document.getElementById("paginador");
+                        paginator.style.display = "none";
+                    }else{
+
+                        fillTable(eventsData);
+                        refreshPaginator();
+                    }
                  }
-                 refreshPaginator();
             }catch(error){
 
                 console.error(error);
@@ -614,6 +634,21 @@
 
                 requestNumberOfEvent();
                 requestEvents(page);
+            }
+        });
+
+        document.getElementById("showHideBalance").addEventListener("click", async event => {
+            const iconElement = document.getElementById("showHideBalance");
+        
+            // Verifica o estado atual do ícone
+            if (iconElement.classList.contains("fa-eye")) {
+                // Altera para "olho fechado"
+                iconElement.className = "fas fa-eye-slash";
+                document.getElementById('balance').textContent = `-----`;
+            } else {
+                // Altera para "olho aberto"
+                iconElement.className = "fas fa-eye";
+                await setBalance();
             }
         });
     </script>
