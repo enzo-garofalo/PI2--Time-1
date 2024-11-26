@@ -616,4 +616,86 @@ input[type="radio"]{
     font-style: italic;
 }
 
+header.projects-section-header button {
+    background-color: var(--accent-color); /* Cor principal do botão */
+    color: var(--text-color); /* Texto branco */
+    border: 1px solid transparent; 
+    border-radius: 8px; /* Retângulo arredondado */
+    padding: 10px 20px; /* Tamanho do botão */
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px; /* Espaçamento entre botões */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Suaviza as mudanças de cor */
+}
+
+header.projects-section-header button:hover {
+    background-color: var(--background-light); /* Cor de fundo ao passar o mouse */
+    color: var(--accent-color); /* Texto na cor de destaque */
+    border-color: var(--accent-color); /* Altera a cor da borda */
+}
+
+header.projects-section-header button:first-child {
+    margin-left: auto; /* Move o botão "Add Funds" para o canto direito */
+}
+
+.modal-content {
+    background-color: var(--background-dark);
+    margin-top: 0%; /* Ajuste para mover o modal mais para cima */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    color: var(--text-color);
+    border: 1px solid var(--input-border);
+}
+
+button.cancelBtn {
+    background-color: red; /* Cor de fundo vermelha */
+    color: var(--text-color);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    letter-spacing: 1px; /* Aumentar o espaço entre as letras */
+}
+
+button.cancelBtn:hover {
+    background-color: darkred; /* Cor mais escura no hover */
+    color: var(--text-color);
+    border: 1px solid darkred;
+}
+
+button.evaluateBtn {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button.evaluateBtn:hover {
+    background-color: var(--background-light);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+.modal-content label {
+    display: block; 
+    margin-bottom: 8px; 
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%; 
+    padding: 10px;
+    margin-bottom: 15px; 
+    border-radius: 5px; 
+    border: 1px solid #ccc; 
+}
+
+
 
