@@ -22,7 +22,8 @@ export const server = express();
 // Se permitido, o navegador deixa passar; se não, bloqueia o acesso.
 // Isso ajuda a proteger contra ataques de segurança, como o Cross-Site Scripting (XSS).
 
-const allowedOrigins = ['http://localhost:5501', 'http://192.168.1.2:5501', 'http://192.168.1.5:5501'];
+const allowedOrigins = [
+  'http://localhost:5501', 'http://192.168.1.2:5501', 'http://192.168.1.5:5501', 'http://192.168.3.141:5501'];
 server.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -96,7 +97,7 @@ routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
-routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
+    routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
 routes.get('/getBalance', FundsManager.getBalance);
 
 //Rotas de bets
