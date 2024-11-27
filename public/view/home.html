@@ -27,9 +27,11 @@
                     <i class="fas fa-plus" style="margin-right: 8px;"></i>Create Event
                 </button>
             </div>
+            <!-- Balance do user-->
             <div class="app-header-right"> 
-                <div id="balance-container" class="mt-3 d-none">
-                    <h3>Your Balance: $<span id="balance"></span></h3>
+                <button type="button" class="fas fa-eye" id="showHideBalance"></button>
+                <div id="balance-container" class="showBalance">
+                        Your Balance: <span id="cifra">$</span><span id="balance"></span>  
                 </div>
             </div>
         </header>
@@ -46,16 +48,16 @@
                     Evaluate Event
                 </a>
                 <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-chart-bar"></i>
-                    Finish Event
-                </a>
-                <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-cogs"></i>
+                    <i class="fa fa-calendar-days"></i>
                     My Events
                 </a>
-                <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-cogs"></i>
+                <a href="../view/myWallet.html" class="app-sidebar-link">
+                    <i class="fa fa-wallet"></i>
                     My Wallet
+                </a>
+                <a href="#" class="app-sidebar-link">
+                    <i class="fa fa-chart-bar"></i>
+                    Finish Event
                 </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-sign-out-alt"></i>
@@ -68,9 +70,9 @@
                     <p class="section-title"><span id="titlePage">Eventos Ativos</span></p>
                     <p class="time" id="currentDate"></p>
                 </header>
-                <div class="row align-items-center">
+                <div id="divTabela">
                     <div class="col">
-                        <table id="tableEvents" class="table">
+                        <table id="tableEvents" class="table" >
                             <thead>
                                 <tr>
                                     <th scope="col" class="text-end">#</th>
@@ -88,10 +90,16 @@
                         </table>
                     </div>
                 </div>
+
+                <div id="noEventsAvaliable" style="display: none;">
+                    <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
+                    <span class="emptyMessage">Não Há Eventos Ativos</span>
+                </div>
+
                 <!-- Paginador -->
                 <div class="row justify-content-center" id="paginador">
                     <div class="col-auto">
-                        <nav aria-label="Page navigation">
+                        <nav aria-label="Page navigation" id="paginador">
                             <ul id="ulPaginator" class="pagination pagination-sm">
                                 <!-- Elementos do paginador -->
                             </ul>
@@ -218,9 +226,19 @@
                  if(resEvents.ok){
                     const eventsData = await resEvents.json();
                     console.log(eventsData);  // Verifique a estrutura dos dados
-                    fillTable(eventsData);
+                    if(eventsData.length === 0){
+                        const noEventsAvaliable = document.getElementById('noEventsAvaliable');
+                        noEventsAvaliable.style.display = "flex"
+                        const table = document.getElementById("divTabela");
+                        table.style.display = "none";
+                        const paginator = document.getElementById("paginador");
+                        paginator.style.display = "none";
+                    }else{
+
+                        fillTable(eventsData);
+                        refreshPaginator();
+                    }
                  }
-                 refreshPaginator();
             }catch(error){
 
                 console.error(error);
@@ -333,7 +351,7 @@
                     <td class="event-status">${event.STATUS_EVENT}</td>
                     <td class="event-finish-date">${event.FINISH_DATE}</td>
                     <td class="bet-on-event">
-                        <button>BET</button>
+                        <button onclick="betOnEvent(${event.ID_EVENT})"> BET </button>
                     </td>
                 </tr>`;
             tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
@@ -497,6 +515,21 @@
         }
 
 
+
+        document.getElementById("showHideBalance").addEventListener("click", async event => {
+            const iconElement = document.getElementById("showHideBalance");
+        
+            // Verifica o estado atual do ícone
+            if (iconElement.classList.contains("fa-eye")) {
+                // Altera para "olho fechado"
+                iconElement.className = "fas fa-eye-slash";
+                document.getElementById('balance').textContent = `-----`;
+            } else {
+                // Altera para "olho aberto"
+                iconElement.className = "fas fa-eye";
+                await setBalance();
+            }
+        });
     </script>
 </body>
 </html>

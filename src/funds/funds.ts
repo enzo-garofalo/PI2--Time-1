@@ -2,6 +2,7 @@ import {Request, RequestHandler, Response} from "express";
 import { DataBaseManager } from "../db/connection";
 import { dbFundsManager } from "./databaseFunds";
 import { AccountsManager } from "../accounts/accounts";
+import OracleDB from "oracledb";
 
 export namespace FundsManager{
 
@@ -19,6 +20,14 @@ export namespace FundsManager{
         value: number,
         fkIdWallet: number | undefined
     }
+
+    export type historicRow = {
+        transactionID: number|undefined;
+        typeTransaction: string,
+        value: number,
+        dateHistoric: string
+    }
+
 
     /*Recebe o valor que quer colocar na carteira e adiciona no Balance e 
     adiciona linha no histórico*/
@@ -195,6 +204,46 @@ export namespace FundsManager{
         // Enviar o saldo como número
         res.statusCode = 200;
         res.json({ balance });  // Retorna um objeto com o saldo
+    };
+
+    export const getTransactions: RequestHandler = async (req: Request, res: Response) => {
+        if (!AccountsManager.isLoggedIn(req, res)) return;
+
+    
+        const joinTables = await DataBaseManager.joinTables(req.cookies.token);
+        if (!joinTables || joinTables.length === 0) {
+            res.statusCode = 500; // Erro interno do servidor
+            res.send("Erro: Não foi possível acessar os dados da conta.");
+            return;
+        }
+    
+        const idWallet = joinTables[0].IDWALLET;
+        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
+
+
+        try{
+            const historic = `
+                SELECT * FROM HISTORIC
+                WHERE FK_ID_WALLET = ${idWallet}`;
+
+                const historicRows: OracleDB.Result<historicRow> = await connection.execute(historic);
+                if(historicRows.rows?.length === 0){
+                    res.statusCode = 200;
+                    res.send({ array: [] });  // Envia uma lista vazia com a chave 'array' se não houver eventos
+                } else {
+                    res.statusCode = 200;
+                    res.send({ array: historicRows.rows });
+                }
+        }catch(error){
+            console.error("Erro ao obter transações.", error);
+            res.statusCode = 500;
+            res.send("Erro ao processar a requisição");
+        }
+        finally{
+            await connection.close();
+            return;
+        }
+        
     };
     
 }

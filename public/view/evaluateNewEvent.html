@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Home</title>
+    <title>Evaluate New Event</title>
     <meta name="description" content="A portfolio management dashboard.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../styles/home.css">
@@ -21,9 +21,11 @@
                 <input type="text" class="search-input" id="searchBar" placeholder="Pesquisar eventos..." oninput="searchEvents()">
                 <button class="search-btn"><i class="fa fa-search"></i></button>
             </div>
+            <!-- Balance do user -->
             <div class="app-header-right"> 
-                <div id="balance-container" class="mt-3 d-none">
-                    <h3>Your Balance: $<span id="balance"></span></h3>
+                <button type="button" class="fas fa-eye" id="showHideBalance"></button>
+                <div id="balance-container" class="showBalance">
+                        Your Balance: <span id="cifra">$</span><span id="balance"></span>  
                 </div>
             </div>
             
@@ -48,7 +50,7 @@
                     <i class="fa fa-cogs"></i>
                     My Events
                 </a>
-                <a href="#" class="app-sidebar-link">
+                <a href="../view/myWallet.html" class="app-sidebar-link">
                     <i class="fa fa-cogs"></i>
                     My Wallet
                 </a>
@@ -64,7 +66,7 @@
                     <p class="time" id="currentDate"></p>
                 </header>
                 <div class="row align-items-center">
-                    <div class="col">
+                    <div class="col" id="divTabela">
                         <table id="tableEvents" class="table">
                             <thead>
                                 <tr>
@@ -82,16 +84,24 @@
                         </table>
                     </div>
                 </div>
+
+                <div id="noEventsAvaliable" style="display: none;">
+                    <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
+                    <span class="emptyMessage">Não Há Eventos Pendentes</span>
+                </div>
+                
+
                 <!-- Paginador -->
                 <div class="row justify-content-center">
                     <div class="col-auto">
-                        <nav aria-label="Page navigation">
+                        <nav aria-label="Page navigation" id="paginador">
                             <ul id="ulPaginator" class="pagination pagination-sm">
                                 <!-- Elementos do paginador -->
                             </ul>
                         </nav>
                     </div>
                 </div>
+
             </main>
         </div>
         <div class="modal" id="modalId">
@@ -102,6 +112,8 @@
                     </div>
                     
                     <div class="event-form">
+                        <input type="text" id="id_event" style="display: none;" disabled>
+
                         <label for="fTitle">Ttile</label>
                         <input type="text" id="fTitle" disabled>
                         
@@ -126,10 +138,10 @@
                         <label for="fVerdict">Is this event approved?</label>
                             <div class="radio-group">
                                 <label>
-                                    <input type="radio" name="fVerdict" value="sim" onclick="toggleReason()"> Yes
+                                    <input type="radio" id="fVerdictYes" name="fVerdict" value="sim" onclick="toggleReason()"> Yes
                                 </label>
                                 <label>
-                                    <input type="radio" name="fVerdict" value="não" onclick="toggleReason()"> No
+                                    <input type="radio" id="fVerdictNo" name="fVerdict" value="não" onclick="toggleReason()"> No
                                 </label>
                         </div> 
             
@@ -137,9 +149,9 @@
                         <label for="fReason">Reason</label>
                         <select name="fReason" id="fReason" disabled onchange="handleOtherReason()">
                             <option value="placeholder" hidden>Select a reason...</option>
-                            <option value="textoConfuso">Texto Confuso</option>
-                            <option value="textoInapropriado">Texto Inapropriado</option>
-                            <option value="disrespeitoTermos">Não respeita a política de privacidade e/ou termos de uso da plataforma</option>
+                            <option value="Texto Confuso">Texto Confuso</option>
+                            <option value="Texto Inapropriado">Texto Inapropriado</option>
+                            <option value="Não respeita a política de privacidade e/ou termos de uso da plataforma">Não respeita a política de privacidade e/ou termos de uso da plataforma</option>
                             <option value="other">Other</option>
                         </select>
 
@@ -154,7 +166,7 @@
                         <button type="button" onclick="hideModal()" class="cancelBtn">
                                 Cancel
                         </button>
-                        <button type="button" onclick="hideModal(); evaluateEvent()" class="evaluateBtn">
+                        <button type="button" onclick="evaluateEvent()" class="evaluateBtn">
                                 Evaluate
                         </button>
                     </div>
@@ -199,12 +211,104 @@
                 otherReasonContainer.style.display = "none"; // Oculta o campo "Outros"
             }
         }
+        // Função principal
+        async function evaluateEvent() {
+            try {
+                const reqHeaders = initializeHeaders();
+                const idEvent = getInputValueById('id_event');
+                reqHeaders.append('eventId', idEvent);
 
-        function evaluateEvent(){
+                const verdict = getVerdict();
+                console.log('verdict', verdict);
+                if (!verdict) {
+                    alert('Give a verdict for the event!');
+                    return;
+                }
+                reqHeaders.append('isValid', verdict);
 
+                if (verdict === 'não') {
+                    const reason = getReason();
+                    if (!reason) return; // Validação falhou, já foi tratado na função getReason
+                    reqHeaders.append('reason', reason);
+                    console.log('reason', reason)
+                }
+
+                // Realize sua requisição aqui, utilizando reqHeaders
+                console.log('Headers:', [...reqHeaders]);
+                const res = await fetch('http://127.0.0.1:3000/evaluateNewEvent', {
+                    method: 'PUT',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    alert('Evento Avaliado!');
+                    requestNumberOfEvent();
+                    requestEvents(page);
+                    hideModal();
+                }else{
+                    const errorMsg = await res.text(); // Ou res.json() se o backend retornar JSON
+                    console.error('Erro:', errorMsg);
+                    alert('Não foi possível avaliar o evento: ' + errorMsg);
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
+
+        // Inicializa os headers
+        function initializeHeaders() {
+            const headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("connection", "keep-alive");
+            return headers;
+        }
+
+        // Obtém o valor de um input pelo ID
+        function getInputValueById(id) {
+            const element = document.getElementById(id);
+            return element ? element.value : '';
+        }
+
+        // Obtém o veredito dos botões de rádio
+        function getVerdict() {
+            const radioYes = document.getElementById('fVerdictYes');
+            const radioNo = document.getElementById('fVerdictNo');
+
+            if (radioYes.checked) {
+                return radioYes.value;
+            }
+            if (radioNo.checked) {
+                return radioNo.value;
+            }
+            return null;
+        }
+
+        // Obtém a razão selecionada ou o texto personalizado se aplicável
+        function getReason() {
+            const selectReason = document.getElementById('fReason');
+            const selectedValue = selectReason.value;
+
+            if (selectedValue === 'placeholder') {
+                alert('Please select a reason!');
+                return null;
+            }
+
+            if (selectedValue === 'other') {
+                const anotherReason = document.getElementById('otherReasonText');
+                if (!anotherReason || anotherReason.value.trim() === '') {
+                    alert('Type the specific reason!');
+                    return null;
+                }
+                return anotherReason.value.trim();
+            }
+
+            return selectedValue;
+        }
+
+        
         function cleanModal() {
             // Campos de texto e número
+            document.getElementById('id_event').value = '';
             document.getElementById('fTitle').value = '';
             document.getElementById('fDescription').value = '';
             document.getElementById('fCategory').value = '';
@@ -253,8 +357,8 @@
             }
         }
 
-
         async function fillModal(id_event) {
+            var idEvent = document.getElementById('id_event');
             var title = document.getElementById('fTitle');
             var description = document.getElementById('fDescription');
             var category = document.getElementById('fCategory');
@@ -268,6 +372,7 @@
                 const eventData = event.array[0]; // Acessa o primeiro elemento do array
 
                 // Preenche os campos do modal
+                idEvent.value = eventData.ID_EVENT;
                 title.value = eventData.TITLE;
                 description.value = eventData.DESCRIPTION;
                 category.value = eventData.CATEGORIES;
@@ -372,9 +477,19 @@
                  if(resEvents.ok){
                     const eventsData = await resEvents.json();
                     console.log(eventsData);  // Verifique a estrutura dos dados
-                    fillTable(eventsData);
+                    if(eventsData.length === 0){
+                        const noEventsAvaliable = document.getElementById('noEventsAvaliable');
+                        noEventsAvaliable.style.display = "flex"
+                        const table = document.getElementById("divTabela");
+                        table.style.display = "none";
+                        const paginator = document.getElementById("paginador");
+                        paginator.style.display = "none";
+                    }else{
+
+                        fillTable(eventsData);
+                        refreshPaginator();
+                    }
                  }
-                 refreshPaginator();
             }catch(error){
 
                 console.error(error);
@@ -519,6 +634,21 @@
 
                 requestNumberOfEvent();
                 requestEvents(page);
+            }
+        });
+
+        document.getElementById("showHideBalance").addEventListener("click", async event => {
+            const iconElement = document.getElementById("showHideBalance");
+        
+            // Verifica o estado atual do ícone
+            if (iconElement.classList.contains("fa-eye")) {
+                // Altera para "olho fechado"
+                iconElement.className = "fas fa-eye-slash";
+                document.getElementById('balance').textContent = `-----`;
+            } else {
+                // Altera para "olho aberto"
+                iconElement.className = "fas fa-eye";
+                await setBalance();
             }
         });
     </script>

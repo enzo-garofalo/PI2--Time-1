@@ -23,7 +23,7 @@ body {
     background: radial-gradient(
         circle at left, 
         rgb(44, 156, 96), /* Feixe de luz verde mais escuro */
-        rgb(0, 0, 0) 70% /* Transição para o fundo escuro */
+        #44d888 70% /* Transição para o fundo escuro */
       ),
       #000; /* Fundo preto */
     color: var(--text-color);
@@ -117,7 +117,9 @@ body {
     align-items: center;
     font-size: 16px;
     font-weight: bold;
-    color: var(--highlight);
+    color: var(--accent-color);
+    gap: 10px; /* Adiciona espaçamento entre o botão e o saldo */
+    position: relative; /* Permite posicionamento específico se necessário */
 }
 
 .app-content {
@@ -190,7 +192,7 @@ body {
     align-items: center;
     padding-bottom: 12px;
     margin-bottom: 20px;
-    border-bottom: 1px solid var(--input-border);
+    border-bottom: 1px solid #ffffff76;
 }
 
 .section-title {
@@ -628,6 +630,144 @@ input[type="radio"]{
     font-style: italic;
 }
 
+header.projects-section-header button {
+    background-color: var(--accent-color); /* Cor principal do botão */
+    color: var(--text-color); /* Texto branco */
+    border: 1px solid transparent; 
+    border-radius: 8px; /* Retângulo arredondado */
+    padding: 10px 20px; /* Tamanho do botão */
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 10px; /* Espaçamento entre botões */
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Suaviza as mudanças de cor */
+}
+
+header.projects-section-header button:hover {
+    background-color: var(--background-light); /* Cor de fundo ao passar o mouse */
+    color: var(--accent-color); /* Texto na cor de destaque */
+    border-color: var(--accent-color); /* Altera a cor da borda */
+}
+
+header.projects-section-header button:first-child {
+    margin-left: auto; /* Move o botão "Add Funds" para o canto direito */
+}
+
+.modal-content {
+    background-color: var(--background-dark);
+    margin-top: 0%; /* Ajuste para mover o modal mais para cima */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 50%;
+    color: var(--text-color);
+    border: 1px solid var(--input-border);
+}
+
+button.cancelBtn {
+    background-color: red; /* Cor de fundo vermelha */
+    color: var(--text-color);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    letter-spacing: 1px; /* Aumentar o espaço entre as letras */
+}
+
+button.cancelBtn:hover {
+    background-color: darkred; /* Cor mais escura no hover */
+    color: var(--text-color);
+    border: 1px solid darkred;
+}
+
+button.evaluateBtn {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+button.evaluateBtn:hover {
+    background-color: var(--background-light);
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+}
+
+.modal-content label {
+    display: block; 
+    margin-bottom: 8px; 
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%; 
+    padding: 10px;
+    margin-bottom: 15px; 
+    border-radius: 5px; 
+    border: 1px solid #ccc; 
+}
+#showHideBalance {
+    color: var(--accent-color); /* Altere para a cor desejada do ícone */
+    background-color: transparent; /* Fundo transparente */
+    border: none; /* Remove qualquer borda */
+    font-size: 1.8em; /* Torna o botão maior */
+    padding: 10px; /* Adiciona espaçamento interno */
+    margin-right: -10px;
+    cursor: pointer; /* Mostra um cursor de mão ao passar sobre o botão */
+    transition: transform 0.3s, color 0.3s; /* Animações para suavizar o hover */
+    
+}
+
+#showHideBalance:hover {
+    transform: scale(1.2); /* Aumenta o botão no hover */
+    color: #ffff; /* Altere para uma cor desejada no hover */
+}
+#balance-container{
+    font-size: 18px;
+    font-weight: 600;
+    font-style: italic;
+}
+#balance-container span{
+    font-size: 20px;
+    color: #ffff;
+}
+
+#noEventsAvaliable {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-light);
+    padding: 50px;
+    border-radius: 12px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+#noEventsAvaliable img {
+    max-width: 80%; /* Ajusta a imagem ao espaço disponível */
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 10px; /* Adiciona bordas arredondadas à imagem */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+#noEventsAvaliable .emptyMessage {
+    color: var(--text-color);
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.5;
+    font-style: italic;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: default;
+}
 
 /*BOTÃO CREATE EVENT (ADD NEW EVENT)*/
 .btn-primary{
