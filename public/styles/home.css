@@ -42,7 +42,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 5px 24px;
-    padding-top: 15px;
+    padding-top: 0px;
     background-color: var(--background-light);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     position: fixed;
@@ -785,3 +785,55 @@ button.evaluateBtn:hover {
 .btn-primary:hover{
     background-color: var(--background-light);
   }
+
+  .loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+
+    /* Controle de visibilidade com transição */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader-container.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.loader {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+    animation: l14 1s infinite;
+}
+
+.loader::before,
+.loader::after {
+    content: "";
+    grid-area: 1/1;
+    border: 8px solid;
+    border-radius: 50%;
+    border-color: var(--accent-color) var(--accent-color) #0000 #0000;
+    mix-blend-mode: darken;
+    animation: l14 1s infinite linear;
+}
+
+.loader::after {
+    border-color: #0000 #0000 var(--highlight) var(--highlight);
+    animation-direction: reverse;
+}
+
+@keyframes l14 {
+    100% {
+        transform: rotate(1turn);
+    }
+}

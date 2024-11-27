@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 </head>
 <body>
+    <div class="loader" style="display: none;" id="loader"></div>
     <div class="app-container">
         <header class="app-header">
             <div class="app-header-left">
@@ -146,7 +147,47 @@
             </div>
         </form>
     </div>
+    
+    <script async defer>
+        async function searchEvents() {
+            const busca = document.getElementById('searchBarInput').value;
 
+            const reqHeaders = new Headers();
+            reqHeaders.append("Content-Type", "application/json");
+            reqHeaders.append("connection", "keep-alive");
+            reqHeaders.append("stringBusca", busca);
+            
+
+            try{
+                const response = await fetch('http://127.0.0.1:3000/searchEvent',{
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+
+                if(response.ok){
+                    // Deipois tratar se não encontrar nada
+                    const eventsList = await response.json()
+
+                    const titlePage = document.getElementById('titlePage');
+                    titlePage.innerHTML = 'Eventos Encontrados:'
+
+                    const paginador = document.getElementById('paginador');
+                    paginador.style.display = "none";
+
+                    const paginaAtiva = document.getElementsByClassName('active')[0]; // Seleciona o primeiro elemento com a classe 'active'
+                    paginaAtiva.classList.remove('active'); // Remove a classe 'active'
+
+                    fillSearchTable(eventsList);
+                }else{
+                    alert('Evento não encontrado!');
+                }
+            }catch(error){
+                alert('Erro ao buscar evento')
+                console.error(error);
+            }
+        }
+    </script>
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
         var tableEvents = document.getElementById('tableEvents');
@@ -427,7 +468,7 @@
             var title = document.getElementById('fTitle').value;
             var description = document.getElementById('fDescription').value;
             var category = document.getElementById('fCategory').value;
-            var finishDate = document.getElementById('fFinishDate');
+            var finishDate = document.getElementById('fFinishDate').value;
         
             // Verificar se todos os campos obrigatórios foram preenchidos
             if (!title || !description || !category || !finishDate) {
@@ -460,7 +501,8 @@
                     requestNumberOfEvent();
                     requestEvents(page);
                 } else {
-                    alert(`Erro ao criar evento`);
+                    const errorMSG = await response.text();
+                    alert(errorMSG);
                 }
             } catch (error) {
                 alert("Erro de comunicação com o servidor. Tente novamente.");
@@ -472,48 +514,6 @@
         window.onload = function() {
             document.querySelector('button[data-bs-toggle="modal"]').addEventListener('click', openModal);
         }
-
-
-        async function searchEvents() {
-            const busca = document.getElementById('searchBarInput').value;
-
-            const reqHeaders = new Headers();
-            reqHeaders.append("Content-Type", "application/json");
-            reqHeaders.append("connection", "keep-alive");
-            reqHeaders.append("stringBusca", busca);
-            
-
-
-            try{
-                const response = await fetch('http://127.0.0.1:3000/searchEvent',{
-                    method: 'GET',
-                    headers: reqHeaders,
-                    credentials: 'include'
-                });
-
-                if(response.ok){
-                    // Deipois tratar se não encontrar nada
-                    const eventsList = await response.json()
-
-                    const titlePage = document.getElementById('titlePage');
-                    titlePage.innerHTML = 'Eventos Encontrados:'
-
-                    const paginador = document.getElementById('paginador');
-                    paginador.style.display = "none";
-
-                    const paginaAtiva = document.getElementsByClassName('active')[0]; // Seleciona o primeiro elemento com a classe 'active'
-                    paginaAtiva.classList.remove('active'); // Remove a classe 'active'
-
-                    fillTable(eventsList);
-                }else{
-                    alert('Evento não encontrado!');
-                }
-            }catch(error){
-                alert('Erro ao buscar evento')
-                console.error(error);
-            }
-        }
-
 
 
         document.getElementById("showHideBalance").addEventListener("click", async event => {
