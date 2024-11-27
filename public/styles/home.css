@@ -607,7 +607,7 @@ input[type="radio"]{
 /* Estilo para o campo de texto que aparece quando "Outros" é selecionado */
 
 
-#otherReasonContainer input[type="text"] {
+.otherReasonContainer input[type="text"] {
     width: 100%;
     padding: 8px;
     font-size: 18px;
@@ -620,12 +620,12 @@ input[type="radio"]{
     color: #FFFF;
 }
 
-#otherReasonContainer input[type="text"]:focus {
+.otherReasonContainer input[type="text"]:focus {
     outline: none;
     border-color: #66e0a3; /* Cor do foco */
 }
 
-#otherReasonContainer input[type="text"]::placeholder {
+.otherReasonContainer input[type="text"]::placeholder {
     color: #aaa;
     font-style: italic;
 }
@@ -652,64 +652,7 @@ header.projects-section-header button:first-child {
     margin-left: auto; /* Move o botão "Add Funds" para o canto direito */
 }
 
-.modal-content {
-    background-color: var(--background-dark);
-    margin-top: 0%; /* Ajuste para mover o modal mais para cima */
-    margin-left: auto;
-    margin-right: auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 50%;
-    color: var(--text-color);
-    border: 1px solid var(--input-border);
-}
 
-button.cancelBtn {
-    background-color: red; /* Cor de fundo vermelha */
-    color: var(--text-color);
-    border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-    letter-spacing: 1px; /* Aumentar o espaço entre as letras */
-}
-
-button.cancelBtn:hover {
-    background-color: darkred; /* Cor mais escura no hover */
-    color: var(--text-color);
-    border: 1px solid darkred;
-}
-
-button.evaluateBtn {
-    background-color: var(--accent-color);
-    color: var(--text-color);
-    border: 1px solid transparent;
-    border-radius: 8px;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-button.evaluateBtn:hover {
-    background-color: var(--background-light);
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
-}
-
-.modal-content label {
-    display: block; 
-    margin-bottom: 8px; 
-}
-
-.modal-content input,
-.modal-content select {
-    width: 100%; 
-    padding: 10px;
-    margin-bottom: 15px; 
-    border-radius: 5px; 
-    border: 1px solid #ccc; 
-}
 #showHideBalance {
     color: var(--accent-color); /* Altere para a cor desejada do ícone */
     background-color: transparent; /* Fundo transparente */

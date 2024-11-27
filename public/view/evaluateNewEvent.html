@@ -83,7 +83,7 @@
                         </table>
                     </div>
                 </div>
-
+                <!-- Depois fazer isso! -->
                 <div id="noEventsAvaliable" style="display: none;">
                     <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
                     <span class="emptyMessage">Não Há Eventos Pendentes</span>
@@ -135,14 +135,17 @@
                     </div>
                     <div class="moderator-evaluation">
                         <label for="fVerdict">Is this event approved?</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" id="fVerdictYes" name="fVerdict" value="sim" onclick="toggleReason()"> Yes
-                                </label>
-                                <label>
-                                    <input type="radio" id="fVerdictNo" name="fVerdict" value="não" onclick="toggleReason()"> No
-                                </label>
-                        </div> 
+                        <div class="radio-group">
+                            <label for="fVerdictYes">
+                                <input type="radio" id="fVerdictYes" name="fVerdict" value="sim" onclick="toggleReason()"> 
+                                Yes
+                            </label>
+                            <label for="fVerdictNo">
+                                <input type="radio" id="fVerdictNo" name="fVerdict" value="não" onclick="toggleReason()"> 
+                                No
+                            </label>
+                        </div>
+                        
             
                         
                         <label for="fReason">Reason</label>
@@ -155,7 +158,7 @@
                         </select>
 
                         <!-- Campo de texto que será exibido ao selecionar "Outros" -->
-                        <div id="otherReasonContainer" style="display: none; margin-top: 10px;">
+                        <div id="otherReasonContainer" class="otherReasonContainer" style="display: none; margin-top: 10px;">
                             <label for="otherReasonText">Specify your reason:</label>
                             <input type="text" id="otherReasonText" placeholder="Describe your reason here..." />
                         </div>
@@ -354,6 +357,7 @@
                 });
                 if(res.ok){
                     const eventData = await res.json();
+                    console.log(eventData)
                     return eventData;
                 }else{
                     // Caso dê algum erro, recarrega página
