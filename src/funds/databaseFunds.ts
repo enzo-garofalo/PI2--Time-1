@@ -68,4 +68,33 @@ export namespace dbFundsManager
             return true;
         }
     }
+
+
+    // export async function getTransactions(id_wallet: number) {
+
+    //     OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+    //     const connection: OracleDB.Connection = 
+    //     await DataBaseManager.get_connection();
+
+    //     try{
+    //         const historicRows: OracleDB.Result<FundsManager.historicRow>  = await connection.execute(
+    //             `
+    //             SELECT * FROM HISTORIC
+    //             WHERE FK_ID_WALLET = :idwallet
+    //             `,
+    //             {
+    //                 id_wallet: id_wallet
+    //             }
+    //         );
+    //         return historicRows;
+            
+    //         await connection.commit();
+    //     }catch{
+    //         console.log('erro inesperado');
+    //         return false;
+    //     }finally{
+    //         await connection.close();
+    //         return;
+    //     }
+    // }
 }

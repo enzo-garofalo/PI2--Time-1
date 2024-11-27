@@ -30,7 +30,7 @@
 
         <div class="app-content">
             <nav class="app-sidebar">
-                <a href="#" class="app-sidebar-link">
+                <a href="../view/home.html" class="app-sidebar-link">
                     <i class="fa fa-home"></i>
                     Home
                 </a>
@@ -72,7 +72,6 @@
                         <table id="tabelaTransactions" class="table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
                                     <th>ID</th>
                                     <th>Type</th>
                                     <th class="text-end">Value ($)</th>
@@ -146,12 +145,16 @@
                     </select>
 
                     <div id="bankFieldsWithdraw" style="display: none;">
-                        <label for="fBankAgency">Bank Agency:</label>
-                        <input type="text" id="fBankAgencyWithdraw" placeholder="Enter bank agency">
+                        <label for="fBankAgency">Bank:</label>
+                        <input type="text" id="fBankWithdraw" placeholder="Enter Bank">
+
+                        <label for="fBankAgency">Agency:</label>
+                        <input type="text" id="fAgencyWithdraw" placeholder="Enter Agency">
 
                         <label for="fBankAccount">Account Number:</label>
                         <input type="text" id="fBankAccountWithdraw" placeholder="Enter account number">
                     </div>
+                    
                     <div id="pixFieldsWithdraw" style="display: none;">
                         <label for="fPixKeyWithdraw">PIX Key:</label>
                         <input type="text" id="fPixKeyWithdraw" placeholder="Enter PIX key">
@@ -170,7 +173,35 @@
     </div>
 
     <script>
-        
+        var ulPaginator = document.getElementById("ulPaginator");
+        var tableEvents = document.getElementById('tableEvents');
+        let numPages = 0; 
+        const pageSize = 10; 
+        var page = 1; 
+
+        async function checkIsModerator(){
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("connection", "keep-alive");
+
+                const res = await fetch('http://127.0.0.1:3000/isModerator', {
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                })
+                if(res.ok){
+                    const elements = document.querySelectorAll('.only-moderator');
+                    elements.forEach(element => {
+                        element.style.display = 'block';
+                    });
+                }
+            }catch(error){
+                alert("Não foi possível carregar dados, tente novamente mais tarde!");
+                window.location.href = "../view/login.html";
+            }
+        }
+
         function togglePaymentFields(type) {
             if (type === 'add') {
                 const paymentMethod = document.getElementById('fPaymentMethod').value;
@@ -183,26 +214,49 @@
             }
         }
 
-        function confirmAddFunds() {
+        //falta colocar as funções para atualizar a tabela e o balance
+        async function AddFunds() {
             const name = document.getElementById('fName').value;
             const cardnumber = document.getElementById('fCardNumber').value;
             const cvc = document.getElementById('fCVC').value;
             const expirationDate = document.getElementById('fExpirationDate').value;
             const amount = document.getElementById('fAmountAdd').value;
         
-            // Verifica se todos os campos foram preenchidos
-            if (!name || !cardnumber || !cvc || !expirationDate || !amount) {
-                alert('Por favor, preencha todos os campos para prosseguir.');
-                return;
+            try{
+                // Verifica se todos os campos foram preenchidos
+                if (!name || !cardnumber || !cvc || !expirationDate || !amount) {
+                    alert('Por favor, preencha todos os campos para prosseguir.');
+                    return;
+                }
+                const headerAddFunds = new Headers();
+                headerAddFunds.append("Credit", amount);
+
+                const res = await fetch("http://127.0.0.1:3000/addFunds", {
+                    method: "PUT",
+                    headers: headerAddFunds,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    fillTable();
+                    //atualizar as transactions
+                }else{
+                    alert('Ocorreu um erro, não foi possível estimar a quatidade de eventos');
+                    window.location.href = '../view/login.html';
+                }
+
+                alert(`Fundos adicionados! Quantidade: $${amount} via cartão.`);
+                hideModal('modalAddFunds');
+            }catch(error){
+
             }
-            alert(`Fundos adicionados! Quantidade: $${amount} via cartão.`);
-            hideModal('modalAddFunds');
         }
         
+        //deixar pra quando estiver certo as outras funções e fazer aparecer as taxas
         function confirmWithdrawFunds() {
             const amount = document.getElementById('fWithdrawAmount').value;
             const withdrawMethod = document.getElementById('fWithdrawMethod').value;
-            const bankAgency = document.getElementById('fBankAgencyWithdraw').value;
+            const bank = document.getElementById('fBankWithdraw').value;
+            const agency = document.getElementById('fAgencyWithdraw').value;
             const bankAccount = document.getElementById('fBankAccountWithdraw').value;
             const pixKey = document.getElementById('fPixKeyWithdraw').value;
         
@@ -211,8 +265,8 @@
                 return;
             }
         
-            if (withdrawMethod === 'bank' && (!bankAgency || !bankAccount)) {
-                alert('Por favor, forneça a agência bancária e o número da conta..');
+            if (withdrawMethod === 'bank' && (!bank || !agency || !bankAccount)) {
+                alert('Por favor, forneça o banco, agência e o número da conta.');
                 return;
             }
         
@@ -233,51 +287,46 @@
             document.getElementById(modalId).style.display = 'none';
         }
         
-        const transacoesPorPagina = 5;
-        let paginaAtual = 1;
-        let transacoes = [];
-
-        async function fetchTransactions(walletId) {
+        //arrumar para vir no response.json um array das transações
+        async function fetchTransactions() {
             try {
-                const response = await fetch(`http://localhost:3000/api/transactions/${walletId}`);
-                transacoes = await response.json();
-                atualizarTabela();
-                gerarPaginacao();
+                const transactions = await fetch(`http://127.0.0.1:3000/getTransactions`);
+                transactions = await response.json();
+                if(transactions.ok){
+                    fillTable(transactions);
+                    // gerarPaginacao();
+
+                }
             } catch (error) {
                 console.error('Erro ao buscar transações:', error);
             }
         }
 
-        function atualizarTabela() {
-            const tabelaTransactions = document.getElementById("tabelaTransactions");
-            tabelaTransactions.innerHTML = "";
+        function fillTable(transactions){
+            cleanTableRows();
 
-            const inicio = (paginaAtual - 1) * transacoesPorPagina;
-            const fim = inicio + transacoesPorPagina;
-            const transacoesPagina = transacoes.slice(inicio, fim);
-
-            transacoesPagina.forEach((transacao, index) => {
-                const row = document.createElement("tr");
-
-                const cellId = document.createElement("td");
-                cellId.textContent = transacao.ID;
-                row.appendChild(cellId);
-
-                const cellTipo = document.createElement("td");
-                cellTipo.textContent = transacao.TYPE;
-                row.appendChild(cellTipo);
-
-                const cellValor = document.createElement("td");
-                cellValor.className = "text-end";
-                cellValor.textContent = `R$ ${transacao.VALUE}`;
-                row.appendChild(cellValor);
-
-                const cellData = document.createElement("td");
-                cellData.textContent = transacao.DATE;
-                row.appendChild(cellData);
-
-                tabelaTransactions.appendChild(row);
+            transactions.forEach(element => {
+                addTransactionsRow(element);
             });
+        }
+
+        function cleanTableRows() {
+            tableHistoric.getElementsByTagName('tbody')[0].innerHTML = '';
+        }
+
+        function addTransactionsRow(transactions) {
+            const transactionsRows = 
+                `<tr id="${transactions.ID_funds}">
+                    <td class="transaction-type">${transactions.Type}</td>
+                    <td class="transaction-value">${transactions.Value}</td>
+                    <td class="transaction-date">${transactions.Date}</td>
+                </tr>`;
+            tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', transactionsRows);
+        }
+
+        function resetUlPageNumbers(){
+          while(ulPaginator.firstChild) 
+            ulPaginator.removeChild(ulPaginator.firstChild);
         }
 
         function gerarPaginacao() {
@@ -305,10 +354,42 @@
             }
         }
 
-        const walletId = 222;
+        async function setBalance() {
+            const res = await fetch('http://127.0.0.1:3000/getBalance', {
+                method: 'GET',
+                credentials: 'include' // Necessário para enviar o cookie com a requisição
+            });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchTransactions(walletId);
+            if (res.ok) {
+                let data = await res.json();
+                let balance = data.balance;
+                // Se necessário, formate o saldo com 2 casas decimais
+                balance = parseFloat(balance).toFixed(2);
+                
+                // Exibe o saldo na página
+                document.getElementById('balance').textContent = `${balance}`;
+            } else {
+                alert('Não foi possível acessar os dados da sua carteira');
+               
+            }
+        }
+
+        document.getElementById("showHideBalance").addEventListener("click", async event => {
+        const iconElement = document.getElementById("showHideBalance");
+        const buttonElement = document.getElementById("showHideBalance");
+
+        // Verifica o estado atual do ícone
+        if (iconElement.classList.contains("fa-eye")) {
+            // Altera para "olho fechado"
+            iconElement.className = "fas fa-eye-slash";
+            document.getElementById('balance').textContent = `-----`;;
+            buttonElement.prepend(iconElement); // Reinsere o ícone no botão
+        } else {
+            // Altera para "olho aberto"
+            iconElement.className = "fas fa-eye";
+            await setBalance();
+            buttonElement.prepend(iconElement); // Reinsere o ícone no botão
+        }
         });
     </script>
 

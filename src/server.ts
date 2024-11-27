@@ -96,8 +96,9 @@ routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 
 //Rotas de Wallet
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
-    routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
+routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
 routes.get('/getBalance', FundsManager.getBalance);
+routes.get('/getTransactions', FundsManager.getTransactions)
 
 //Rotas de bets
 routes.put('/betOnEvent', betsManager.betOnEventHandler)
