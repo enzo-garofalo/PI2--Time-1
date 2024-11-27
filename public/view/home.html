@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 </head>
 <body>
-    <div class="loader" style="display: none;" id="loader"></div>
     <div class="app-container">
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+        </div>
         <header class="app-header">
             <div class="app-header-left">
                 <span class="app-icon"><img src="../assets/pucbet-logo.png" class="logoPucBet"></span>
@@ -205,7 +207,7 @@
                     
                     <div id="betValue" class="otherReasonContainer"style="margin-top: 10px;">
                         <label for="betValue">Make your bet:</label>
-                        <input type="text" id="betValue" placeholder="Insert your bet value..." style="text-align: right;" required/>
+                        <input type="text" id="betValueInput" placeholder="Insert your bet value..." style="text-align: right;" required/>
                     </div>
                 </div>
                         
@@ -222,33 +224,16 @@
     </div>
     <!-- bet event -->
     <script async defer>
-        // Atualize o seletor para o ID correto
-        const input = document.getElementById('betValue');
-
-        input.addEventListener('input', () => {
-            // Remove caracteres não numéricos
-            input.value = input.value.replace(/[^0-9.]/g, '');
-
-            // Garantir que só há um ponto decimal
-            const parts = input.value.split('.');
-            if (parts.length > 2) {
-                input.value = parts[0] + '.' + parts[1]; // Mantém apenas o primeiro ponto decimal
-            }
-
-            // Evita números negativos e entradas como "003"
-            if (input.value.startsWith('0') && input.value.length > 1 && !input.value.startsWith('0.')) {
-                input.value = input.value.slice(1);
-            }
-        });
-
+    
         async function betOnEvent() {
+            loader.classList.add('active');
             const eventId = document.getElementById('Sid_event').value;
             const verdict = getVerdict();
-            const inputElement = document.getElementById('betValue'); // Certifique-se de usar o ID correto
+            const inputElement = document.getElementById('betValueInput');
+            
+
             const betValue = parseFloat(inputElement.value);
 
-            console.log('Valor inserido:', inputElement.value); // Verificar o valor digitado no console
-            console.log('Valor convertido:', betValue); // Verificar se a conversão está correta
 
             // Validação para evitar NaN
             if (isNaN(betValue) || betValue <= 0) {
@@ -275,12 +260,16 @@
                 const msg = await res.text();
                 if (res.ok) {
                     alert(msg);
+                    cleanModal()
+                    window.location.reload()
                 } else {
                     alert(`Error: ${msg}`);
                 }
             } catch (error) {
                 console.error('Erro ao enviar solicitação:', error);
                 alert('Failed to connect to the server.');
+            }finally{
+                loader.classList.remove('active');
             }
         }
 
