@@ -10,7 +10,7 @@
 }
 
 .container-xxlarge2 {
-    background: linear-gradient(180deg, rgb(68, 216, 136), rgb(47, 158, 123));
+    background: linear-gradient(180deg, #44d888, rgb(47, 158, 123));
     height: 45vh;
     position: relative;
     display: flex;
@@ -269,5 +269,5 @@
 .btn-signup:hover {
     transform: scale(1.05);
     background: linear-gradient(to right, #00ff99, #00e676);
-    box-shadow: 0px 6px 12px rgba(0, 255, 153, 0.6);
+    box-shadow: 0px 6px 12px #00ff9999;
 }
