@@ -140,8 +140,8 @@
                     <label for="fWithdrawMethod">Choose a Withdrawal Method:</label>
                     <select id="fWithdrawMethod" onchange="togglePaymentFields('withdraw')">
                         <option value="" hidden>Select a method...</option>
-                        <option value="bank">Bank - Ag. / Account Number</option>
-                        <option value="pix">PIX Key</option>
+                        <option value="Conta bancaria">Conta bancaria</option>
+                        <option value="Pix">Pix</option>
                     </select>
 
                     <div id="bankFieldsWithdraw" style="display: none;">
@@ -209,8 +209,8 @@
                 document.getElementById('pixFieldsAdd').style.display = paymentMethod === 'pix' ? 'block' : 'none';
             } else if (type === 'withdraw') {
                 const withdrawMethod = document.getElementById('fWithdrawMethod').value;
-                document.getElementById('bankFieldsWithdraw').style.display = withdrawMethod === 'bank' ? 'block' : 'none';
-                document.getElementById('pixFieldsWithdraw').style.display = withdrawMethod === 'pix' ? 'block' : 'none';
+                document.getElementById('bankFieldsWithdraw').style.display = withdrawMethod === 'Conta bancaria' ? 'block' : 'none';
+                document.getElementById('pixFieldsWithdraw').style.display = withdrawMethod === 'Pix' ? 'block' : 'none';
             }
         }
 
@@ -242,19 +242,19 @@
                     //fillTable();
                     //atualizar as transactions
                 }else{
-                    alert('Ocorreu um erro, não foi possível estimar a quatidade de eventos');
+                    alert('Ocorreu um erro, não foi possível adicionar fundos.');
                     window.location.href = '../view/login.html';
                 }
 
                 alert(`Fundos adicionados! Quantidade: $${amount} via cartão.`);
                 hideModal('modalAddFunds');
             }catch(error){
-
+                console.error(error);
             }
         }
         
         //deixar pra quando estiver certo as outras funções e fazer aparecer as taxas
-        function confirmWithdrawFunds() {
+        async function confirmWithdrawFunds() {
             const amount = document.getElementById('fWithdrawAmount').value;
             const withdrawMethod = document.getElementById('fWithdrawMethod').value;
             const bank = document.getElementById('fBankWithdraw').value;
@@ -262,23 +262,58 @@
             const bankAccount = document.getElementById('fBankAccountWithdraw').value;
             const pixKey = document.getElementById('fPixKeyWithdraw').value;
         
-            if (!amount || !withdrawMethod) {
-                alert('Por favor, preencha todos os campos para prosseguir.');
-                return;
-            }
+            try {
+                // Verifica se todos os campos obrigatórios foram preenchidos
+                if (!amount || !withdrawMethod) {
+                    alert('Por favor, preencha todos os campos para prosseguir.');
+                    return;
+                }
         
-            if (withdrawMethod === 'bank' && (!bank || !agency || !bankAccount)) {
-                alert('Por favor, forneça o banco, agência e o número da conta.');
-                return;
-            }
+                // Validações específicas do método de retirada
+                if (withdrawMethod === 'Conta bancaria' && (!bank || !agency || !bankAccount)) {
+                    alert('Por favor, forneça o banco, agência e número da conta.');
+                    return;
+                }
         
-            if (withdrawMethod === 'pix' && !pixKey) {
-                alert('Por favor, coloque a chave PIX.');
-                return;
-            }
+                if (withdrawMethod === 'Pix' && !pixKey) {
+                    alert('Por favor, coloque a chave PIX.');
+                    return;
+                }
         
-            alert(`Retirada dos Valores feita com Sucesso! Quantidade: $${amount} via ${withdrawMethod}.`);
-            hideModal('modalWithdrawFunds');
+                const headerWithdrawFunds = new Headers();
+
+                headerWithdrawFunds.append("Debit", amount);
+                headerWithdrawFunds.append("pixOuconta", withdrawMethod);
+                if(withdrawMethod === "Pix"){
+                    headerWithdrawFunds.append("chave_pix", pixKey);
+                }else if(withdrawMethod === "Conta Bancaria"){
+                    headerWithdrawFunds.append("banco", bank);
+                    headerWithdrawFunds.append("agencia", agency);
+                    headerWithdrawFunds.append("numero_conta", bankAccount);
+                }
+        
+                const res = await fetch("http://127.0.0.1:3000/withdrawFunds", {
+                    method: "PUT",
+                    headers: headerWithdrawFunds,
+                    credentials: 'include'
+                });
+                const messageWidraw = await res.text();
+                if (res.ok) {
+                    console.log("Fundos retirados com sucesso.");
+                    showAlert(messageWidraw, 'success')
+                    //fillTable();
+                    //atualizar as transactions
+                } else {
+                    showAlert(messageWidraw, 'warning')
+                    //alert('Ocorreu um erro ao tentar retirar os fundos.');
+                    //window.location.href = '../view/login.html';
+                }
+        
+                //alert(`Fundos retirados! Quantidade: $${amount}`);
+                hideModal('modalWithdrawFunds');
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         function showModal(modalId) {
@@ -396,6 +431,19 @@
             buttonElement.prepend(iconElement); // Reinsere o ícone no botão
         }
         });
+
+        async function showAlert(message, type){
+            const alertContainer = document.getElementById('alert-box');
+
+            alertContainer.className = `alert alert-${type} alert-dismissible fade show w-100`;
+            alertContainer.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="location.reload()"></button>
+            `;
+            alertContainer.classList.remove('d-none');
+        }
+
+
     </script>
 
     <script
