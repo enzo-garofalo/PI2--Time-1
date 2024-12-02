@@ -176,6 +176,28 @@
             </form>
         </div>
     </div>
+    <!-- Formatação das datas -->
+    <script async defer>
+        // Função para formatar a data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se necessário
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses começam do zero
+            const year = date.getFullYear();
+
+            return `${day}/${month}/${year}`;
+        }
+
+        // Função para formatar todas as datas na tabela
+        function formatAllDates() {
+            const dateCells = document.querySelectorAll('.event-finish-date');
+            dateCells.forEach(cell => {
+                const formattedDate = formatDate(cell.textContent.trim());
+                cell.textContent = formattedDate;
+            });
+        }
+    </script>
+    <!-- Modal configs, evaluate call -->
     <script async defer>
         const loader = document.getElementById('loader-container');
         var modal = document.getElementById('modalId');
@@ -389,7 +411,8 @@
                 description.value = eventData.DESCRIPTION;
                 category.value = eventData.CATEGORIES;
                 registerDate.value = eventData.REGISTER_DATE.split("T")[0]; // Ajusta o formato da data
-                finishDate.value = eventData.FINISH_DATE;
+                finishDate.value = eventData.FINISH_DATE.split("T")[0];
+            
             } else {
                 alert("Evento não encontrado ou dados inválidos.");
             }
@@ -410,6 +433,7 @@
             }
         }   
     </script>
+    <!-- Config para exibir eventos -->
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
         var tableEvents = document.getElementById('tableEvents');
@@ -478,8 +502,10 @@
                 reqHeaders.append("page", pageNumber);
                 reqHeaders.append("pageSize", pageSize);
                 reqHeaders.append("status", "Pendente");
+                reqHeaders.append("toFinish", false);
 
-                
+                console.log(pageNumber);
+                console.log(pageSize);
                 const resEvents = await fetch("http://127.0.0.1:3000/getEventsByPage", {
                     method: "POST",
                     headers: reqHeaders,
@@ -573,6 +599,8 @@
             events.forEach(element => {
                 addEventRow(element);
             });
+
+            formatAllDates()
         }
 
         // Função para limpar as linhas da tabela
