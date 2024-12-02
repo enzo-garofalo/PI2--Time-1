@@ -222,6 +222,22 @@
             </div>
         </form>
     </div>
+      <!-- Popup de alerta geral -->
+      <div class="alert-wrapper" id="alertPopup">
+        <div class="custom-container">
+            <div class="errorPopup" id="errorPopup">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="error-icon">
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#44d888"></path>
+                </svg>
+                <p>It seems that you can no longer create events.</p>
+                <button class="close-btn" onclick="closePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
     <!-- bet event -->
     <script async defer>
     
@@ -793,6 +809,18 @@
                 await setBalance();
             }
         });
+
+        // Função para fechar o popup adicionando a 'hidden' class
+        function closePopup() {
+            const popup = document.getElementById('errorPopup');
+            popup.classList.add('hidden');
+        }
+        // Função para mostrar o popup removendo a 'hidden' class
+        function showPopup() {
+            const popup = document.getElementById('errorPopup');
+            popup.classList.remove('hidden');
+        }
+
     </script>
 </body>
 </html>
