@@ -209,42 +209,42 @@ export namespace FundsManager{
     export const getTransactions: RequestHandler = async (req: Request, res: Response) => {
         if (!AccountsManager.isLoggedIn(req, res)) return;
 
-    
-        const joinTables = await DataBaseManager.joinTables(req.cookies.token);
-        if (!joinTables || joinTables.length === 0) {
-            res.statusCode = 500; // Erro interno do servidor
-            res.send("Erro: Não foi possível acessar os dados da conta.");
-            return;
-        }
-    
-        const idWallet = joinTables[0].IDWALLET;
-        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
+        try {
+            const joinTables = await DataBaseManager.joinTables(req.cookies.token);
 
+            if (!joinTables || joinTables.length === 0) {
+                res.status(500).json({ success: false, message: "Não foi possível acessar os dados da conta." });
+                return;
+            }
 
-        try{
-            const historic = `
-                SELECT * FROM HISTORIC
-                WHERE FK_ID_WALLET = ${idWallet}`;
+            const idWallet = joinTables[0].IDWALLET;
+            const connection: OracleDB.Connection = await DataBaseManager.get_connection();
 
-                const historicRows: OracleDB.Result<historicRow> = await connection.execute(historic);
-                if(historicRows.rows?.length === 0){
-                    res.statusCode = 200;
-                    res.send({ array: [] });  // Envia uma lista vazia com a chave 'array' se não houver eventos
+            try {
+                const query = `
+                    SELECT * 
+                    FROM HISTORIC
+                    WHERE FK_ID_WALLET = :idWallet`;
+
+                const result: OracleDB.Result<historicRow> = await connection.execute(query, { idWallet });
+
+                if (!result.rows || result.rows.length === 0) {
+                    res.status(200).json({ success: true, data: [], message: "Nenhuma transação encontrada." });
                 } else {
-                    res.statusCode = 200;
-                    res.send({ array: historicRows.rows });
+                    res.status(200).json({ success: true, data: result.rows, message: "Transações obtidas com sucesso." });
                 }
-        }catch(error){
-            console.error("Erro ao obter transações.", error);
-            res.statusCode = 500;
-            res.send("Erro ao processar a requisição");
+            } catch (error) {
+                console.error("Erro ao obter transações:", error);
+                res.status(500).json({ success: false, message: "Erro ao processar a requisição." });
+            } finally {
+                await connection.close();
+            }
+        } catch (error) {
+            console.error("Erro geral no handler:", error);
+            res.status(500).json({ success: false, message: "Erro interno do servidor." });
         }
-        finally{
-            await connection.close();
-            return;
-        }
-        
     };
+
     
 }
     

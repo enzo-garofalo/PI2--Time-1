@@ -123,7 +123,7 @@
 
             <div class="modal-footer">
                 <button type="button" onclick="hideModal('modalAddFunds')" class="cancelBtn">Cancel</button>
-                <button type="button" onclick="confirmAddFunds()" class="evaluateBtn">Add</button>
+                <button type="button" onclick="AddFunds()" class="evaluateBtn">Add</button>
             </div>
         </form>
     </div>
@@ -174,7 +174,7 @@
 
     <script>
         var ulPaginator = document.getElementById("ulPaginator");
-        var tableEvents = document.getElementById('tableEvents');
+        var tableTransactions= document.getElementById('tabelaTransactions');
         let numPages = 0; 
         const pageSize = 10; 
         var page = 1; 
@@ -237,7 +237,9 @@
                     credentials: 'include'
                 });
                 if(res.ok){
-                    fillTable();
+                    console.log("Crédito adicionado.")
+                    
+                    //fillTable();
                     //atualizar as transactions
                 }else{
                     alert('Ocorreu um erro, não foi possível estimar a quatidade de eventos');
@@ -290,38 +292,41 @@
         //arrumar para vir no response.json um array das transações
         async function fetchTransactions() {
             try {
-                const transactions = await fetch(`http://127.0.0.1:3000/getTransactions`);
-                transactions = await response.json();
-                if(transactions.ok){
-                    fillTable(transactions);
-                    // gerarPaginacao();
-
+                const response = await fetch(`http://127.0.0.1:3000/getTransactions`);
+                
+                if (response.ok) {
+                    const transactions = await response.json();
+                    console.log(transactions);
+                    //fillTable(transactions);
+                    // gerarPaginacao(); // Descomente se a função de paginação for implementada.
+                } else {
+                    console.error('Erro na resposta da API:', transactions.message || 'Erro desconhecido');
                 }
             } catch (error) {
                 console.error('Erro ao buscar transações:', error);
             }
         }
 
-        function fillTable(transactions){
+        function fillTable(transactions) {
             cleanTableRows();
 
-            transactions.forEach(element => {
-                addTransactionsRow(element);
+            transactions.forEach(transaction => {
+                addTransactionsRow(transaction);
             });
         }
 
         function cleanTableRows() {
-            tableHistoric.getElementsByTagName('tbody')[0].innerHTML = '';
+            document.querySelector('#tableHistoric tbody').innerHTML = '';
         }
 
-        function addTransactionsRow(transactions) {
-            const transactionsRows = 
-                `<tr id="${transactions.ID_funds}">
-                    <td class="transaction-type">${transactions.Type}</td>
-                    <td class="transaction-value">${transactions.Value}</td>
-                    <td class="transaction-date">${transactions.Date}</td>
+        function addTransactionsRow(transaction) {
+            const transactionRow = `
+                <tr id="${transaction.ID_funds}">
+                    <td class="transaction-type">${transaction.Type}</td>
+                    <td class="transaction-value">${transaction.Value}</td>
+                    <td class="transaction-date">${transaction.Date}</td>
                 </tr>`;
-            tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', transactionsRows);
+            document.querySelector('#tableHistoric tbody').insertAdjacentHTML('beforeend', transactionRow);
         }
 
         function resetUlPageNumbers(){
