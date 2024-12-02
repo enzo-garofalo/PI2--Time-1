@@ -49,8 +49,6 @@ export namespace EventsManager
                 res.send('Não é possível criar evento na data informada!');
                 return;
             }
-            
-            // Formatar para YYYY-MM-DD para remover a parte do horário
 
             // Cria o objeto do evento a ser adicionado
             const newEvent: Event = {
@@ -223,7 +221,7 @@ export namespace EventsManager
             const today = new Date();
             
             // Verifica se a data atual é anterior ou igual à data de término do evento
-            if (today <= eventFinishDate || event?.[0]?.STATUS_EVENT !== 'aprovado') {
+            if (today <= eventFinishDate || event?.[0]?.STATUS_EVENT !== 'Aprovado') {
                 res.statusCode = 400; // Código 400: Solicitação inválida
                 res.send('Não foi possível finalizar evento.\n \
                 - Verifique a data de término do evento.\n \

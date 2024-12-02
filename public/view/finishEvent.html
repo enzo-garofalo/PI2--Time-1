@@ -105,7 +105,7 @@
     </div>
 
 
-    <!-- Modal do search -->
+    <!-- Modal do finish -->
     <div class="modal" id="modalId">
         <form class="modal-content">
             <div class="container">
@@ -172,6 +172,60 @@
             </div>
         </form>
     </div>
+
+    <!--finish event-->
+    <script async defer>
+
+        async function finishEvent(){
+            loader.classList.add('active');
+            const eventId = document.getElementById('Sid_event').value;
+            const verdict = getVerdict();
+
+
+            const reqHeaders = new Headers();
+            reqHeaders.append("Content-Type", "application/json");
+            reqHeaders.append("connection", "keep-alive");
+            reqHeaders.append('eventId', eventId);
+            reqHeaders.append('aconteceu', verdict);
+
+            console.log(reqHeaders);
+
+            try {
+                const res = await fetch('http://127.0.0.1:3000/finishEvent', {
+                    method: 'POST',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+
+                const msg = await res.text();
+                if (res.ok) {
+                    alert(msg);
+                    cleanModal()
+                    window.location.reload()
+                } else {
+                    alert(`Error: ${msg}`);
+                }
+            } catch (error) {
+                console.error('Erro ao enviar solicitação:', error);
+                alert('Failed to connect to the server.');
+            }finally{
+                loader.classList.remove('active');
+            }
+        }
+
+        function getVerdict() {
+            const radioYes = document.getElementById('fVerdictYes');
+            const radioNo = document.getElementById('fVerdictNo');
+
+            if (radioYes.checked) {
+                return radioYes.value;
+            }
+            if (radioNo.checked) {
+                return radioNo.value;
+            }
+            return null;
+        }
+    </script>
 
     <!-- Formatação das datas -->
     <script async defer>
