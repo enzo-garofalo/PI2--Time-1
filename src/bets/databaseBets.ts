@@ -23,6 +23,16 @@ export namespace dbBetsManager {
                 { valueBet: bet.valuesBet, idUser: bet.fk_ID_User } // Parâmetros passados para o SQL (valores da aposta e id do usuário)
             );
 
+            await connection.execute(
+                `UPDATE EVENTS
+                SET BETS_FUNDS = (BETS_FUNDS + :valueBet)
+                WHERE ID_EVENT = :id_event`, 
+                {
+                    valueBet: bet.valuesBet,
+                    id_Event: bet.fk_ID_Event
+                }
+            )
+
             // Segundo comando SQL: Insere uma nova aposta na tabela BETS
             // A aposta é registrada com valores como 'sim' ou 'não' (BET), valor da aposta (VALUE_BET), ID do usuário e ID do evento
             await connection.execute(

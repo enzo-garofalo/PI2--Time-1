@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
 </head>
 <body>
-    <div class="loader" style="display: none;" id="loader"></div>
     <div class="app-container">
+        <div class="loader-container" id="loader-container">
+            <div class="loader"></div>
+        </div>
         <header class="app-header">
             <div class="app-header-left">
                 <span class="app-icon"><img src="../assets/pucbet-logo.png" class="logoPucBet"></span>
@@ -147,7 +149,257 @@
             </div>
         </form>
     </div>
+    <!-- Modal do search -->
+    <div class="modal" id="modalId">
+        <form class="modal-content">
+            <div class="container">
+                <div class="modal-header">
+                    <h1>Event Details</Data></h1>
+                </div>
+                
+                <div class="event-form">
+                    <input type="text" id="Sid_event" style="display: none;" disabled>
+
+                    <label for="fTitle">Ttile</label>
+                    <input type="text" id="STitle" disabled>
+                    
+                    <label for="fTitle">Description</label>
+                    <input type="text" id="SDescription" disabled>
+                    
+                    <label for="fCategory">Category</label>
+                    <input type="text" id="SCategory" disabled>
+                    
+                    <div class="date-container">
+                   <div class="date-field">
+                            <label for="fRegisterDate">Register Date</label>
+                            <input type="date" id="SRegisterDate" disabled>
+                        </div>
+                        <div class="date-field">
+                            <label for="fFinishDate">Finish Date</label>
+                            <input type="date" id="SFinishDate" disabled>
+                        </div>     
+                    </div> 
+                    <div class="date-container">
+                   <div class="date-field">
+                            <label for="fRegisterDate">Status</label>
+                            <input type="text" id="SStatus" disabled>
+                        </div>
+                        <div class="date-field">
+                            <label for="fFinishDate">Bets Funds</label>
+                            <input type="text" id="SBetsFunds" style="text-align: right;" disabled>
+                        </div>     
+                    </div> 
+                </div>
+                <div class="user-bet moderator-evaluation" id="userBet">
+                    <label for="fVerdict">Will this event happen?</label>
+                    <div class="radio-group">
+                        <label for="fVerdictYes">
+                            <input type="radio" id="fVerdictYes" name="fVerdict" value="sim"> 
+                            Yes
+                        </label>
+                        <label for="fVerdictNo">
+                            <input type="radio" id="fVerdictNo" name="fVerdict" value="não"> 
+                            No
+                        </label>
+                    </div>
+                    
     
+                    
+                    <div id="betValue" class="otherReasonContainer"style="margin-top: 10px;">
+                        <label for="betValue">Make your bet:</label>
+                        <input type="text" id="betValueInput" placeholder="Insert your bet value..." style="text-align: right;" required/>
+                    </div>
+                </div>
+                        
+                <div class="modal-footer" id="modalSearch">
+                    <button type="button" onclick="hideModal()" class="cancelBtn" id="cancelBtn">
+                            Close
+                    </button>
+                    <button type="button" onclick="betOnEvent()" class="evaluateBtn" id="betBtn">
+                            BET
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+      <!-- Popup de alerta geral -->
+      <div class="alert-wrapper" id="alertPopup">
+        <div class="custom-container">
+            <div class="errorPopup" id="errorPopup">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="error-icon">
+                    <path fill="none" d="M0 0h24v24H0z"></path>
+                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#44d888"></path>
+                </svg>
+                <p>It seems that you can no longer create events.</p>
+                <button class="close-btn" onclick="closePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+    <!-- bet event -->
+    <script async defer>
+    
+        async function betOnEvent() {
+            loader.classList.add('active');
+            const eventId = document.getElementById('Sid_event').value;
+            const verdict = getVerdict();
+            const inputElement = document.getElementById('betValueInput');
+            
+
+            const betValue = parseFloat(inputElement.value);
+
+
+            // Validação para evitar NaN
+            if (isNaN(betValue) || betValue <= 0) {
+                alert('Please enter a valid bet value greater than 0.');
+                return;
+            }
+
+            const reqHeaders = new Headers();
+            reqHeaders.append("Content-Type", "application/json");
+            reqHeaders.append("connection", "keep-alive");
+            reqHeaders.append('idEvent', eventId);
+            reqHeaders.append('acontecera', verdict);
+            reqHeaders.append('valorAposta', betValue);
+
+            console.log(reqHeaders);
+
+            try {
+                const res = await fetch('http://127.0.0.1:3000/betOnEvent', {
+                    method: 'PUT',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+
+                const msg = await res.text();
+                if (res.ok) {
+                    alert(msg);
+                    cleanModal()
+                    window.location.reload()
+                } else {
+                    alert(`Error: ${msg}`);
+                }
+            } catch (error) {
+                console.error('Erro ao enviar solicitação:', error);
+                alert('Failed to connect to the server.');
+            }finally{
+                loader.classList.remove('active');
+            }
+        }
+
+
+        function getVerdict() {
+            const radioYes = document.getElementById('fVerdictYes');
+            const radioNo = document.getElementById('fVerdictNo');
+
+            if (radioYes.checked) {
+                return radioYes.value;
+            }
+            if (radioNo.checked) {
+                return radioNo.value;
+            }
+            return null;
+        }
+    </script>
+
+    <script async defer>
+        const loader = document.getElementById('loader-container');
+        var modal = document.getElementById('modalId');
+
+        function cleanModal() {
+            // Campos de texto e número
+            document.getElementById('Sid_event').value = '';
+            document.getElementById('STitle').value = '';
+            document.getElementById('SDescription').value = '';
+            document.getElementById('SCategory').value = '';
+            document.getElementById('SRegisterDate').value = '';
+            document.getElementById('SFinishDate').value = '';
+            document.getElementById('SStatus').value = '';
+            document.getElementById('SBetsFunds').value = '';
+        }
+
+        async function getEventById(id_event, status){
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append('connection', 'keep-alive');
+                reqHeaders.append('status', status);
+                reqHeaders.append('id', id_event);
+
+                const res = await fetch('http://127.0.0.1:3000/getEvent', {
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    const eventData = await res.json();
+                    console.log(eventData);
+                    return eventData;
+                }else{
+                    // Caso dê algum erro, recarrega página
+                    alert('Não foi possível encontrar o evento');
+                    window.location.reload();
+                }
+            }catch(error){
+                console.error(error);
+            }
+        }
+
+        async function fillModal(id_event, status) {
+            var idEvent = document.getElementById('Sid_event');
+            var title = document.getElementById('STitle');
+            var description = document.getElementById('SDescription');
+            var category = document.getElementById('SCategory');
+            var registerDate = document.getElementById('SRegisterDate');
+            var finishDate = document.getElementById('SFinishDate');
+            var eventStatus =document.getElementById('SStatus');
+            var betsFunds =document.getElementById('SBetsFunds');
+
+            const betBtn = document.getElementById('betBtn');
+            const userBet = document.getElementById('userBet');
+
+            // Obtém os dados do evento
+            const event = await getEventById(id_event, status);
+
+            if (event && event.array.length > 0) {
+                const eventData = event.array[0]; // Acessa o primeiro elemento do array
+
+                // Preenche os campos do modal
+                idEvent.value = eventData.ID_EVENT;
+                title.value = eventData.TITLE;
+                description.value = eventData.DESCRIPTION;
+                category.value = eventData.CATEGORIES;
+                registerDate.value = eventData.REGISTER_DATE.split("T")[0]; // Ajusta o formato da data
+                finishDate.value = eventData.FINISH_DATE;
+                eventStatus.value = eventData.STATUS_EVENT;
+                betsFunds.value = eventData.BETS_FUNDS;
+                if(eventStatus.value != 'Aprovado'){
+                     betBtn.style.display = 'none';
+                     userBet.style.display = 'none';
+                } 
+
+            } else {
+                alert("Evento não encontrado ou dados inválidos.");
+            }
+        }
+
+        async function showModal(id_event, status){
+            cleanModal();
+            await fillModal(id_event, status);
+            modal.style.display = 'block';
+        }
+        
+        function hideModal(){
+            modal.style.display = 'none';
+        }
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }   
+    </script>
     <script async defer>
         async function searchEvents() {
             const busca = document.getElementById('searchBarInput').value;
@@ -178,7 +430,7 @@
                     const paginaAtiva = document.getElementsByClassName('active')[0]; // Seleciona o primeiro elemento com a classe 'active'
                     paginaAtiva.classList.remove('active'); // Remove a classe 'active'
 
-                    fillSearchTable(eventsList);
+                    fillTable(eventsList);
                 }else{
                     alert('Evento não encontrado!');
                 }
@@ -392,7 +644,7 @@
                     <td class="event-status">${event.STATUS_EVENT}</td>
                     <td class="event-finish-date">${event.FINISH_DATE}</td>
                     <td class="bet-on-event">
-                        <button onclick="betOnEvent(${event.ID_EVENT})"> BET </button>
+                        <button onclick="showModal(${event.ID_EVENT}, '${event.STATUS_EVENT}')"> Show Event </button>
                     </td>
                 </tr>`;
             tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
@@ -530,6 +782,18 @@
                 await setBalance();
             }
         });
+
+        // Função para fechar o popup adicionando a 'hidden' class
+        function closePopup() {
+            const popup = document.getElementById('errorPopup');
+            popup.classList.add('hidden');
+        }
+        // Função para mostrar o popup removendo a 'hidden' class
+        function showPopup() {
+            const popup = document.getElementById('errorPopup');
+            popup.classList.remove('hidden');
+        }
+
     </script>
 </body>
 </html>

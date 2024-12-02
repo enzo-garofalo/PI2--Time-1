@@ -63,10 +63,12 @@ export namespace betsManager
         
         if(resultSearchUser)
         {
+
             const IdUser = Number(resultSearchUser[0].ID); // ID do usuário
             const pIdEvent = Number(req.get('idEvent'));  // ID do evento
             const pBet = req.get('acontecera')?.toLowerCase(); // Valor da aposta (sim ou não)
             const pBetValue = Number(req.get('valorAposta'));  // Valor da aposta em números
+            console.log(IdUser, pIdEvent, pBet, pBetValue);
 
             // Verifica se todos os parâmetros foram fornecidos
             if(pIdEvent && pBet && pBetValue)

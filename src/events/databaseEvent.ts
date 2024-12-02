@@ -228,7 +228,7 @@ export namespace dbEventsManager
                `
                SELECT *
                FROM EVENTS
-               WHERE TITLE = :stringBusca
+               WHERE TITLE = :stringBusca AND status_event != 'Reprovado'
                `,
                {stringBusca}
            );
