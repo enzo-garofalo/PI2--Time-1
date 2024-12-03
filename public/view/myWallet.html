@@ -36,17 +36,17 @@
                     <i class="fa fa-chart-bar"></i>
                     Evaluate Event
                 </a>
+                <a href="../view/finishEvent.html" class="app-sidebar-link only-moderator">
+                    <i class="fa fa-chart-bar"></i>
+                    Finish Event
+                </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-calendar-days"></i>
                     My Events
                 </a>
-                <a href="#" class="app-sidebar-link active">
+                <a href="../view/myWallet.html" class="app-sidebar-link active">
                     <i class="fa fa-wallet"></i>
                     My Wallet
-                </a>
-                <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-chart-bar"></i>
-                    Finish Event
                 </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-sign-out-alt"></i>
@@ -65,14 +65,14 @@
                     
                 </header>
                 
-                <div class="row align-items-center">
+                <div id="divTabela" class="row align-items-center">
                     <div class="col">
                         <table id="tabelaTransactions" class="table">
                             <thead>
                                 <tr>
                                     <th scope="col" class="text-end">ID</th>
                                     <th scope="col" class="text-left">Type</th>
-                                    <th scope="col" class="text-end">Value ($)</th>
+                                    <th scope="col" class="text-right">Value ($)</th>
                                     <th scope="coL" class="text-center">Date</th>
                                 </tr>
                             </thead>
@@ -82,11 +82,17 @@
                         </table>
                     </div>
                 </div>
-                <div class="row justify-content-center">
+
+                <div id="noTransactionsAvaliable" style="display: none;">
+                    <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
+                    <span class="emptyMessage">Não há Transações</span>
+                </div>
+
+                <div class="row justify-content-center" id="paginador">
                     <div class="col-auto">
-                        <nav aria-label="Page navigation">
-                            <ul id="pagination" class="pagination pagination-sm">
-                                <!-- Elementos de paginação -->
+                        <nav aria-label="Page navigation" id="paginador">
+                            <ul id="ulPaginator" class="pagination pagination-sm">
+                                <!-- Elementos do paginador -->
                             </ul>
                         </nav>
                     </div>
@@ -98,25 +104,27 @@
     <!-- Modal Add Funds -->
     <div class="modal" id="modalAddFunds" style="display: none;">
         <form class="modal-content">
-            <div class="container">
+            <div class="container moderator-evaluation event-form">
                 <div class="modal-header">
                     <h1>Add Funds</h1>
                 </div>
 
-                <label for="fName">Name: </label>
-                <input type="text" id="fName" placeholder="Enter your name">
+                <div class="funds-form">
+                    <label for="fName">Name: </label>
+                    <input type="text" id="fName" placeholder="Enter your name">
 
-                <label for="fCardNumber">Card Number:</label>
-                <input type="text" id="fCardNumber" placeholder="Enter card number">
+                    <label for="fCardNumber">Card Number:</label>
+                    <input type="text" id="fCardNumber" placeholder="Enter card number">
 
-                <label for="fCVC">CVC:</label>
-                <input type="text" id="fCVC" placeholder="Enter CVC">
+                    <label for="fCVC">CVC:</label>
+                    <input type="text" id="fCVC" placeholder="Enter CVC">
 
-                <label for="fExpirationDate">Expiration Date:</label>
-                <input type="text" id="fExpirationDate" placeholder="Enter expiration date">
+                    <label for="fExpirationDate">Expiration Date:</label>
+                    <input type="text" id="fExpirationDate" placeholder="Enter expiration date">
 
-                <label for="fAmountAdd">Amount ($):</label>
-                <input type="number" id="fAmountAdd" placeholder="Enter amount to add" min="0" step="0.01">
+                    <label for="fAmountAdd">Amount ($):</label>
+                    <input type="number" id="fAmountAdd" placeholder="Enter amount to add" min="0" step="0.01">
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -169,7 +177,28 @@
             </div>
         </form>
     </div>
+    <!-- Formatação das datas -->
+    <script async defer>
+        // Função para formatar todas as datas na tabela
+        function formatAllDates() {
+            const dateCells = document.querySelectorAll('.transaction-date');
+            dateCells.forEach(cell => {
+                const fullDate = cell.textContent.trim(); // Obtém o valor da célula
+                const formattedDate = fullDate.split('T')[0]; // Remove o horário (após o 'T')
+                cell.textContent = formattedDate; // Atualiza a célula com a data formatada
+            });
+        }
 
+        function formatAllValues() {
+            const values = document.querySelectorAll('.transaction-value');
+            values.forEach(cell => {
+                const rawValue = parseFloat(cell.textContent); // Pega o valor bruto
+                if (!isNaN(rawValue)) {
+                    cell.textContent = rawValue.toFixed(2); // Formata com duas casas decimais
+                }
+            });
+        }
+    </script>
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
         var tableTransactions= document.getElementById('tabelaTransactions');
@@ -222,10 +251,12 @@
                     credentials:"include"
                 });
                 if(transQtty.ok){
-                    const qttyJason = transQtty.json();
-                    const qtty = qttyJson[0].QTTY
+                    const qttyJson = await transQtty.json();
+                    const qtty = qttyJson[0].QTTY;
+                    console.log(qtty)
                     if (qtty && qtty > 0) {
                         numPages = Math.ceil(qtty / pageSize);
+                        console.log(numPages);
                         refreshPaginator(); // Adicionei para chamar a função que cria o paginador. ENZO que fez no HOME. Medina
                     } else {
                         console.log("Número de páginas inválido.");
@@ -256,8 +287,8 @@
                     const transactionData = await resTrans.json();
                     console.log(transactionData);  // Verifique a estrutura dos dados
                     if(transactionData.length === 0){
-                        const noEventsAvaliable = document.getElementById('noEventsAvaliable');
-                        noEventsAvaliable.style.display = "flex"
+                        const noTransactionsAvaliable = document.getElementById('noTransactionsAvaliable');
+                        noTransactionsAvaliable.style.display = "flex"
                         const table = document.getElementById("divTabela");
                         table.style.display = "none";
                         const paginator = document.getElementById("paginador");
@@ -280,6 +311,9 @@
             transactions.forEach(element => {
                 addTransactionsRow(element);
             });
+
+            formatAllDates();
+            formatAllValues();
         }
 
         function cleanTableRows() {
@@ -319,7 +353,7 @@
             prevA.href = "javascript:void(0);";
             prevA.textContent = "«";
             prevA.addEventListener("click", () => {
-                if (page > 1) requestEvents(page - 1);
+                if (page > 1) requestTransactions(page - 1);
             });
             prevLi.appendChild(prevA);
             ulPaginator.appendChild(prevLi);
@@ -334,7 +368,7 @@
                 a.href = "javascript:void(0);";
                 a.textContent = i;
                 a.addEventListener("click", () => {
-                    if (i !== page) requestEvents(i);
+                    if (i !== page) requestTransactions(i);
                 });
                 li.appendChild(a);
                 ulPaginator.appendChild(li);
@@ -349,7 +383,7 @@
             nextA.href = "javascript:void(0);";
             nextA.textContent = "»";
             nextA.addEventListener("click", () => {
-                if (page < numPages) requestEvents(page + 1);
+                if (page < numPages) requestTransactions(page + 1);
             });
             nextLi.appendChild(nextA);
             ulPaginator.appendChild(nextLi);
