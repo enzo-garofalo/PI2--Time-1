@@ -140,8 +140,6 @@
                         <option value="" hidden>Select a method...</option>
                         <option value="Conta bancaria">Conta bancaria</option>
                         <option value="Pix">Pix</option>
-                        <option value="Conta bancaria">Conta bancaria</option>
-                        <option value="Pix">Pix</option>
                     </select>
 
                     <div id="bankFieldsWithdraw" style="display: none;">
@@ -400,19 +398,18 @@
                     console.log("Crédito adicionado.")
                     
                 }else{
-                    alert('Ocorreu um erro, não foi possível adicionar fundos.');
+                    alert('Ocorreu um erro, não foi possível estimar a quatidade de eventos');
                     window.location.href = '../view/login.html';
                 }
 
                 hideModal('modalAddFunds');
                 alert(`Fundos adicionados! Quantidade: $${amount} via cartão.`);
             }catch(error){
-                console.error(error);
+
             }
         }
         
         //deixar pra quando estiver certo as outras funções e fazer aparecer as taxas
-        async function confirmWithdrawFunds() {
         async function confirmWithdrawFunds() {
             const amount = document.getElementById('fWithdrawAmount').value;
             const withdrawMethod = document.getElementById('fWithdrawMethod').value;
@@ -427,28 +424,13 @@
                     alert('Por favor, preencha todos os campos para prosseguir.');
                     return;
                 }
-            try {
-                // Verifica se todos os campos obrigatórios foram preenchidos
-                if (!amount || !withdrawMethod) {
-                    alert('Por favor, preencha todos os campos para prosseguir.');
-                    return;
-                }
         
                 // Validações específicas do método de retirada
                 if (withdrawMethod === 'Conta bancaria' && (!bank || !agency || !bankAccount)) {
                     alert('Por favor, forneça o banco, agência e número da conta.');
                     return;
                 }
-                // Validações específicas do método de retirada
-                if (withdrawMethod === 'Conta bancaria' && (!bank || !agency || !bankAccount)) {
-                    alert('Por favor, forneça o banco, agência e número da conta.');
-                    return;
-                }
         
-                if (withdrawMethod === 'Pix' && !pixKey) {
-                    alert('Por favor, coloque a chave PIX.');
-                    return;
-                }
                 if (withdrawMethod === 'Pix' && !pixKey) {
                     alert('Por favor, coloque a chave PIX.');
                     return;
