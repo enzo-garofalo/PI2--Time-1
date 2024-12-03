@@ -50,6 +50,10 @@
                     <i class="fa fa-chart-bar"></i>
                     Evaluate Event
                 </a>
+                <a href="../view/finishEvent.html" class="app-sidebar-link only-moderator">
+                    <i class="fa fa-chart-bar"></i>
+                    Finish Event
+                </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-calendar-days"></i>
                     My Events
@@ -57,10 +61,6 @@
                 <a href="../view/myWallet.html" class="app-sidebar-link">
                     <i class="fa fa-wallet"></i>
                     My Wallet
-                </a>
-                <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-chart-bar"></i>
-                    Finish Event
                 </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-sign-out-alt"></i>
@@ -303,7 +303,28 @@
             return null;
         }
     </script>
+    <!-- Formatação das datas -->
+    <script async defer>
+        // Função para formatar a data
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se necessário
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses começam do zero
+            const year = date.getFullYear();
 
+            return `${day}/${month}/${year}`;
+        }
+
+        // Função para formatar todas as datas na tabela
+        function formatAllDates() {
+            const dateCells = document.querySelectorAll('.event-finish-date');
+            dateCells.forEach(cell => {
+                const formattedDate = formatDate(cell.textContent.trim());
+                cell.textContent = formattedDate;
+            });
+        }
+    </script>
+    <!-- Modal configs -->
     <script async defer>
         const loader = document.getElementById('loader-container');
         var modal = document.getElementById('modalId');
@@ -372,7 +393,7 @@
                 description.value = eventData.DESCRIPTION;
                 category.value = eventData.CATEGORIES;
                 registerDate.value = eventData.REGISTER_DATE.split("T")[0]; // Ajusta o formato da data
-                finishDate.value = eventData.FINISH_DATE;
+                finishDate.value = eventData.FINISH_DATE.split("T")[0];
                 eventStatus.value = eventData.STATUS_EVENT;
                 betsFunds.value = eventData.BETS_FUNDS;
                 if(eventStatus.value != 'Aprovado'){
@@ -400,6 +421,7 @@
             }
         }   
     </script>
+    <!-- Search event logic -->
     <script async defer>
         async function searchEvents() {
             const busca = document.getElementById('searchBarInput').value;
@@ -440,6 +462,7 @@
             }
         }
     </script>
+    <!-- Get events by page logic -->
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
         var tableEvents = document.getElementById('tableEvents');
@@ -508,6 +531,7 @@
                 reqHeaders.append("page", pageNumber);
                 reqHeaders.append("pageSize", pageSize);
                 reqHeaders.append("status", "Aprovado");
+                reqHeaders.append("toFinish", 'false');  // Envia a string 'false'
 
                 
                 const resEvents = await fetch("http://127.0.0.1:3000/getEventsByPage", {
@@ -626,6 +650,8 @@
             events.forEach(element => {
                 addEventRow(element);
             });
+
+            formatAllDates()
         }
 
         // Função para limpar as linhas da tabela
@@ -757,7 +783,8 @@
                     alert(errorMSG);
                 }
             } catch (error) {
-                alert("Erro de comunicação com o servidor. Tente novamente.");
+                const errorMSG = await response.text();
+                alert(errorMSG);
                 console.error(error);
             }
         }

@@ -5,7 +5,6 @@ import { DataBaseManager } from "../db/connection";
 import { AccountsManager } from "../accounts/accounts";
 import { emailServiceManager } from "./emailService";
 import OracleDB from "oracledb";
-import { pid } from "process";
 
 
 
@@ -21,7 +20,7 @@ export namespace EventsManager
         RESULT_EVENT: string | undefined,
         REGISTER_DATE: string | undefined,
         BETS_FUNDS: number,
-        FINISH_DATE: string,
+        FINISH_DATE: Date,
         FK_ID_USER: number | undefined
     }
 
@@ -35,22 +34,22 @@ export namespace EventsManager
         const pDescription = req.get('Description');
         const pCategories = req.get('Categories');
         const pFinishDate = req.get('finishDate');
-    
         // Busca o ID do usuário com base no token da sessão
         const id_user = await DataBaseManager.getUserID(req.cookies.token);
-    
+        
         // Verifica se todos os parâmetros necessários estão presentes
         if (pTitle && pDescription && pCategories && pFinishDate && id_user) {
             
             // Valida se a data de término é posterior à data atual
             const today = new Date();
             let eventDate = new Date(pFinishDate);
+            
             if (eventDate <= today) {
                 res.statusCode = 400;
                 res.send('Não é possível criar evento na data informada!');
                 return;
             }
-    
+
             // Cria o objeto do evento a ser adicionado
             const newEvent: Event = {
                 ID_EVENT: undefined,
@@ -61,7 +60,7 @@ export namespace EventsManager
                 RESULT_EVENT: undefined,
                 REGISTER_DATE: undefined,
                 BETS_FUNDS: 0.00,
-                FINISH_DATE: pFinishDate,
+                FINISH_DATE:  eventDate,
                 FK_ID_USER: id_user
             };
     
@@ -222,7 +221,7 @@ export namespace EventsManager
             const today = new Date();
             
             // Verifica se a data atual é anterior ou igual à data de término do evento
-            if (today <= eventFinishDate || event?.[0]?.STATUS_EVENT !== 'aprovado') {
+            if (today <= eventFinishDate || event?.[0]?.STATUS_EVENT !== 'Aprovado') {
                 res.statusCode = 400; // Código 400: Solicitação inválida
                 res.send('Não foi possível finalizar evento.\n \
                 - Verifique a data de término do evento.\n \
@@ -372,9 +371,13 @@ export namespace EventsManager
         const pPage = req.get('page');
         const pPageSize = req.get('pageSize');
         const pStatus = req.get('status');
-        if(pPage && pPageSize && pStatus){
-            const events = await dbEventsManager.getEventsByPage(parseInt(pPage), parseInt(pPageSize), pStatus);
-            console.log('Events', events);
+        const pToFinish = req.get('toFinish') === 'false' ? false : Boolean(req.get('toFinish'));  // Verifica se é a string 'false'
+        
+
+        if(pPage && pPageSize && pStatus && pToFinish !== undefined){
+            console.log(pToFinish)
+            const events = await dbEventsManager.getEventsByPage(parseInt(pPage), parseInt(pPageSize), pStatus, pToFinish);
+            console.log('Events', events.rows);
             res.status(200).json(events.rows);
         }else{
             res.status(400).send('Requisição inválida - Parâmetros Faltantes');

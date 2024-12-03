@@ -2,6 +2,7 @@ import OracleDB from "oracledb";
 import dotenv from "dotenv";
 dotenv.config(); 
 
+
 import { DataBaseManager } from "../db/connection";
 import { EventsManager } from "../events/events";
 import { FundsManager } from "../funds/funds";
@@ -337,23 +338,50 @@ export namespace dbEventsManager
         return eventQtty;
     }
 
-    export async function getEventsByPage(page:number, pageSize: number, status_event: string) : Promise<OracleDB.Result<unknown>> {
-        const startRecord = ((page-1)*pageSize) + 1;
+    export async function getEventsByPage(page: number, pageSize: number, status_event: string, toFinish: boolean): Promise<OracleDB.Result<unknown>> {
+        const startRecord = (page - 1) * pageSize;
         let connection = await DataBaseManager.get_connection();
-        let eventQtty = await connection.execute(
-            `
+    
+        // Define the condition for date comparison
+        let apendice: string;
+        if (toFinish) {
+            apendice = 'TRUNC(FINISH_DATE) <= TRUNC(SYSDATE)';
+        } else {
+            apendice = 'TRUNC(FINISH_DATE) > TRUNC(SYSDATE)';
+        }
+    
+        const consulta = `
             SELECT * 
             FROM EVENTS 
             WHERE STATUS_EVENT = :status_event 
-            ORDER BY ID_EVENT 
-            OFFSET :startRecord ROWS FETCH NEXT :pagesize ROWS ONLY
-            `,
-            [status_event, startRecord, pageSize]
-        );
-        await connection.close();
-        console.log(eventQtty.rows);
-        return eventQtty;
+              AND ${apendice}
+            ORDER BY FINISH_DATE 
+            OFFSET :startRecord ROWS FETCH NEXT :pageSize ROWS ONLY
+        `;
+    
+        // Log the query and parameters for debugging
+        console.log(`Executing query: ${consulta}`);
+        console.log(`Parameters: status_event=${status_event}, startRecord=${startRecord}, pageSize=${pageSize}`);
+    
+        try {
+            const eventQtty = await connection.execute(consulta, {
+                status_event: status_event,
+                startRecord: startRecord,
+                pageSize: pageSize
+            });
+    
+            console.log(eventQtty.rows);
+            return eventQtty;
+        } catch (error) {
+            console.error('Error fetching events:', error);
+            throw error;
+        } finally {
+            await connection.close();
+        }
     }
+    
+    
+    
 }
 
 

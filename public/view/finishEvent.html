@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Evaluate New Event</title>
+    <title>Home</title>
     <meta name="description" content="A portfolio management dashboard.">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../styles/home.css">
@@ -14,20 +14,20 @@
     <div class="app-container">
         <div class="loader-container" id="loader-container">
             <div class="loader"></div>
-        </div>        
+        </div>
         <header class="app-header">
             <div class="app-header-left">
                 <span class="app-icon"><img src="../assets/pucbet-logo.png" class="logoPucBet"></span>
             </div>
-            
-            <!-- Balance do user -->
+       
+
+            <!-- Balance do user-->
             <div class="app-header-right"> 
                 <button type="button" class="fas fa-eye" id="showHideBalance"></button>
                 <div id="balance-container" class="showBalance">
                         Your Balance: <span id="cifra">$</span><span id="balance"></span>  
                 </div>
             </div>
-            
         </header>
         
 
@@ -37,9 +37,13 @@
                     <i class="fa fa-home"></i>
                     Home
                 </a>
-                <a href="../view/evaluateNewEvent.html" class="app-sidebar-link only-moderator active" style="display: none;">
+                <a href="../view/evaluateNewEvent.html" class="app-sidebar-link only-moderator" style="display: none;">
                     <i class="fa fa-chart-bar"></i>
                     Evaluate Event
+                </a>
+                <a href="../view/finishEvent.html" class="app-sidebar-link only-moderator active">
+                    <i class="fa fa-chart-bar"></i>
+                    Finish Event
                 </a>
                 <a href="#" class="app-sidebar-link">
                     <i class="fa fa-calendar-days"></i>
@@ -50,10 +54,6 @@
                     My Wallet
                 </a>
                 <a href="#" class="app-sidebar-link">
-                    <i class="fa fa-chart-bar"></i>
-                    Finish Event
-                </a>
-                <a href="#" class="app-sidebar-link">
                     <i class="fa fa-sign-out-alt"></i>
                     Logout
                 </a>
@@ -61,18 +61,19 @@
 
             <main class="projects-section">
                 <header class="projects-section-header">
-                    <p class="section-title">Eventos Pendentes</p>
+                    <p class="section-title"><span id="titlePage">Finalize os Eventos</span></p>
                     <p class="time" id="currentDate"></p>
                 </header>
-                <div class="row align-items-center">
-                    <div class="col" id="divTabela">
-                        <table id="tableEvents" class="table">
+                <div id="divTabela">
+                    <div class="col">
+                        <table id="tableEvents" class="table" >
                             <thead>
                                 <tr>
                                     <th scope="col" class="text-end">#</th>
                                     <th scope="col" class="text-left">Title</th>
                                     <th scope="col" class="text-end">Description</th>
                                     <th scope="col" class="text-end">Category</th>
+                                    <th scope="col" class="text-end">Status</th>
                                     <th scope="col" class="text-center">Finish Date</th>
                                     <th scope="col" class="text-center">Action</th>
                                 </tr>
@@ -83,15 +84,14 @@
                         </table>
                     </div>
                 </div>
-                <!-- Depois fazer isso! -->
+
                 <div id="noEventsAvaliable" style="display: none;">
                     <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
-                    <span class="emptyMessage">Não Há Eventos Pendentes</span>
+                    <span class="emptyMessage">Não Há Eventos Ativos</span>
                 </div>
-                
 
                 <!-- Paginador -->
-                <div class="row justify-content-center">
+                <div class="row justify-content-center" id="paginador">
                     <div class="col-auto">
                         <nav aria-label="Page navigation" id="paginador">
                             <ul id="ulPaginator" class="pagination pagination-sm">
@@ -100,82 +100,133 @@
                         </nav>
                     </div>
                 </div>
-
             </main>
         </div>
-        <div class="modal" id="modalId">
-            <form class="modal-content">
-                <div class="container">
-                    <div class="modal-header">
-                        <h1>Evaluate Event</h1>
+    </div>
+
+
+    <!-- Modal do finish -->
+    <div class="modal" id="modalId">
+        <form class="modal-content">
+            <div class="container">
+                <div class="modal-header">
+                    <h1>Event Details</Data></h1>
+                </div>
+                
+                <div class="event-form">
+                    <input type="text" id="Sid_event" style="display: none;" disabled>
+
+                    <label for="fTitle">Ttile</label>
+                    <input type="text" id="STitle" disabled>
+                    
+                    <label for="fTitle">Description</label>
+                    <input type="text" id="SDescription" disabled>
+                    
+                    <label for="fCategory">Category</label>
+                    <input type="text" id="SCategory" disabled>
+                    
+                    <div class="date-container">
+                   <div class="date-field">
+                            <label for="fRegisterDate">Register Date</label>
+                            <input type="date" id="SRegisterDate" disabled>
+                        </div>
+                        <div class="date-field">
+                            <label for="fFinishDate">Finish Date</label>
+                            <input type="date" id="SFinishDate" disabled>
+                        </div>     
+                    </div> 
+                    <div class="date-container">
+                   <div class="date-field">
+                            <label for="fRegisterDate">Status</label>
+                            <input type="text" id="SStatus" disabled>
+                        </div>
+                        <div class="date-field">
+                            <label for="fFinishDate">Bets Funds</label>
+                            <input type="text" id="SBetsFunds" style="text-align: right;" disabled>
+                        </div>     
+                    </div> 
+                </div>
+                <div class="user-bet moderator-evaluation" id="userBet">
+                    <label for="fVerdict">This event happened?</label>
+                    <div class="radio-group">
+                        <label for="fVerdictYes">
+                            <input type="radio" id="fVerdictYes" name="fVerdict" value="sim"> 
+                            Yes
+                        </label>
+                        <label for="fVerdictNo">
+                            <input type="radio" id="fVerdictNo" name="fVerdict" value="não"> 
+                            No
+                        </label>
                     </div>
                     
-                    <div class="event-form">
-                        <input type="text" id="id_event" style="display: none;" disabled>
-
-                        <label for="fTitle">Ttile</label>
-                        <input type="text" id="fTitle" disabled>
-                        
-                        <label for="fTitle">Description</label>
-                        <input type="text" id="fDescription" disabled>
-                        
-                        <label for="fCategory">Category</label>
-                        <input type="text" id="fCategory" disabled>
-                        
-                        <div class="date-container">
-                            <div class="date-field">
-                                <label for="fRegisterDate">Register Date</label>
-                                <input type="date" id="fRegisterDate" disabled>
-                            </div>
-                            <div class="date-field">
-                                <label for="fFinishDate">Finish Date</label>
-                                <input type="date" id="fFinishDate" disabled>
-                            </div>
-                        </div> 
-                    </div>
-                    <div class="moderator-evaluation">
-                        <label for="fVerdict">Is this event approved?</label>
-                        <div class="radio-group">
-                            <label for="fVerdictYes">
-                                <input type="radio" id="fVerdictYes" name="fVerdict" value="sim" onclick="toggleReason()"> 
-                                Yes
-                            </label>
-                            <label for="fVerdictNo">
-                                <input type="radio" id="fVerdictNo" name="fVerdict" value="não" onclick="toggleReason()"> 
-                                No
-                            </label>
-                        </div>
-                        
-            
-                        
-                        <label for="fReason">Reason</label>
-                        <select name="fReason" id="fReason" disabled onchange="handleOtherReason()">
-                            <option value="placeholder" hidden>Select a reason...</option>
-                            <option value="Texto Confuso">Texto Confuso</option>
-                            <option value="Texto Inapropriado">Texto Inapropriado</option>
-                            <option value="Não respeita a política de privacidade e/ou termos de uso da plataforma">Não respeita a política de privacidade e/ou termos de uso da plataforma</option>
-                            <option value="other">Other</option>
-                        </select>
-
-                        <!-- Campo de texto que será exibido ao selecionar "Outros" -->
-                        <div id="otherReasonContainer" class="otherReasonContainer" style="display: none; margin-top: 10px;">
-                            <label for="otherReasonText">Specify your reason:</label>
-                            <input type="text" id="otherReasonText" placeholder="Describe your reason here..." />
-                        </div>
-                    </div>
-        
-                    <div class="modal-footer">
-                        <button type="button" onclick="hideModal()" class="cancelBtn" id="cancelBtn">
-                                Cancel
-                        </button>
-                        <button type="button" onclick="evaluateEvent()" class="evaluateBtn" id="evaluateBtn">
-                                Evaluate
-                        </button>
-                    </div>
                 </div>
-            </form>
-        </div>
+                        
+                <div class="modal-footer" id="modalSearch">
+                    <button type="button" onclick="hideModal()" class="cancelBtn" id="cancelBtn">
+                            Close
+                    </button>
+                    <button type="button" onclick="finishEvent()" class="evaluateBtn" id="betBtn">
+                            Finish
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
+
+    <!--finish event-->
+    <script async defer>
+
+        async function finishEvent(){
+            loader.classList.add('active');
+            const eventId = document.getElementById('Sid_event').value;
+            const verdict = getVerdict();
+
+
+            const reqHeaders = new Headers();
+            reqHeaders.append("Content-Type", "application/json");
+            reqHeaders.append("connection", "keep-alive");
+            reqHeaders.append('eventId', eventId);
+            reqHeaders.append('aconteceu', verdict);
+
+            console.log(reqHeaders);
+
+            try {
+                const res = await fetch('http://127.0.0.1:3000/finishEvent', {
+                    method: 'POST',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+
+                const msg = await res.text();
+                if (res.ok) {
+                    alert(msg);
+                    cleanModal()
+                    window.location.reload()
+                } else {
+                    alert(`Error: ${msg}`);
+                }
+            } catch (error) {
+                console.error('Erro ao enviar solicitação:', error);
+                alert('Failed to connect to the server.');
+            }finally{
+                loader.classList.remove('active');
+            }
+        }
+
+        function getVerdict() {
+            const radioYes = document.getElementById('fVerdictYes');
+            const radioNo = document.getElementById('fVerdictNo');
+
+            if (radioYes.checked) {
+                return radioYes.value;
+            }
+            if (radioNo.checked) {
+                return radioNo.value;
+            }
+            return null;
+        }
+    </script>
+
     <!-- Formatação das datas -->
     <script async defer>
         // Função para formatar a data
@@ -197,179 +248,29 @@
             });
         }
     </script>
-    <!-- Modal configs, evaluate call -->
+    <!-- Modal configs -->
     <script async defer>
         const loader = document.getElementById('loader-container');
         var modal = document.getElementById('modalId');
 
-        function toggleReason() {
-            const reasonField = document.getElementById('fReason');
-            const placeholderOption = reasonField.options[0]; // Pega o placeholder
-            const radioNo = document.querySelector('input[name="fVerdict"][value="não"]');
-            const radioYes = document.querySelector('input[name="fVerdict"][value="sim"]');
-            const otherReasonContainer = document.getElementById('otherReasonContainer');
-
-            if (radioNo.checked) {
-                // Habilita o campo e ajusta o placeholder para "Select a reason..."
-                reasonField.disabled = false;
-                reasonField.style.borderColor = '#66e0a3';
-                placeholderOption.text = "Select a reason...";
-                reasonField.selectedIndex = 0; // Define o placeholder como selecionado
-            } else if (radioYes.checked) {
-                // Desabilita o campo e ajusta o placeholder para "Reason isn't needed..."
-                reasonField.disabled = true;
-                reasonField.style.borderColor = '#3d3d3d';
-                placeholderOption.text = "Reason isn't needed...";
-                reasonField.selectedIndex = 0; // Define o placeholder como selecionado
-                otherReasonContainer.style.display = "none"; // Oculta o campo "Outros"
-            }
-        }
-
-        function handleOtherReason() {
-            const reasonField = document.getElementById('fReason');
-            const otherReasonContainer = document.getElementById('otherReasonContainer');
-            const selectedValue = reasonField.value;
-
-            if (selectedValue === "other") {
-                otherReasonContainer.style.display = "block"; // Exibe o campo "Outros"
-            } else {
-                otherReasonContainer.style.display = "none"; // Oculta o campo "Outros"
-            }
-        }
-        // Função principal
-        async function evaluateEvent() {
-            try {
-                loader.classList.add('active');
-                document.getElementById("evaluateBtn").disabled = true;
-                document.getElementById("cancelBtn").disabled = true;
-                const reqHeaders = initializeHeaders();
-                const idEvent = getInputValueById('id_event');
-                reqHeaders.append('eventId', idEvent);
-
-                const verdict = getVerdict();
-                console.log('verdict', verdict);
-                if (!verdict) {
-                    alert('Give a verdict for the event!');
-                    return;
-                }
-                reqHeaders.append('isValid', verdict);
-
-                if (verdict === 'não') {
-                    const reason = getReason();
-                    if (!reason) return; // Validação falhou, já foi tratado na função getReason
-                    reqHeaders.append('reason', reason);
-                    console.log('reason', reason)
-                }
-
-                // Realize sua requisição aqui, utilizando reqHeaders
-                console.log('Headers:', [...reqHeaders]);
-                const res = await fetch('http://127.0.0.1:3000/evaluateNewEvent', {
-                    method: 'PUT',
-                    headers: reqHeaders,
-                    credentials: 'include'
-                });
-                if(res.ok){
-                    alert('Evento Avaliado!');
-                    requestNumberOfEvent();
-                    requestEvents(page);
-                    hideModal();
-                }else{
-                    const errorMsg = await res.text(); // Ou res.json() se o backend retornar JSON
-                    console.error('Erro:', errorMsg);
-                    alert('Não foi possível avaliar o evento: ' + errorMsg);
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                // Sempre oculta o loader e reativa os botões
-                loader.classList.remove('active');
-                document.getElementById("evaluateBtn").disabled = false;
-                document.getElementById("cancelBtn").disabled = false;
-            }
-        }
-
-        // Inicializa os headers
-        function initializeHeaders() {
-            const headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("connection", "keep-alive");
-            return headers;
-        }
-
-        // Obtém o valor de um input pelo ID
-        function getInputValueById(id) {
-            const element = document.getElementById(id);
-            return element ? element.value : '';
-        }
-
-        // Obtém o veredito dos botões de rádio
-        function getVerdict() {
-            const radioYes = document.getElementById('fVerdictYes');
-            const radioNo = document.getElementById('fVerdictNo');
-
-            if (radioYes.checked) {
-                return radioYes.value;
-            }
-            if (radioNo.checked) {
-                return radioNo.value;
-            }
-            return null;
-        }
-
-        // Obtém a razão selecionada ou o texto personalizado se aplicável
-        function getReason() {
-            const selectReason = document.getElementById('fReason');
-            const selectedValue = selectReason.value;
-
-            if (selectedValue === 'placeholder') {
-                alert('Please select a reason!');
-                return null;
-            }
-
-            if (selectedValue === 'other') {
-                const anotherReason = document.getElementById('otherReasonText');
-                if (!anotherReason || anotherReason.value.trim() === '') {
-                    alert('Type the specific reason!');
-                    return null;
-                }
-                return anotherReason.value.trim();
-            }
-
-            return selectedValue;
-        }
-
-        
         function cleanModal() {
             // Campos de texto e número
-            document.getElementById('id_event').value = '';
-            document.getElementById('fTitle').value = '';
-            document.getElementById('fDescription').value = '';
-            document.getElementById('fCategory').value = '';
-            document.getElementById('fRegisterDate').value = '';
-            document.getElementById('fFinishDate').value = '';
-
-            // Campos de radio buttons
-            const radioButtons = document.querySelectorAll('input[name="fVerdict"]');
-            radioButtons.forEach(radio => radio.checked = false);
-
-            // Select
-            const reasonSelect = document.getElementById('fReason');
-            reasonSelect.selectedIndex = 0;
-            reasonSelect.disabled = true; // Desabilita novamente
-            reasonSelect.style.borderColor = '#3d3d3d';
-
-            // Campo "Other Reason"
-            const otherReasonContainer = document.getElementById('otherReasonContainer');
-            otherReasonContainer.style.display = 'none';
-            document.getElementById('otherReasonText').value = '';
+            document.getElementById('Sid_event').value = '';
+            document.getElementById('STitle').value = '';
+            document.getElementById('SDescription').value = '';
+            document.getElementById('SCategory').value = '';
+            document.getElementById('SRegisterDate').value = '';
+            document.getElementById('SFinishDate').value = '';
+            document.getElementById('SStatus').value = '';
+            document.getElementById('SBetsFunds').value = '';
         }
 
-        async function getEventById(id_event){
+        async function getEventById(id_event, status){
             try{
                 const reqHeaders = new Headers();
                 reqHeaders.append("Content-Type", "application/json");
                 reqHeaders.append('connection', 'keep-alive');
-                reqHeaders.append('status', 'Pendente');
+                reqHeaders.append('status', status);
                 reqHeaders.append('id', id_event);
 
                 const res = await fetch('http://127.0.0.1:3000/getEvent', {
@@ -379,7 +280,7 @@
                 });
                 if(res.ok){
                     const eventData = await res.json();
-                    console.log(eventData)
+                    console.log(eventData);
                     return eventData;
                 }else{
                     // Caso dê algum erro, recarrega página
@@ -391,16 +292,21 @@
             }
         }
 
-        async function fillModal(id_event) {
-            var idEvent = document.getElementById('id_event');
-            var title = document.getElementById('fTitle');
-            var description = document.getElementById('fDescription');
-            var category = document.getElementById('fCategory');
-            var registerDate = document.getElementById('fRegisterDate');
-            var finishDate = document.getElementById('fFinishDate');
+        async function fillModal(id_event, status) {
+            var idEvent = document.getElementById('Sid_event');
+            var title = document.getElementById('STitle');
+            var description = document.getElementById('SDescription');
+            var category = document.getElementById('SCategory');
+            var registerDate = document.getElementById('SRegisterDate');
+            var finishDate = document.getElementById('SFinishDate');
+            var eventStatus =document.getElementById('SStatus');
+            var betsFunds =document.getElementById('SBetsFunds');
+
+            const betBtn = document.getElementById('betBtn');
+            const userBet = document.getElementById('userBet');
 
             // Obtém os dados do evento
-            const event = await getEventById(id_event);
+            const event = await getEventById(id_event, status);
 
             if (event && event.array.length > 0) {
                 const eventData = event.array[0]; // Acessa o primeiro elemento do array
@@ -412,15 +318,21 @@
                 category.value = eventData.CATEGORIES;
                 registerDate.value = eventData.REGISTER_DATE.split("T")[0]; // Ajusta o formato da data
                 finishDate.value = eventData.FINISH_DATE.split("T")[0];
-            
+                eventStatus.value = eventData.STATUS_EVENT;
+                betsFunds.value = eventData.BETS_FUNDS;
+                if(eventStatus.value != 'Aprovado'){
+                     betBtn.style.display = 'none';
+                     userBet.style.display = 'none';
+                } 
+
             } else {
                 alert("Evento não encontrado ou dados inválidos.");
             }
         }
 
-        async function showModal(id_event){
+        async function showModal(id_event, status){
             cleanModal();
-            await fillModal(id_event);
+            await fillModal(id_event, status);
             modal.style.display = 'block';
         }
         
@@ -433,14 +345,15 @@
             }
         }   
     </script>
-    <!-- Config para exibir eventos -->
+
+    <!-- Get events by page logic -->
     <script async defer>
         var ulPaginator = document.getElementById("ulPaginator");
         var tableEvents = document.getElementById('tableEvents');
         let numPages = 0; 
         const pageSize = 10; 
         var page = 1; 
-        // Consertar 
+
         async function checkIsModerator(){
             try{
                 const reqHeaders = new Headers();
@@ -468,7 +381,7 @@
             try{
                 const reqHeaders = new Headers();
                 reqHeaders.append("Content-Type", "application/json");
-                reqHeaders.append("status", "Pendente");
+                reqHeaders.append("status", "Aprovado");
 
                 const res = await fetch("http://127.0.0.1:3000/getEventQtty", {
                     method: "GET",
@@ -501,11 +414,10 @@
                 reqHeaders.append("Content-Type", "application/json");
                 reqHeaders.append("page", pageNumber);
                 reqHeaders.append("pageSize", pageSize);
-                reqHeaders.append("status", "Pendente");
-                reqHeaders.append("toFinish", false);
+                reqHeaders.append("status", "Aprovado");
+                reqHeaders.append("toFinish", true);
 
-                console.log(pageNumber);
-                console.log(pageSize);
+                
                 const resEvents = await fetch("http://127.0.0.1:3000/getEventsByPage", {
                     method: "POST",
                     headers: reqHeaders,
@@ -592,6 +504,29 @@
             nextLi.appendChild(nextA);
             ulPaginator.appendChild(nextLi);
         }
+        
+        async function fetchActiveEvent(){
+            try{
+                const reqHeaders = new Headers();
+                reqHeaders.append("Content-Type", "application/json");
+                reqHeaders.append("connection", "keep-alive");
+                reqHeaders.append("status", "aprovado");
+
+                const res = await fetch('http://127.0.0.1:3000/getEvent', {
+                    method: 'GET',
+                    headers: reqHeaders,
+                    credentials: 'include'
+                });
+                if(res.ok){
+                    const eventsData = await res.json();
+                    fillTable(eventsData);
+                }else{
+                    alert('ocorreu um erro, verficar e tratar ...');
+                }
+            }catch(error){
+                console.error(error);
+            }
+        }
 
         function fillTable(events){
             cleanTableRows();
@@ -612,13 +547,14 @@
         function addEventRow(event) {
             const eventRow = 
                 `<tr id="${event.ID_EVENT}">
-                    <td class="event-id" id="${event.ID_EVENT}">${event.ID_EVENT}</td>
+                    <td class="event-id">${event.ID_EVENT}</td>
                     <td class="event-title">${event.TITLE}</td>
                     <td class="event-description">${event.DESCRIPTION}</td>
                     <td class="event-categorie">${event.CATEGORIES}</td>
+                    <td class="event-status">${event.STATUS_EVENT}</td>
                     <td class="event-finish-date">${event.FINISH_DATE}</td>
-                    <td class="evaluateEvent">
-                        <button onclick="showModal(${event.ID_EVENT})">Evaluate</button>
+                    <td class="bet-on-event">
+                        <button onclick="showModal(${event.ID_EVENT}, '${event.STATUS_EVENT}')"> Show Event </button>
                     </td>
                 </tr>`;
             tableEvents.getElementsByTagName('tbody')[0].insertAdjacentHTML('beforeend', eventRow);
@@ -676,6 +612,10 @@
                 requestEvents(page);
             }
         });
+      
+
+
+
 
         document.getElementById("showHideBalance").addEventListener("click", async event => {
             const iconElement = document.getElementById("showHideBalance");
