@@ -102,7 +102,10 @@ routes.delete('/deleteEvent', EventsManager.deleteEventHandler)
 routes.put('/addFunds', FundsManager.addNewFundsHandler);
 routes.put('/withdrawFunds', FundsManager.withdrawFundsHandler);
 routes.get('/getBalance', FundsManager.getBalance);
-routes.get('/getTransactions', FundsManager.getTransactions)
+routes.get('/getTransactions', FundsManager.getTransactions);
+routes.get('/getTransactionsQtty', FundsManager.getTransactionsQttyHandler);
+routes.get('/getTransactionsByPage', FundsManager.getTransactionsByPage);
+
 
 //Rotas de bets
 routes.put('/betOnEvent', betsManager.betOnEventHandler)

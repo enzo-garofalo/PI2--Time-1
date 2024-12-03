@@ -70,31 +70,43 @@ export namespace dbFundsManager
     }
 
 
-    // export async function getTransactions(id_wallet: number) {
+    export async function getTransactionsQtty(id_wallet: number) {
 
-    //     OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
-    //     const connection: OracleDB.Connection = 
-    //     await DataBaseManager.get_connection();
+        OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
+        const connection: OracleDB.Connection = 
+        await DataBaseManager.get_connection();
 
-    //     try{
-    //         const historicRows: OracleDB.Result<FundsManager.historicRow>  = await connection.execute(
-    //             `
-    //             SELECT * FROM HISTORIC
-    //             WHERE FK_ID_WALLET = :idwallet
-    //             `,
-    //             {
-    //                 id_wallet: id_wallet
-    //             }
-    //         );
-    //         return historicRows;
-            
-    //         await connection.commit();
-    //     }catch{
-    //         console.log('erro inesperado');
-    //         return false;
-    //     }finally{
-    //         await connection.close();
-    //         return;
-    //     }
-    // }
+        const transctionsQtty: OracleDB.Result<FundsManager.historicRow>  = await connection.execute(
+                `
+                SELECT count(TRANSACTION_ID) as QTTY
+                FROM HISTORIC
+                WHERE FK_ID_WALLET = :idwallet
+                `,
+                [id_wallet]
+            );
+        await connection.close();
+        console.log(transctionsQtty.rows);
+        return transctionsQtty;
+       
+    }
+
+    export async function getTransactionsByPage(id_wallet:number, page:number, pageSize: number ) {
+        const startRecord = ((page-1)*pageSize) + 1;
+        let connection = await DataBaseManager.get_connection();
+        
+        let transctionsQtty = await connection.execute(
+           `
+            SELECT * 
+            FROM HISTORIC 
+            WHERE FK_ID_WALLET = :idwallet 
+            ORDER BY TRANSACTION_ID 
+            OFFSET :startRecord ROWS FETCH NEXT :pagesize ROWS ONLY
+            `,
+            [id_wallet, startRecord, pageSize]
+        );
+        await connection.close();
+        console.log(transctionsQtty.rows);
+        return transctionsQtty;
+       
+    }
 }

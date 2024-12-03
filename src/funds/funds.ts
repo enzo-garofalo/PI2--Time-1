@@ -233,18 +233,54 @@ export namespace FundsManager{
                 } else {
                     res.status(200).json({ success: true, data: result.rows, message: "Transações obtidas com sucesso." });
                 }
+                console.log(result.rows);
             } catch (error) {
                 console.error("Erro ao obter transações:", error);
                 res.status(500).json({ success: false, message: "Erro ao processar a requisição." });
             } finally {
                 await connection.close();
             }
+
         } catch (error) {
             console.error("Erro geral no handler:", error);
             res.status(500).json({ success: false, message: "Erro interno do servidor." });
         }
     };
 
-    
+    export const getTransactionsQttyHandler: RequestHandler = async (req: Request, res: Response) => {
+        if (!AccountsManager.isLoggedIn(req, res)) return;
+
+        try {
+            const joinTables = await DataBaseManager.joinTables(req.cookies.token);
+
+            if (!joinTables || joinTables.length === 0) {
+                res.status(500).json({ success: false, message: "Não foi possível acessar os dados da conta." });
+                return;
+            }
+            const transactionsQtty = await dbFundsManager.getTransactionsQtty(joinTables[0].IDWALLET);
+            res.status(200).send(transactionsQtty.rows);
+
+        }catch(error){
+            res.status(400).send('Requisição inválida');
+        }
+    }
+
+    export const getTransactionsByPage: RequestHandler = async(req: Request, res: Response) => {
+        if (!AccountsManager.isLoggedIn(req, res)) return;
+        const pPage = req.get('page');
+        const pPageSize = req.get('pageSize');
+        const joinTables = await DataBaseManager.joinTables(req.cookies.token);
+        if (!joinTables || joinTables.length === 0) {
+            res.status(500).json({ success: false, message: "Não foi possível acessar os dados da conta." });
+            return;
+        }
+        if(pPage && pPageSize){
+            const transactions = await dbFundsManager.getTransactionsByPage(joinTables[0].IDWALLET, parseInt(pPage), parseInt(pPageSize));
+            console.log('Transactions', transactions);
+            res.status(200).json(transactions.rows);
+        }else{
+            res.status(400).send('Requisição inválida - Parâmetros Faltantes');
+        }
+    }
+
 }
-    
