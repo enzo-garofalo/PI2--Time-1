@@ -91,6 +91,7 @@ routes.put('/evaluateNewEvent', EventsManager.evaluateNewEventHandler);
 
 routes.get('/searchEvent', EventsManager.searchEventHandler);
 routes.get('/getEvent', EventsManager.getEventHandler);
+routes.get('/getUserEvents', EventsManager.getUserEventHandler);
 
 routes.get('/getEventQtty', EventsManager.getEventQttyHandler);
 routes.post('/getEventsByPage', EventsManager.getEventByPageHandler)
