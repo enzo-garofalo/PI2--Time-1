@@ -91,7 +91,7 @@ export namespace dbFundsManager
     }
 
     export async function getTransactionsByPage(id_wallet:number, page:number, pageSize: number ) {
-        const startRecord = ((page-1)*pageSize) + 1;
+        const startRecord = ((page-1)*pageSize);
         let connection = await DataBaseManager.get_connection();
         
         let transctionsQtty = await connection.execute(

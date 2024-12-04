@@ -79,7 +79,7 @@
                     </div>
                 </div>
 
-                <div id="noTransactionsAvaliable" style="display: none;">
+                <div id="noEventsAvaliable" style="display: none;">
                     <img src="../assets/undraw_blank_canvas_re_2hwy.svg" alt="Canvas em branco">
                     <span class="emptyMessage">Não há Transações</span>
                 </div>
@@ -278,13 +278,13 @@
                     method: "GET",
                     headers: reqHeaders,
                     credentials: 'include'
-                 });
+                });
                 if(resTrans.ok){
                     const transactionData = await resTrans.json();
                     console.log(transactionData);  // Verifique a estrutura dos dados
                     if(transactionData.length === 0){
-                        const noTransactionsAvaliable = document.getElementById('noTransactionsAvaliable');
-                        noTransactionsAvaliable.style.display = "flex"
+                        const noEventsAvaliable = document.getElementById('noEventsAvaliable');
+                        noEventsAvaliable.style.display = "flex"
                         const table = document.getElementById("divTabela");
                         table.style.display = "none";
                         const paginator = document.getElementById("paginador");
@@ -397,8 +397,8 @@
             if(event.target.readyState === 'complete'){
                 await checkIsModerator();
                 await setBalance();
-                requestTransactionsQtty();
-                requestTransactions(page);
+                await requestTransactionsQtty();
+                await requestTransactions(page);
             }
         });
 
