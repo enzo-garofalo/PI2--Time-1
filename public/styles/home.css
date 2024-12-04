@@ -475,6 +475,7 @@ body {
 
 .event-form input[type="text"],
 .event-form input[type="date"],
+.event-form input[type="number"],
 .moderator-evaluation select {
     width: 100%;
     padding: 12px;
@@ -488,6 +489,7 @@ body {
 
 .event-form input[type="text"]:focus,
 .event-form input[type="date"]:focus,
+.event-form input[type="number"]:focus,
 .moderator-evaluation select:focus {
     border-color: var(--accent-color);
     outline: none;
@@ -795,9 +797,9 @@ header.projects-section-header button:first-child {
     justify-content: center;
     align-items: center;
     height: 100vh;
-  }
-  
-  .errorPopup {
+}
+
+.errorPopup {
     width: 360px;
     display: flex;
     flex-direction: column;
@@ -811,31 +813,31 @@ header.projects-section-header button:first-child {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
     border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-  
-  .errorPopup.hidden {
+}
+
+.errorPopup.hidden {
     transform: scale(0.9);
     opacity: 0;
     pointer-events: none;
-  }
-  
-  .error-icon {
+}
+
+.error-icon {
     width: 60px;
     height: 60px;
     margin-bottom: 25px;
     color: #44d888; /* Cor do ícone */
     font-size: 3rem;
-  }
-  
-  .errorPopup p {
+}
+
+.errorPopup p {
     margin-bottom: 25px;
     font-size: 18px;
     line-height: 1.6;
     color: #555555;
     font-weight: 500;
-  }
-  
-  .close-btn {
+}
+
+.close-btn {
     background-color: transparent;
     border: 1px solid #44d888; 
     color: #44d888; 
@@ -847,18 +849,22 @@ header.projects-section-header button:first-child {
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 -4px 12px rgba(255, 255, 255, 0.2);
     outline: none;
-  }
-  
-  .close-btn:hover {
+}
+
+.close-btn:hover {
     background-color: #44d888; 
     color: #ffffff; 
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1), 0 -6px 16px rgba(255, 255, 255, 0.2);
-  }
-  
-  .close-btn:active {
+}
+
+.close-btn:active {
     background-color: #44d888; 
     color: white; 
     box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.2);
     transform: translateY(0);
-  }
+}
+
+.transaction-value {
+    text-align: right;
+}
