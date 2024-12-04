@@ -45,7 +45,7 @@
                     <i class="fa fa-chart-bar"></i>
                     Finish Event
                 </a>
-                <a href="#" class="app-sidebar-link active">
+                <a href="../view/myEvents.html" class="app-sidebar-link active">
                     <i class="fa fa-calendar-days"></i>
                     My Events
                 </a>
@@ -297,10 +297,10 @@
                 finishDate.value = eventData.FINISH_DATE.split("T")[0];
                 eventStatus.value = eventData.STATUS_EVENT;
                 betsFunds.value = eventData.BETS_FUNDS;
-                if(eventStatus.value === 'Aprovado'){ // apenas eventos pendendes podem ser excluidos
-                    cancelBtn.style.display = 'none';
+                if (eventStatus.value === 'Aprovado' || eventStatus.value === 'Deletado' || eventStatus.value === 'Reprovado') {
+                    cancelBtn.style.display = 'none'; // apenas eventos pendendes podem ser excluidos
                     deleteBtn.style.display = 'none';
-                } 
+                }
 
             } else {
                 alert("Evento não encontrado ou dados inválidos.");

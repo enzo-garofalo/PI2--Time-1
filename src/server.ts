@@ -24,7 +24,7 @@ export const server = express();
 
 
 const allowedOrigins = ['http://localhost:5501', 'http://192.168.1.2:5501', 
-                        'http://192.168.1.5:5501', 'http://127.0.0.1:5501',
+                        'http://127.0.0.7:5501', 'http://127.0.0.1:5501',
                         'http://192.168.1.5:5502', 'http://192.168.1.10:5501'];
 
 server.use(cors({
