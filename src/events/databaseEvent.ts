@@ -141,7 +141,7 @@ export namespace dbEventsManager
             WHERE ID_EVENT = :idEvent AND BET = :verdict
             `, { idEvent, verdict }
         );
-    
+        console.log('Veredito: ', verdict);
         // Obtém o número total de ganhadores
         const totalWinners = countWinners.rows?.[0]?.TOTAL_BETTORS || 0;
     
@@ -158,6 +158,7 @@ export namespace dbEventsManager
                 WHERE ID_EVENT = :idEvent AND BET = :verdict
                 `, { idEvent, verdict }
             );
+            console.log('winners: ', idWinnersList);
             // Perguntar sobre batch processing para o mateues
             // Se houver ganhadores na lista, processa cada um deles
             if(idWinnersList.rows){
@@ -342,12 +343,12 @@ export namespace dbEventsManager
         const startRecord = (page - 1) * pageSize;
         let connection = await DataBaseManager.get_connection();
     
-        // Define the condition for date comparison
+        // Define the condition for da te comparison
         let apendice: string;
         if (toFinish) {
-            apendice = 'TRUNC(FINISH_DATE) <= TRUNC(SYSDATE)';
+            apendice = 'TRUNC(FINISH_DATE) <  TRUNC(SYSDATE)';
         } else {
-            apendice = 'TRUNC(FINISH_DATE) > TRUNC(SYSDATE)';
+            apendice = 'TRUNC(FINISH_DATE) >= TRUNC(SYSDATE)';
         }
     
         const consulta = `

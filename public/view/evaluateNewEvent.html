@@ -178,22 +178,13 @@
     </div>
     <!-- Formatação das datas -->
     <script async defer>
-        // Função para formatar a data
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se necessário
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses começam do zero
-            const year = date.getFullYear();
-
-            return `${day}/${month}/${year}`;
-        }
-
         // Função para formatar todas as datas na tabela
         function formatAllDates() {
             const dateCells = document.querySelectorAll('.event-finish-date');
             dateCells.forEach(cell => {
-                const formattedDate = formatDate(cell.textContent.trim());
-                cell.textContent = formattedDate;
+                const fullDate = cell.textContent.trim(); // Obtém o valor da célula
+                const formattedDate = fullDate.split('T')[0]; // Remove o horário (após o 'T')
+                cell.textContent = formattedDate; // Atualiza a célula com a data formatada
             });
         }
     </script>

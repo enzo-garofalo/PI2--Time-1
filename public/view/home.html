@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+<head>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -222,21 +224,7 @@
             </div>
         </form>
     </div>
-      <!-- Popup de alerta geral -->
-      <div class="alert-wrapper" id="alertPopup">
-        <div class="custom-container">
-            <div class="errorPopup" id="errorPopup">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="error-icon">
-                    <path fill="none" d="M0 0h24v24H0z"></path>
-                    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#44d888"></path>
-                </svg>
-                <p>It seems that you can no longer create events.</p>
-                <button class="close-btn" onclick="closePopup()">Close</button>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
+    
 
     <!-- bet event -->
     <script async defer>
@@ -305,22 +293,13 @@
     </script>
     <!-- Formatação das datas -->
     <script async defer>
-        // Função para formatar a data
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            const day = String(date.getDate()).padStart(2, '0'); // Adiciona zero à esquerda se necessário
-            const month = String(date.getMonth() + 1).padStart(2, '0'); // Meses começam do zero
-            const year = date.getFullYear();
-
-            return `${day}/${month}/${year}`;
-        }
-
         // Função para formatar todas as datas na tabela
         function formatAllDates() {
             const dateCells = document.querySelectorAll('.event-finish-date');
             dateCells.forEach(cell => {
-                const formattedDate = formatDate(cell.textContent.trim());
-                cell.textContent = formattedDate;
+                const fullDate = cell.textContent.trim(); // Obtém o valor da célula
+                const formattedDate = fullDate.split('T')[0]; // Remove o horário (após o 'T')
+                cell.textContent = formattedDate; // Atualiza a célula com a data formatada
             });
         }
     </script>
