@@ -188,7 +188,8 @@ export namespace EventsManager
         }
     }
 
-    export const finishEventHandler: RequestHandler = async (req: Request, res: Response) => {
+    export const finishEventHandler: RequestHandler = 
+    async (req: Request, res: Response) => {
     
         // Verifica se o usuário está logado (sessão válida com token)
         if(!AccountsManager.isLoggedIn(req,res)) return;
@@ -352,6 +353,43 @@ export namespace EventsManager
             return;
         }
     }
+
+    export const getUserEventHandler: RequestHandler =
+    async (req: Request, res: Response) => {
+        // Verifica se o usuário está logado
+        if (!AccountsManager.isLoggedIn(req, res)) return;
+    
+        // Busca o ID do usuário com base no token da sessão
+        const id_user = await DataBaseManager.getUserID(req.cookies.token);
+        
+
+        const connection: OracleDB.Connection = await DataBaseManager.get_connection();
+    
+        try {
+            // Consulta base, com filtro por status e id do usuário
+            console.log('id:',id_user)
+            let consulta = `SELECT * FROM EVENTS WHERE FK_ID_USER = ${id_user}`;
+        
+    
+            const result: OracleDB.Result<Event> = await connection.execute(consulta);
+            
+            if (result.rows?.length === 0) {
+                res.statusCode = 200;
+                res.send({ array: [] });  // Envia uma lista vazia com a chave 'array' se não houver eventos
+            } else {
+                res.statusCode = 200;
+                res.send({ array: result.rows });  // Envia os dados dentro de um objeto com a chave 'array'
+            }
+        } catch (error) {
+            console.error("Erro ao obter eventos do usuário:", error);
+            res.statusCode = 500;
+            res.send("Erro ao processar a requisição");
+        } finally {
+            await connection.close();
+            return;
+        }
+    };
+    
 
     export const getEventQttyHandler: RequestHandler =
     async (req: Request, res: Response) => {
