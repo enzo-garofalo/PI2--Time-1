@@ -297,7 +297,8 @@
                 finishDate.value = eventData.FINISH_DATE.split("T")[0];
                 eventStatus.value = eventData.STATUS_EVENT;
                 betsFunds.value = eventData.BETS_FUNDS;
-                if (eventStatus.value === 'Aprovado' || eventStatus.value === 'Deletado' || eventStatus.value === 'Reprovado') {
+                if (eventStatus.value === 'Aprovado' || eventStatus.value === 'Deletado' || eventStatus.value === 'Reprovado' 
+                || eventStatus.value === 'Finalizado') {
                     cancelBtn.style.display = 'none'; // apenas eventos pendendes podem ser excluidos
                     deleteBtn.style.display = 'none';
                 }
