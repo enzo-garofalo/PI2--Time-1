@@ -124,74 +124,84 @@ export namespace dbEventsManager
         return totalBetsFunds.rows?.[0]?.VALUE_BET || 0;
     }
     
-    export async function shareEventFunds(idEvent: number, verdict: string) 
-    {
-        // Estabelece uma conexão com o banco de dados
-        let connection = await DataBaseManager.get_connection();
+    export async function shareEventFunds(idEvent: number, verdict: string) {
+        const connection:OracleDB.Connection = 
+        await DataBaseManager.get_connection();
+        try {
     
-        // Calcula o total de fundos apostados no evento
-        const totalEventFunds = await calculateBetsFunds(idEvent);
+            // Busca o total de fundos apostados no evento
+            const searchFunds: OracleDB.Result<{ TOTAL_EVENT_FUNDS: number }> = await connection.execute(
+                `
+                SELECT BETS_FUNDS AS TOTAL_EVENT_FUNDS
+                FROM EVENTS
+                WHERE ID_EVENT = :idEvent
+                `, { idEvent }
+            );
+            const totalEventFunds: number = searchFunds.rows?.[0]?.TOTAL_EVENT_FUNDS ?? 0;
     
-        // Conta o número de apostadores que acertaram o resultado (ganhadores)
-        const countWinners: OracleDB.Result<{TOTAL_BETTORS: number}> = 
-        await connection.execute(
-            `
-            SELECT COUNT(ID_USER) AS TOTAL_BETTORS
-            FROM BETS
-            WHERE ID_EVENT = :idEvent AND BET = :verdict
-            `, { idEvent, verdict }
-        );
-        console.log('Veredito: ', verdict);
-        // Obtém o número total de ganhadores
-        const totalWinners = countWinners.rows?.[0]?.TOTAL_BETTORS || 0;
-    
-        // Se houver ganhadores
-        if(totalWinners > 0){
-            // Calcula o valor que cada ganhador receberá
-            const winnersValue = totalEventFunds / totalWinners;
-    
-            // Recupera a lista dos IDs dos ganhadores
-            const idWinnersList: OracleDB.Result<{ID_USER: number}> =
-            await connection.execute(
-                `SELECT ID_USER
+            // Conta o número de ganhadores
+            const countWinners: OracleDB.Result<{ TOTAL_BETTORS: number }> = await connection.execute(
+                `
+                SELECT COUNT(ID_USER) AS TOTAL_BETTORS
                 FROM BETS
                 WHERE ID_EVENT = :idEvent AND BET = :verdict
                 `, { idEvent, verdict }
             );
-            console.log('winners: ', idWinnersList);
-            // Perguntar sobre batch processing para o mateues
-            // Se houver ganhadores na lista, processa cada um deles
-            if(idWinnersList.rows){
-                for(const winner of idWinnersList.rows || []) 
-                {
-                    // Obtém o ID do usuário ganhador
-                    const idUser = winner.ID_USER;
+            const totalWinners = countWinners.rows?.[0]?.TOTAL_BETTORS || 0;
     
-                    // Recupera o ID da carteira do usuário
-                    const idWallet = await DataBaseManager.getIdWallet(idUser);
-                    
-                    // Se o ID da carteira for encontrado, atualiza o saldo
-                    if(idWallet){
-                        await connection.execute(
-                            `UPDATE WALLETS
-                            SET BALANCE = (BALANCE + :winnersValue)
-                            WHERE FK_ID_USER = :fk_id_user`,
-                            { winnersValue: winnersValue, fk_id_user: idUser }
-                        );
-            
-                        // Cria um novo registro no histórico de transações
-                        const newTransaction: FundsManager.Historic = {
-                            fkIdWallet: Number(idWallet[0].ID_WALLET),
-                            typeTransaction: 'Ganho',  // Indica o tipo de transação como "Ganho"
-                            value: winnersValue  // Valor recebido pelo ganhador
-                        };
-                        await dbFundsManager.addLineHistoric(newTransaction);  // Adiciona a linha ao histórico
+            if (totalWinners > 0) {
+                const winnersValue = totalEventFunds / totalWinners;
+    
+                // Recupera IDs dos ganhadores
+                const idWinnersList: OracleDB.Result<{ ID_USER: number }> = await connection.execute(
+                    `
+                    SELECT ID_USER
+                    FROM BETS
+                    WHERE ID_EVENT = :idEvent AND BET = :verdict
+                    `, { idEvent, verdict }
+                );
+    
+                // Processa os ganhadores em paralelo
+                if (idWinnersList.rows) {
+                    for (const winner of idWinnersList.rows) {
+                        const idUser = winner.ID_USER;
+                        const idWallet = await DataBaseManager.getIdWallet(idUser);
+                
+                        if (idWallet) {
+                            // Atualiza o saldo da carteira do usuário
+                            await connection.execute(
+                                `
+                                UPDATE WALLETS
+                                SET BALANCE = (BALANCE + :winnersValue)
+                                WHERE FK_ID_USER = :fk_id_user
+                                `,
+                                { winnersValue, fk_id_user: idUser }
+                            );
+                
+                            // Faz um commit após atualizar a carteira
+                            await connection.commit();
+                
+                            // Cria um novo registro no histórico de transações
+                            const newTransaction: FundsManager.Historic = {
+                                fkIdWallet: Number(idWallet[0].ID_WALLET),
+                                typeTransaction: 'Ganho',
+                                value: winnersValue,
+                            };
+                
+                            // Adiciona a linha ao histórico
+                            await dbFundsManager.addLineHistoric(newTransaction);
+                        }
                     }
-                }
-                await connection.commit();  // Confirma as transações
+                }                
             }
-            // Fecha a conexão com o banco de dados após a distribuição dos fundos
-            await connection.close();
+        } catch (error) {
+            console.error('Erro ao compartilhar fundos do evento:', error);
+            throw error; // Propaga o erro para tratamento externo, se necessário
+        } finally {
+            // Garante que a conexão seja encerrada
+            if (connection) {
+                await connection.close();
+            }
         }
     }
     

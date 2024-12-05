@@ -1,5 +1,7 @@
 import {Request, RequestHandler, Response} from "express";
 import { AccountsManager } from "../accounts/accounts";
+import { FundsManager } from "../funds/funds";
+import { dbFundsManager } from "../funds/databaseFunds";
 import { DataBaseManager } from "../db/connection";
 import { dbBetsManager } from "./databaseBets";
 import { dbEventsManager } from "../events/databaseEvent";
@@ -39,7 +41,19 @@ export namespace betsManager
 
         // Verifica o saldo do usuário antes de permitir a aposta
         const userWallet = await DataBaseManager.getWalletByID(IdUser);
+        if(userWallet)
+        {
+            const newTransaction: FundsManager.Historic = {
+                fkIdWallet: Number(userWallet[0].ID_WALLET),
+                typeTransaction: 'Apostou',
+                value: pBetValue,
+            };
+            
+            await dbFundsManager.addLineHistoric(newTransaction);
+        }
         const userBalance = userWallet?.[0].BALANCE;
+
+        // Adiciona a linha ao histórico
 
         if(userBalance === undefined || pBetValue <= 0 || pBetValue > userBalance){
             res.status(400).send(`Não foi possível apostar no evento!\n\

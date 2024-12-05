@@ -99,7 +99,7 @@ export namespace dbFundsManager
             SELECT * 
             FROM HISTORIC 
             WHERE FK_ID_WALLET = :idwallet 
-            ORDER BY TRANSACTION_ID 
+            ORDER BY TRANSACTION_DATE DESC
             OFFSET :startRecord ROWS FETCH NEXT :pagesize ROWS ONLY
             `,
             [id_wallet, startRecord, pageSize]
